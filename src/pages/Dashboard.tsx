@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 type FileItem = {
   key: string;
   url: string;
@@ -11,13 +12,16 @@ type FileWithStatus = {
 };
 
 const userId = localStorage.getItem("username") || "";
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || "";
 
 export default function Dashboard() {
   const [folders, setFolders] = useState<string[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
   const [uploadQueue, setUploadQueue] = useState<FileWithStatus[]>([]);
+
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
 
   const fetchFiles = async (prefix: string) => {
     try {
@@ -56,7 +60,10 @@ export default function Dashboard() {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const newFiles: FileWithStatus[] = Array.from(e.target.files).map((file) => ({ file, status: "pending" }));
+    const newFiles: FileWithStatus[] = Array.from(e.target.files).map((file) => ({
+      file,
+      status: "pending",
+    }));
     setUploadQueue((prev) => [...prev, ...newFiles]);
     for (const fileObj of newFiles) {
       await uploadFile(fileObj);
@@ -66,7 +73,9 @@ export default function Dashboard() {
 
   const uploadFile = async (fileObj: FileWithStatus) => {
     setUploadQueue((prev) =>
-      prev.map((f) => (f.file === fileObj.file ? { ...f, status: "uploading", errorMsg: undefined } : f))
+      prev.map((f) =>
+        f.file === fileObj.file ? { ...f, status: "uploading", errorMsg: undefined } : f
+      )
     );
     try {
       const token = localStorage.getItem("token");
@@ -109,6 +118,37 @@ export default function Dashboard() {
     }
   };
 
+  const createFolder = async () => {
+    if (!newFolderName.trim()) return alert("Folder name cannot be empty");
+
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("username");
+      if (!token || !userId) throw new Error("Not authenticated");
+
+      const res = await fetch(`${API_URL}/createFolder`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          prefix: currentPrefix,
+          folderName: newFolderName.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create folder");
+
+      setNewFolderName("");
+      setIsCreatingFolder(false);
+      fetchFiles(currentPrefix);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const filteredFiles = files.filter(({ key }) =>
     key.startsWith(`${userId}/${currentPrefix}`) &&
     !key.slice(`${userId}/${currentPrefix}`.length).includes("/")
@@ -123,88 +163,188 @@ export default function Dashboard() {
     }));
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="shadow-md px-6 py-4 flex justify-between items-center sticky top-0 bg-white z-10">
-        <h1 className="text-2xl font-bold text-blue-600">My Drive</h1>
-        <label className="cursor-pointer bg-blue-600 text-white px-5 py-2 rounded-md shadow hover:bg-blue-700">
-          Upload
-          <input type="file" multiple className="hidden" onChange={handleUpload} />
-        </label>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Top bar */}
+      <header className="flex items-center justify-between bg-white shadow-md px-8 py-4 sticky top-0 z-20">
+        <h1 className="text-3xl font-extrabold text-blue-700 tracking-tight select-none">
+          My Drive
+        </h1>
+
+        <div className="flex items-center gap-4">
+          {!isCreatingFolder ? (
+            <button
+              onClick={() => setIsCreatingFolder(true)}
+              className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              aria-label="Create new folder"
+            >
+              + New Folder
+            </button>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Folder name"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") createFolder();
+                  if (e.key === "Escape") {
+                    setIsCreatingFolder(false);
+                    setNewFolderName("");
+                  }
+                }}
+              />
+              <button
+                onClick={createFolder}
+                className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              >
+                Create
+              </button>
+              <button
+                onClick={() => {
+                  setIsCreatingFolder(false);
+                  setNewFolderName("");
+                }}
+                className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none"
+                aria-label="Cancel folder creation"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-150 font-semibold select-none"
+          >
+            Upload
+            <input
+              id="file-upload"
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleUpload}
+            />
+          </label>
+        </div>
       </header>
 
-      <main className="p-6 flex flex-col gap-6 flex-grow max-w-7xl mx-auto w-full">
-        <nav className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-          <button onClick={() => fetchFiles("")} className="hover:underline font-medium">Drive</button>
-          {breadcrumbs.length > 0 && <span>/</span>}
-          {breadcrumbs.map(({ name, prefix }, i) => (
-            <React.Fragment key={prefix}>
-              <button onClick={() => fetchFiles(prefix)} className="hover:underline">
-                {name}
-              </button>
-              {i < breadcrumbs.length - 1 && <span>/</span>}
-            </React.Fragment>
-          ))}
-        </nav>
+      {/* Breadcrumbs */}
+      <nav className="bg-white px-8 py-3 flex items-center text-sm text-gray-600 select-none">
+        <button
+          className="hover:underline font-medium"
+          onClick={() => fetchFiles("")}
+          aria-label="Go to root directory"
+        >
+          Drive
+        </button>
+        {breadcrumbs.length > 0 && <span className="mx-2">/</span>}
+        {breadcrumbs.map(({ name, prefix }, i) => (
+          <React.Fragment key={prefix}>
+            <button
+              className="hover:underline"
+              onClick={() => fetchFiles(prefix)}
+              aria-label={`Go to folder ${name}`}
+            >
+              {name}
+            </button>
+            {i < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
+          </React.Fragment>
+        ))}
+      </nav>
 
+      {/* Main content */}
+      <main className="flex-grow max-w-7xl mx-auto px-8 py-6 grid grid-cols-1 gap-10">
+        {/* Folders */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">Folders</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Folders</h2>
           {folders.length === 0 ? (
-            <p className="italic text-gray-400">No folders</p>
+            <p className="italic text-gray-400">No folders available</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {folders.map((folder) => (
                 <button
                   key={folder}
                   onClick={() => enterFolder(folder)}
-                  className="flex flex-col items-center p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50 hover:bg-blue-50"
+                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  aria-label={`Open folder ${folder}`}
                 >
-                  <span className="text-4xl">📁</span>
-                  <span className="mt-2 text-sm truncate w-full text-center">{folder}</span>
+                  <div className="text-6xl text-yellow-400 group-hover:text-yellow-500 transition-colors">
+                    📁
+                  </div>
+                  <span
+                    className="mt-3 text-sm font-medium text-gray-700 truncate max-w-full"
+                    title={folder}
+                  >
+                    {folder}
+                  </span>
                 </button>
               ))}
             </div>
           )}
         </section>
 
+        {/* Files */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">Files</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Files</h2>
           {filteredFiles.length === 0 ? (
-            <p className="italic text-gray-400">No files</p>
+            <p className="italic text-gray-400">No files available</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {filteredFiles.map(({ key, url }) => (
                 <a
                   key={key}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50 hover:bg-green-50"
+                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+                  aria-label={`Open file ${key.split("/").pop()}`}
                 >
-                  <span className="text-4xl">📄</span>
-                  <span className="mt-2 text-sm truncate w-full text-center">{key.split("/").pop()}</span>
+                  <div className="text-6xl text-blue-400 group-hover:text-blue-600 transition-colors">
+                    📄
+                  </div>
+                  <span
+                    className="mt-3 text-sm font-medium text-gray-700 truncate max-w-full"
+                    title={key.split("/").pop()}
+                  >
+                    {key.split("/").pop()}
+                  </span>
                 </a>
               ))}
             </div>
           )}
         </section>
 
+        {/* Upload Status */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">Upload Status</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Upload Status</h2>
           {uploadQueue.length === 0 ? (
-            <p className="italic text-gray-400">No uploads yet</p>
+            <p className="italic text-gray-400">No uploads in progress</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-3 max-w-xl">
               {uploadQueue.map(({ file, status, errorMsg }) => (
-                <li key={file.name} className="flex justify-between items-center border border-gray-200 p-2 rounded shadow-sm">
-                  <span className="truncate max-w-xs text-sm">{file.name}</span>
-                  <span className="text-sm">
-                    {status === "pending" && <span className="text-gray-500">Pending</span>}
-                    {status === "uploading" && <span className="text-yellow-600">Uploading...</span>}
-                    {status === "success" && <span className="text-green-600">Uploaded ✓</span>}
-                    {status === "error" && (
-                      <span className="text-red-600" title={errorMsg}>Error ❌</span>
-                    )}
+                <li
+                  key={file.name}
+                  className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                >
+                  <span className="text-gray-800 truncate max-w-[70%]" title={file.name}>
+                    {file.name}
                   </span>
+                  {status === "uploading" && (
+                    <span className="text-blue-600 font-semibold animate-pulse">
+                      Uploading...
+                    </span>
+                  )}
+                  {status === "success" && (
+                    <span className="text-green-600 font-semibold">Uploaded ✓</span>
+                  )}
+                  {status === "error" && (
+                    <span className="text-red-600 font-semibold" title={errorMsg}>
+                      Failed ✗
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
