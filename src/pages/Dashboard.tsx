@@ -258,7 +258,20 @@ export default function Dashboard() {
               onChange={handleUpload}
             />
           </label>
+          <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            // Optionally redirect or reload
+            window.location.reload();
+          }}
+          className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
+          aria-label="Logout"
+        >
+          Logout
+        </button>
         </div>
+        
       </header>
 
       {/* Breadcrumbs */}

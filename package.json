@@ -10,8 +10,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
     "amazon-cognito-identity-js": "^6.3.15",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
@@ -46,6 +44,8 @@
     ]
   },
   "devDependencies": {
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17"
