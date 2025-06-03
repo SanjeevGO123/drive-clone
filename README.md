@@ -40,7 +40,7 @@ project-root/              # React app
 ├── public/
 ├── src/
 │   ├── pages/
-│   ├── secrets/config.ts     # Local config (ignored in git)
+│   ├── .env.development     # Local config (ignored in git)
 │   ├── App.tsx
 │   └── ...
 │   └── ...
@@ -49,7 +49,7 @@ project-root/              # React app
     └── generatepresignedURL.ts
 ```
 
-> 🔐 `src/secrets/config.ts` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
+> 🔐 `.env.development` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
 
 ---
 
@@ -67,18 +67,12 @@ project-root/              # React app
 npm install
 ```
 
-Create `src/secrets/config.ts`:
+Create `.env.development` in the root of the React app with the following content:
 
-```ts
-const REACT_APP_API_URL = "https://your-api-gateway-url";
-const USER_POOL_ID = 'your_user_pool_id';
-const CLIENT_ID = 'your_cognito_app_client_id';
-
-export default {
-  REACT_APP_API_URL,
-  USER_POOL_ID,
-  CLIENT_ID
-};
+```env
+REACT_APP_API_URL=https://your-api-gateway-url
+REACT_APP_COGNITO_USER_POOL_ID=your_cognito_user_pool_id
+REACT_APP_COGNITO_CLIENT_ID=your_cognito_app_client_id
 ```
 
 Then run:

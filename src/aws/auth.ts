@@ -3,10 +3,14 @@ import {
   CognitoUser,
   AuthenticationDetails
 } from 'amazon-cognito-identity-js';
-import config from '../secrets/config';
+const USER_POOL_ID = process.env.REACT_APP_USER_POOL_ID;
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+if (!USER_POOL_ID || !CLIENT_ID) {
+  throw new Error("Missing Cognito User Pool ID or Client ID in environment variables");
+}
 const poolData = {
-  UserPoolId: config.USER_POOL_ID,
-  ClientId: config.CLIENT_ID
+  UserPoolId: USER_POOL_ID,
+  ClientId: CLIENT_ID
 };
 
 const userPool = new CognitoUserPool(poolData);

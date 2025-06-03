@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import config from "../secrets/config";
-
 type FileItem = {
   key: string;
   url: string;
@@ -13,7 +11,7 @@ type FileWithStatus = {
 };
 
 const userId = localStorage.getItem("username") || "";
-const API_URL = config.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Dashboard() {
   const [folders, setFolders] = useState<string[]>([]);
