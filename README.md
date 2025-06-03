@@ -1,46 +1,147 @@
-# Getting Started with Create React App
+# 🚀 Drive Clone - Google Drive Inspired Cloud Storage App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack, AWS-native cloud storage solution inspired by Google Drive. Built using a modern React frontend with AWS Cognito authentication and a serverless backend deployed using AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🧰 Tech Stack
 
-### `npm start`
+### Frontend:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+* React + TypeScript
+* TailwindCSS for styling
+* AWS Cognito (via `amazon-cognito-identity-js`) for authentication
+* Hosted on S3 + CloudFront CDN
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Backend:
 
-### `npm test`
+* Serverless AWS Lambda functions:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  * `getFiles.ts` - Lists files and folders for a user
+  * `generatepresignedURL.ts` - Provides presigned URLs for file uploads
+* Secured by API Gateway (JWT auth via Cognito)
+* File storage in Amazon S3 (organized per user)
+* Metadata stored in DynamoDB (optional, for additional features)
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🔒 Authentication Flow
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* AWS Cognito User Pools handle sign-up, login, and token issuance
+* Frontend uses the Cognito SDK to authenticate users and get a JWT token
+* All backend API requests require a valid `Authorization: Bearer <token>` header
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 📁 Folder Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+project-root/
+├── frontend/                # React app
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── secrets/config.ts     # Local config (ignored in git)
+│   │   ├── App.tsx
+│   │   └── ...
+│   └── ...
+└── backend/                # Lambda functions
+    ├── getFiles.ts
+    └── generatepresignedURL.ts
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+> 🔐 `frontend/src/secrets/config.ts` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 🛠️ Local Development
 
-## Learn More
+### Prerequisites
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* Node.js >= 18
+* AWS Account
+* AWS CLI configured
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Setup Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Create `src/secrets/config.ts`:
+
+```ts
+const REACT_APP_API_URL = "https://your-api-gateway-url";
+const USER_POOL_ID = 'your_user_pool_id';
+const CLIENT_ID = 'your_cognito_app_client_id';
+
+export default {
+  REACT_APP_API_URL,
+  USER_POOL_ID,
+  CLIENT_ID
+};
+```
+
+Then run:
+
+```bash
+npm start
+```
+
+### Deploy Backend
+
+Ensure each file is individually deployed as a Lambda function:
+
+* `getFiles.ts`
+* `generatepresignedURL.ts`
+
+Both should:
+
+* Be protected behind API Gateway with Cognito JWT authorizer
+* Have access to the S3 bucket and DynamoDB (if used)
+* Use environment variables for sensitive data (e.g., S3 bucket name)
+---
+
+## 🧪 Features
+
+* 🔐 Secure Cognito login/signup
+* 📁 Hierarchical folder navigation with breadcrumbs
+* 📤 Drag-and-drop or multi-select file uploads
+* 🖼️ Google Drive-like UI built with Tailwind
+* ☁️ Real-time fetch of files/folders using Lambda
+* 🔗 Secure presigned S3 URLs for direct uploads
+
+---
+
+## 🚀 Deployment
+
+* **Frontend**: Build and upload to S3 bucket
+
+```bash
+npm run build
+aws s3 sync dist/ s3://your-frontend-bucket-name
+```
+
+* **Backend**: Deploy each TypeScript function via Lambda (can use AWS Console or SAM/CDK for IaC)
+* **CDN**: Configure CloudFront with S3 origin for frontend and API Gateway as the backend for API routes
+* **API Gateway**: Set up routes for Lambda functions with Cognito authorizer
+* **Cognito**: Create a User Pool and App Client, configure domain, and set up sign-in/sign-up pages
+* **S3**: Create a bucket for file storage, set permissions, and enable CORS
+* **DynamoDB**: (Optional) Create a table for storing file metadata if needed
+* **CI/CD**: Use AWS CodePipeline for automated deployments
+
+---
+
+## 🧼 Best Practices
+
+* Keep sensitive data in `config.ts` and `.gitignore` it
+* Enable CORS and secure headers in API Gateway
+* Use IAM roles to restrict Lambda and S3 access
+* Enable CloudWatch logs for monitoring
+
+---
+
+## 🤝 Acknowledgements
+
+Inspired by the Google Drive UX. Built for modern cloud-native app deployment on AWS.
