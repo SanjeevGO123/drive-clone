@@ -36,21 +36,20 @@ A full-stack, AWS-native cloud storage solution inspired by Google Drive. Built 
 ## 📁 Folder Structure
 
 ```
-project-root/
-├── frontend/                # React app
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── secrets/config.ts     # Local config (ignored in git)
-│   │   ├── App.tsx
-│   │   └── ...
+project-root/              # React app
+├── public/
+├── src/
+│   ├── pages/
+│   ├── secrets/config.ts     # Local config (ignored in git)
+│   ├── App.tsx
+│   └── ...
 │   └── ...
 └── backend/                # Lambda functions
     ├── getFiles.ts
     └── generatepresignedURL.ts
 ```
 
-> 🔐 `frontend/src/secrets/config.ts` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
+> 🔐 `src/secrets/config.ts` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
 
 ---
 
@@ -65,7 +64,6 @@ project-root/
 ### Setup Frontend
 
 ```bash
-cd frontend
 npm install
 ```
 
