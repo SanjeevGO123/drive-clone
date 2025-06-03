@@ -15,6 +15,27 @@ const userId = localStorage.getItem("username") || "";
 const API_URL = process.env.REACT_APP_API_URL || "";
 
 export default function Dashboard() {
+  // Dark mode state
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("darkMode");
+      if (saved !== null) return saved === "true";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  // Apply or remove dark class on <html>
+  useEffect(() => {
+    const html = document.documentElement;
+    if (darkMode) {
+      html.classList.add("dark");
+    } else {
+      html.classList.remove("dark");
+    }
+    localStorage.setItem("darkMode", darkMode.toString());
+  }, [darkMode]);
+
   const [folders, setFolders] = useState<string[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
@@ -163,14 +184,23 @@ export default function Dashboard() {
     }));
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Top bar */}
-      <header className="flex items-center justify-between bg-white shadow-md px-8 py-4 sticky top-0 z-20">
-        <h1 className="text-3xl font-extrabold text-blue-700 tracking-tight select-none">
+      <header className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-8 py-4 sticky top-0 z-20">
+        <h1 className="text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
           My Drive
         </h1>
 
         <div className="flex items-center gap-4">
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Toggle Dark Mode"
+          >
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+
           {!isCreatingFolder ? (
             <button
               onClick={() => setIsCreatingFolder(true)}
@@ -187,7 +217,7 @@ export default function Dashboard() {
                 placeholder="Folder name"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") createFolder();
                   if (e.key === "Escape") {
@@ -207,7 +237,7 @@ export default function Dashboard() {
                   setIsCreatingFolder(false);
                   setNewFolderName("");
                 }}
-                className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none"
+                className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200"
                 aria-label="Cancel folder creation"
               >
                 ✕
@@ -232,7 +262,7 @@ export default function Dashboard() {
       </header>
 
       {/* Breadcrumbs */}
-      <nav className="bg-white px-8 py-3 flex items-center text-sm text-gray-600 select-none">
+      <nav className="bg-white dark:bg-gray-800 px-8 py-3 flex items-center text-sm text-gray-600 dark:text-gray-400 select-none">
         <button
           className="hover:underline font-medium"
           onClick={() => fetchFiles("")}
@@ -259,23 +289,23 @@ export default function Dashboard() {
       <main className="flex-grow max-w-7xl mx-auto px-8 py-6 grid grid-cols-1 gap-10">
         {/* Folders */}
         <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Folders</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Folders</h2>
           {folders.length === 0 ? (
-            <p className="italic text-gray-400">No folders available</p>
+            <p className="italic text-gray-400 dark:text-gray-500">No folders available</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {folders.map((folder) => (
                 <button
                   key={folder}
                   onClick={() => enterFolder(folder)}
-                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   aria-label={`Open folder ${folder}`}
                 >
-                  <div className="text-6xl text-yellow-400 group-hover:text-yellow-500 transition-colors">
+                  <div className="text-6xl text-yellow-400 dark:text-yellow-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors">
                     📁
                   </div>
                   <span
-                    className="mt-3 text-sm font-medium text-gray-700 truncate max-w-full"
+                    className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
                     title={folder}
                   >
                     {folder}
@@ -288,68 +318,79 @@ export default function Dashboard() {
 
         {/* Files */}
         <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Files</h2>
-          {filteredFiles.length === 0 ? (
-            <p className="italic text-gray-400">No files available</p>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Files</h2>
+          {files.length === 0 ? (
+            <p className="italic text-gray-400 dark:text-gray-500">No files available</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {filteredFiles.map(({ key, url }) => (
-                <a
-                  key={key}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-green-400"
-                  aria-label={`Open file ${key.split("/").pop()}`}
-                >
-                  <div className="text-6xl text-blue-400 group-hover:text-blue-600 transition-colors">
-                    📄
-                  </div>
-                  <span
-                    className="mt-3 text-sm font-medium text-gray-700 truncate max-w-full"
-                    title={key.split("/").pop()}
+              {files.map(({ key, url }) => {
+                // Extract file name relative to userId and prefix
+                const fileName = key.slice(`${userId}/${currentPrefix}`.length);
+                return (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    key={key}
+                    className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    aria-label={`Open file ${fileName}`}
                   >
-                    {key.split("/").pop()}
-                  </span>
-                </a>
-              ))}
+                    <div className="text-6xl text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors select-none">
+                      📄
+                    </div>
+                    <span
+                      className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
+                      title={fileName}
+                    >
+                      {fileName}
+                    </span>
+                  </a>
+                );
+              })}
             </div>
           )}
         </section>
 
         {/* Upload Status */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Upload Status</h2>
-          {uploadQueue.length === 0 ? (
-            <p className="italic text-gray-400">No uploads in progress</p>
-          ) : (
-            <ul className="space-y-3 max-w-xl">
+        {uploadQueue.length > 0 && (
+          <section>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Upload Status</h2>
+            <ul className="space-y-2">
               {uploadQueue.map(({ file, status, errorMsg }) => (
                 <li
-                  key={file.name}
-                  className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                  key={file.name + file.size}
+                  className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-md shadow-sm dark:shadow-gray-600"
                 >
-                  <span className="text-gray-800 truncate max-w-[70%]" title={file.name}>
+                  <span className="truncate max-w-xs text-gray-800 dark:text-gray-200">
                     {file.name}
                   </span>
-                  {status === "uploading" && (
-                    <span className="text-blue-600 font-semibold animate-pulse">
-                      Uploading...
-                    </span>
-                  )}
-                  {status === "success" && (
-                    <span className="text-green-600 font-semibold">Uploaded ✓</span>
-                  )}
-                  {status === "error" && (
-                    <span className="text-red-600 font-semibold" title={errorMsg}>
-                      Failed ✗
-                    </span>
-                  )}
+                  <span
+                    className={`font-semibold ${
+                      status === "success"
+                        ? "text-green-600 dark:text-green-400"
+                        : status === "error"
+                        ? "text-red-600 dark:text-red-400"
+                        : status === "uploading"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}
+                    title={errorMsg || undefined}
+                  >
+                    {status === "pending"
+                      ? "Pending"
+                      : status === "uploading"
+                      ? "Uploading..."
+                      : status === "success"
+                      ? "Uploaded"
+                      : status === "error"
+                      ? `Error: ${errorMsg}`
+                      : ""}
+                  </span>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
+          </section>
+        )}
       </main>
     </div>
   );
