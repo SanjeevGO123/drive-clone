@@ -127,7 +127,7 @@ aws s3 sync dist/ s3://your-frontend-bucket-name
 
 ## 🧼 Best Practices
 
-* Keep sensitive data in `config.ts` and `.gitignore` it
+* Keep sensitive data in `.env.development` and `.gitignore` it
 * Enable CORS and secure headers in API Gateway
 * Use IAM roles to restrict Lambda and S3 access
 * Enable CloudWatch logs for monitoring
