@@ -48,6 +48,10 @@ export default function Dashboard() {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
 
+  // Add state for options menu
+  const [fileOptionsAnchor, setFileOptionsAnchor] = useState<string | null>(null);
+  const [folderOptionsAnchor, setFolderOptionsAnchor] = useState<string | null>(null);
+
   const fetchFiles = async (prefix: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -176,6 +180,50 @@ export default function Dashboard() {
 
       setNewFolderName("");
       setIsCreatingFolder(false);
+      fetchFiles(currentPrefix);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  // Delete file API call
+  const deleteFile = async (fileKey: string) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("username");
+      if (!token || !userId) throw new Error("Not authenticated");
+      const res = await fetch(`${API_URL}/deleteFile`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, fileKey }),
+      });
+      if (!res.ok) throw new Error("Failed to delete file");
+      fetchFiles(currentPrefix);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  // Delete folder API call
+  const deleteFolder = async (folderName: string) => {
+    if (!window.confirm("Are you sure you want to delete this folder and all its contents?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("username");
+      if (!token || !userId) throw new Error("Not authenticated");
+      const res = await fetch(`${API_URL}/deleteFolder`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, prefix: currentPrefix, folderName }),
+      });
+      if (!res.ok) throw new Error("Failed to delete folder");
       fetchFiles(currentPrefix);
     } catch (err: any) {
       alert(err.message);
@@ -370,22 +418,47 @@ export default function Dashboard() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {folders.map((folder) => (
-                <button
-                  key={folder}
-                  onClick={() => enterFolder(folder)}
-                  className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  aria-label={`Open folder ${folder}`}
-                >
-                  <div className="text-6xl text-yellow-400 dark:text-yellow-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors">
-                    📁
-                  </div>
-                  <span
-                    className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
-                    title={folder}
+                <div key={folder} className="relative group">
+                  <button
+                    onClick={() => enterFolder(folder)}
+                    className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                    aria-label={`Open folder ${folder}`}
                   >
-                    {folder}
-                  </span>
-                </button>
+                    <div className="text-6xl text-yellow-400 dark:text-yellow-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors">
+                      📁
+                    </div>
+                    <span
+                      className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
+                      title={folder}
+                    >
+                      {folder}
+                    </span>
+                  </button>
+                  {/* 3-dots button for folder */}
+                  <button
+                    className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFolderOptionsAnchor(folderOptionsAnchor === folder ? null : folder);
+                    }}
+                  >
+                    <span className="text-lg">⋮</span>
+                  </button>
+                  {/* Folder options dropdown */}
+                  {folderOptionsAnchor === folder && (
+                    <div className="absolute right-2 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md z-20">
+                      <button
+                        className="block w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                        onClick={() => {
+                          setFolderOptionsAnchor(null);
+                          deleteFolder(folder);
+                        }}
+                      >
+                        Delete Folder
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -426,7 +499,30 @@ export default function Dashboard() {
                         {fileName}
                       </span>
                     </button>
-
+                    {/* 3-dots button for file */}
+                    <button
+                      className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFileOptionsAnchor(fileOptionsAnchor === key ? null : key);
+                      }}
+                    >
+                      <span className="text-lg">⋮</span>
+                    </button>
+                    {/* File options dropdown */}
+                    {fileOptionsAnchor === key && (
+                      <div className="absolute right-2 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md z-20">
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                          onClick={() => {
+                            setFileOptionsAnchor(null);
+                            deleteFile(key);
+                          }}
+                        >
+                          Delete File
+                        </button>
+                      </div>
+                    )}
                     {/* Hover Preview */}
                     {hoveredFile?.key === key && (
                       <div className="absolute z-10 left-full ml-2 top-0 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3">
