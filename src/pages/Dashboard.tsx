@@ -52,6 +52,18 @@ export default function Dashboard() {
   const [fileOptionsAnchor, setFileOptionsAnchor] = useState<string | null>(null);
   const [folderOptionsAnchor, setFolderOptionsAnchor] = useState<string | null>(null);
 
+  // Toast and Modal state
+  const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    type: 'file' | 'folder' | null;
+    target: string | null;
+    onConfirm: (() => void) | null;
+    name: string;
+  }>(
+    { open: false, type: null, target: null, onConfirm: null, name: '' }
+  );
+
   const fetchFiles = async (prefix: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -186,9 +198,20 @@ export default function Dashboard() {
     }
   };
 
+  // Toast helpers
+  const showToast = (message: string, type: 'error' | 'success' = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Open confirm modal
+  const openDeleteConfirm = (type: 'file' | 'folder', target: string, name: string, onConfirm: () => void) => {
+    setConfirmModal({ open: true, type, target, onConfirm, name });
+  };
+  const closeConfirmModal = () => setConfirmModal({ open: false, type: null, target: null, onConfirm: null, name: '' });
+
   // Delete file API call
   const deleteFile = async (fileKey: string) => {
-    if (!window.confirm("Are you sure you want to delete this file?")) return;
     try {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
@@ -203,14 +226,14 @@ export default function Dashboard() {
       });
       if (!res.ok) throw new Error("Failed to delete file");
       fetchFiles(currentPrefix);
+      showToast("File deleted", "success");
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete file", "error");
     }
   };
 
   // Delete folder API call
   const deleteFolder = async (folderName: string) => {
-    if (!window.confirm("Are you sure you want to delete this folder and all its contents?")) return;
     try {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
@@ -225,8 +248,9 @@ export default function Dashboard() {
       });
       if (!res.ok) throw new Error("Failed to delete folder");
       fetchFiles(currentPrefix);
+      showToast("Folder deleted", "success");
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete folder", "error");
     }
   };
 
@@ -290,22 +314,67 @@ export default function Dashboard() {
     setPreviewLoading(false);
   };
 
+  // Google Drive style: grid/list toggle, selection, toolbar, styled cards, prominent breadcrumbs, empty state
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const toggleSelect = (key: string) => {
+    setSelected((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) newSet.delete(key);
+      else newSet.add(key);
+      return newSet;
+    });
+  };
+  const clearSelection = () => setSelected(new Set());
+  const isSelected = (key: string) => selected.has(key);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Top bar */}
       <header className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-8 py-4 sticky top-0 z-20">
-        <h1 className="text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
-          My Drive
-        </h1>
-
         <div className="flex items-center gap-4">
-          {/* Dark mode toggle */}
+          <h1 className="text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
+            My Drive
+          </h1>
+          {/* Breadcrumbs styled like Google Drive */}
+          <nav className="ml-6 flex items-center text-base text-gray-600 dark:text-gray-400 select-none">
+            <button
+              className="hover:underline font-medium text-blue-600 dark:text-blue-300"
+              onClick={() => fetchFiles("")}
+              aria-label="Go to root directory"
+            >
+              Drive
+            </button>
+            {breadcrumbs.length > 0 && <span className="mx-2">/</span>}
+            {breadcrumbs.map(({ name, prefix }, i) => (
+              <React.Fragment key={prefix}>
+                <button
+                  className="hover:underline text-blue-600 dark:text-blue-300"
+                  onClick={() => fetchFiles(prefix)}
+                  aria-label={`Go to folder ${name}`}
+                >
+                  {name}
+                </button>
+                {i < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
+              </React.Fragment>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
           <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            aria-label="Toggle Dark Mode"
+            className={`px-2 py-1 rounded ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`}
+            onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
           >
-            {darkMode ? "Light Mode" : "Dark Mode"}
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${viewMode === 'list' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`}
+            onClick={() => setViewMode('list')}
+            aria-label="List view"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="2" rx="1"/><rect x="4" y="11" width="16" height="2" rx="1"/><rect x="4" y="16" width="16" height="2" rx="1"/></svg>
           </button>
 
           {!isCreatingFolder ? (
@@ -380,63 +449,194 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Breadcrumbs */}
-      <nav className="bg-white dark:bg-gray-800 px-8 py-3 flex items-center text-sm text-gray-600 dark:text-gray-400 select-none">
-        <button
-          className="hover:underline font-medium"
-          onClick={() => fetchFiles("")}
-          aria-label="Go to root directory"
-        >
-          Drive
-        </button>
-        {breadcrumbs.length > 0 && <span className="mx-2">/</span>}
-        {breadcrumbs.map(({ name, prefix }, i) => (
-          <React.Fragment key={prefix}>
-            <button
-              className="hover:underline"
-              onClick={() => fetchFiles(prefix)}
-              aria-label={`Go to folder ${name}`}
-            >
-              {name}
-            </button>
-            {i < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
-          </React.Fragment>
-        ))}
-      </nav>
+      {/* Toolbar for actions */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-2 px-8 py-2 bg-blue-50 dark:bg-blue-900 border-b border-blue-200 dark:border-blue-700 sticky top-[72px] z-10">
+          <span className="text-blue-700 dark:text-blue-300 font-medium">{selected.size} selected</span>
+          <button
+            className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+            onClick={() => {
+              // Delete all selected (files and folders) with confirmation
+              const toDelete = Array.from(selected);
+              if (toDelete.length === 1) {
+                const key = toDelete[0];
+                const isFolder = folders.includes(key);
+                openDeleteConfirm(
+                  isFolder ? 'folder' : 'file',
+                  key,
+                  isFolder ? key : key.slice(`${userId}/${currentPrefix}`.length),
+                  () => {
+                    if (isFolder) deleteFolder(key);
+                    else deleteFile(key);
+                    clearSelection();
+                  }
+                );
+              } else {
+                openDeleteConfirm(
+                  'file',
+                  '',
+                  `${toDelete.length} items`,
+                  () => {
+                    toDelete.forEach((key) => {
+                      const isFolder = folders.includes(key);
+                      if (isFolder) deleteFolder(key);
+                      else deleteFile(key);
+                    });
+                    clearSelection();
+                  }
+                );
+              }
+            }}
+          >
+            Delete
+          </button>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+            onClick={clearSelection}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
-      {/* Main content */}
-      <main className="flex-grow max-w-7xl mx-auto px-8 py-6 grid grid-cols-1 gap-10">
-        {/* Folders */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-            Folders
-          </h2>
-          {folders.length === 0 ? (
-            <p className="italic text-gray-400 dark:text-gray-500">
-              No folders available
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {folders.map((folder) => (
-                <div key={folder} className="relative group">
-                  <button
-                    onClick={() => enterFolder(folder)}
-                    className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
-                    aria-label={`Open folder ${folder}`}
-                  >
-                    <div className="text-6xl text-yellow-400 dark:text-yellow-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors">
-                      📁
-                    </div>
-                    <span
-                      className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
-                      title={folder}
+      <main className="flex-grow max-w-7xl mx-auto px-8 py-6">
+        {/* Folders and Files in grid or list view */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {/* Folders */}
+            {folders.map((folder) => (
+              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''}`}
+                onClick={(e) => {
+                  if (e.ctrlKey || e.metaKey) toggleSelect(folder);
+                  else if (selected.size > 0) {
+                    if (isSelected(folder)) toggleSelect(folder);
+                    else setSelected(new Set([folder]));
+                  } else enterFolder(folder);
+                }}
+              >
+                {/* Selection checkmark */}
+                {isSelected(folder) && (
+                  <span className="absolute top-2 left-2 bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
+                )}
+                {/* 3-dots button for folder */}
+                <button
+                  className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFolderOptionsAnchor(folderOptionsAnchor === folder ? null : folder);
+                  }}
+                >
+                  <span className="text-lg">⋮</span>
+                </button>
+                {/* Dropdown menu for folder */}
+                {folderOptionsAnchor === folder && (
+                  <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
+                    <button
+                      className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFolderOptionsAnchor(null);
+                        openDeleteConfirm('folder', folder, folder, () => deleteFolder(folder));
+                      }}
                     >
-                      {folder}
-                    </span>
-                  </button>
-                  {/* 3-dots button for folder */}
+                      Delete
+                    </button>
+                  </div>
+                )}
+                {/* Folder icon and name */}
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="text-6xl text-yellow-400 dark:text-yellow-300 mb-2">📁</div>
+                  <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base" title={folder}>{folder}</span>
+                </div>
+              </div>
+            ))}
+            {/* Files */}
+            {files.map(({ key, url }) => {
+              const fileName = key.slice(`${userId}/${currentPrefix}`.length);
+              return (
+                <div key={key} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''}`}
+                  onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey) toggleSelect(key);
+                    else if (selected.size > 0) {
+                      if (isSelected(key)) toggleSelect(key);
+                      else setSelected(new Set([key]));
+                    } else openFilePreview({ key, url });
+                  }}
+                >
+                  {/* Selection checkmark */}
+                  {isSelected(key) && (
+                    <span className="absolute top-2 left-2 bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
+                  )}
+                  {/* 3-dots button for file */}
                   <button
                     className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFileOptionsAnchor(fileOptionsAnchor === key ? null : key);
+                    }}
+                  >
+                    <span className="text-lg">⋮</span>
+                  </button>
+                  {/* Dropdown menu for file */}
+                  {fileOptionsAnchor === key && (
+                    <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFileOptionsAnchor(null);
+                          openDeleteConfirm('file', key, fileName, () => deleteFile(key));
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                  {/* File icon and name */}
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="text-6xl mb-2">{getFileIcon(fileName)}</div>
+                    <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base" title={fileName}>{fileName}</span>
+                  </div>
+                </div>
+              );
+            })}
+            {/* Empty state */}
+            {folders.length === 0 && files.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 opacity-60">
+                <svg className="w-24 h-24 mb-4 text-blue-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 48 48"><rect x="8" y="16" width="32" height="20" rx="3" fill="#e0e7ff"/><rect x="8" y="16" width="32" height="20" rx="3" stroke="#60a5fa" strokeWidth="2"/><rect x="16" y="8" width="16" height="8" rx="2" fill="#bae6fd"/><rect x="16" y="8" width="16" height="8" rx="2" stroke="#38bdf8" strokeWidth="2"/></svg>
+                <div className="text-lg text-gray-500">Your Drive is empty</div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // List view
+          <div className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            {/* Header row */}
+            <div className="grid grid-cols-12 px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-300">
+              <div className="col-span-6">Name</div>
+              <div className="col-span-3">Type</div>
+              <div className="col-span-3">Actions</div>
+            </div>
+            {/* Folders */}
+            {folders.map((folder) => (
+              <div key={folder} className={`grid grid-cols-12 items-center px-6 py-3 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer ${isSelected(folder) ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
+                onClick={(e) => {
+                  if (e.ctrlKey || e.metaKey) toggleSelect(folder);
+                  else if (selected.size > 0) {
+                    if (isSelected(folder)) toggleSelect(folder);
+                    else setSelected(new Set([folder]));
+                  } else enterFolder(folder);
+                }}
+              >
+                <div className="col-span-6 flex items-center gap-3">
+                  {isSelected(folder) && <span className="bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>}
+                  <span className="text-2xl">📁</span>
+                  <span className="truncate font-medium text-gray-800 dark:text-gray-200" title={folder}>{folder}</span>
+                </div>
+                <div className="col-span-3 text-yellow-500">Folder</div>
+                <div className="col-span-3 flex gap-2 relative">
+                  <button
+                    className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFolderOptionsAnchor(folderOptionsAnchor === folder ? null : folder);
@@ -444,64 +644,46 @@ export default function Dashboard() {
                   >
                     <span className="text-lg">⋮</span>
                   </button>
-                  {/* Folder options dropdown */}
+                  {/* Dropdown menu for folder */}
                   {folderOptionsAnchor === folder && (
-                    <div className="absolute right-2 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md z-20">
+                    <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
                       <button
-                        className="block w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
-                        onClick={() => {
+                        className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setFolderOptionsAnchor(null);
-                          deleteFolder(folder);
+                          openDeleteConfirm('folder', folder, folder, () => deleteFolder(folder));
                         }}
                       >
-                        Delete Folder
+                        Delete
                       </button>
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Files */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-            Files
-          </h2>
-          {files.length === 0 ? (
-            <p className="italic text-gray-400 dark:text-gray-500">
-              No files available
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {files.map(({ key, url }) => {
-                const fileName = key.slice(`${userId}/${currentPrefix}`.length);
-                return (
-                  <div
-                    key={key}
-                    className="relative"
-                    onMouseEnter={() => setHoveredFile({ key, url })}
-                    onMouseLeave={() => setHoveredFile(null)}
-                  >
+              </div>
+            ))}
+            {/* Files */}
+            {files.map(({ key, url }) => {
+              const fileName = key.slice(`${userId}/${currentPrefix}`.length);
+              return (
+                <div key={key} className={`grid grid-cols-12 items-center px-6 py-3 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer ${isSelected(key) ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
+                  onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey) toggleSelect(key);
+                    else if (selected.size > 0) {
+                      if (isSelected(key)) toggleSelect(key);
+                      else setSelected(new Set([key]));
+                    } else openFilePreview({ key, url });
+                  }}
+                >
+                  <div className="col-span-6 flex items-center gap-3">
+                    {isSelected(key) && <span className="bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>}
+                    <span className="text-2xl">{getFileIcon(fileName)}</span>
+                    <span className="truncate font-medium text-gray-800 dark:text-gray-200" title={fileName}>{fileName}</span>
+                  </div>
+                  <div className="col-span-3 text-gray-500 dark:text-gray-400">File</div>
+                  <div className="col-span-3 flex gap-2 relative">
                     <button
-                      onClick={() => openFilePreview({ key, url })}
-                      className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
-                      aria-label={`Preview file ${fileName}`}
-                    >
-                      <div className="text-6xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors select-none">
-                        {getFileIcon(fileName)}
-                      </div>
-                      <span
-                        className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
-                        title={fileName}
-                      >
-                        {fileName}
-                      </span>
-                    </button>
-                    {/* 3-dots button for file */}
-                    <button
-                      className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                      className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFileOptionsAnchor(fileOptionsAnchor === key ? null : key);
@@ -509,98 +691,33 @@ export default function Dashboard() {
                     >
                       <span className="text-lg">⋮</span>
                     </button>
-                    {/* File options dropdown */}
+                    {/* Dropdown menu for file */}
                     {fileOptionsAnchor === key && (
-                      <div className="absolute right-2 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md z-20">
+                      <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
                         <button
-                          className="block w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
-                          onClick={() => {
+                          className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setFileOptionsAnchor(null);
-                            deleteFile(key);
+                            openDeleteConfirm('file', key, fileName, () => deleteFile(key));
                           }}
                         >
-                          Delete File
+                          Delete
                         </button>
                       </div>
                     )}
-                    {/* Hover Preview */}
-                    {hoveredFile?.key === key && (
-                      <div className="absolute z-10 left-full ml-2 top-0 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3">
-                        <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 truncate">
-                          {fileName}
-                        </div>
-                        {getFileExtension(fileName) &&
-                        ["jpg", "jpeg", "png", "gif", "webp"].includes(
-                          getFileExtension(fileName)
-                        ) ? (
-                          <img
-                            src={url}
-                            alt={fileName}
-                            className="w-full h-32 object-cover rounded border"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded border flex items-center justify-center">
-                            <div className="text-4xl">
-                              {getFileIcon(fileName)}
-                            </div>
-                          </div>
-                        )}
-                        <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                          Click to preview
-                        </div>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Upload Status */}
-        {uploadQueue.length > 0 && (
-          <section>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-              Upload Status
-            </h2>
-            <ul className="space-y-2">
-              {uploadQueue.map(({ file, status, errorMsg }) => (
-                <li
-                  key={file.name + file.size}
-                  className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-md shadow-sm dark:shadow-gray-600"
-                >
-                  <span className="truncate max-w-xs text-gray-800 dark:text-gray-200">
-                    {file.name}
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      status === "success"
-                        ? "text-green-600 dark:text-green-400"
-                        : status === "error"
-                        ? "text-red-600 dark:text-red-400"
-                        : status === "uploading"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-600 dark:text-gray-400"
-                    }`}
-                    title={errorMsg || undefined}
-                  >
-                    {status === "pending"
-                      ? "Pending"
-                      : status === "uploading"
-                      ? "Uploading..."
-                      : status === "success"
-                      ? "Uploaded"
-                      : status === "error"
-                      ? `Error: ${errorMsg}`
-                      : ""}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+                </div>
+              );
+            })}
+            {/* Empty state */}
+            {folders.length === 0 && files.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 opacity-60">
+                <svg className="w-24 h-24 mb-4 text-blue-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 48 48"><rect x="8" y="16" width="32" height="20" rx="3" fill="#e0e7ff"/><rect x="8" y="16" width="32" height="20" rx="3" stroke="#60a5fa" strokeWidth="2"/><rect x="16" y="8" width="16" height="8" rx="2" fill="#bae6fd"/><rect x="16" y="8" width="16" height="8" rx="2" stroke="#38bdf8" strokeWidth="2"/></svg>
+                <div className="text-lg text-gray-500">Your Drive is empty</div>
+              </div>
+            )}
+          </div>
         )}
       </main>
       {/* File Preview Modal */}
@@ -681,6 +798,47 @@ export default function Dashboard() {
         )}
       </div>
     </div>
+  </div>
+)}
+
+{/* Confirm Modal */}
+{confirmModal.open && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        Confirm Delete
+      </h3>
+      <p className="mb-6 text-gray-600 dark:text-gray-300">
+        Are you sure you want to delete this {confirmModal.type}? <span className="font-bold">{confirmModal.name}</span>?
+        {confirmModal.type === 'folder' && (
+          <span className="block text-xs text-red-500 mt-2">All files inside will be deleted.</span>
+        )}
+      </p>
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+          onClick={closeConfirmModal}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+          onClick={() => {
+            closeConfirmModal();
+            confirmModal.onConfirm && confirmModal.onConfirm();
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Toast Notification */}
+{toast && (
+  <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
+    {toast.message}
   </div>
 )}
     </div>
