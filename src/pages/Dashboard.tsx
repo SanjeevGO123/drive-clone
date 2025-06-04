@@ -510,14 +510,14 @@ export default function Dashboard() {
         </div>
       )}
 
-      <main className="flex-grow max-w-7xl mx-auto px-8 py-6">
+      <main className="flex-grow max-w-7xl mx-auto px-2 sm:px-4 md:px-8 py-4 md:py-6 w-full">
         {/* Folders and Files in grid or list view */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
             {/* Folders */}
             {folders.map((folder) => (
-              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[200px] h-full flex flex-col justify-center items-center`}
-                style={{ minHeight: 200, height: '100%' }}
+              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
+                style={{ minHeight: 120, height: '100%' }}
                 onClick={(e) => {
                   if (e.ctrlKey || e.metaKey) toggleSelect(folder);
                   else if (selected.size > 0) {
@@ -566,7 +566,8 @@ export default function Dashboard() {
             {files.map(({ key, url }) => {
               const fileName = key.slice(`${userId}/${currentPrefix}`.length);
               return (
-                <div key={key} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''}`}
+                <div key={key} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
+                  style={{ minHeight: 120, height: '100%' }}
                   onClick={(e) => {
                     if (e.ctrlKey || e.metaKey) toggleSelect(key);
                     else if (selected.size > 0) {
@@ -622,9 +623,9 @@ export default function Dashboard() {
           </div>
         ) : (
           // List view
-          <div className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          <div className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto text-xs sm:text-sm md:text-base">
             {/* Header row */}
-            <div className="grid grid-cols-12 px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-300">
+            <div className="grid grid-cols-12 px-2 sm:px-6 py-2 sm:py-3 font-semibold text-gray-500 dark:text-gray-300">
               <div className="col-span-6">Name</div>
               <div className="col-span-3">Type</div>
               <div className="col-span-3">Actions</div>
