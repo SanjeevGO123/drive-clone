@@ -301,13 +301,22 @@ export default function Auth() {
             ? "to continue to Drive Clone"
             : "Create your Google-style account"}
         </p>
-        <div className="w-full space-y-3 mb-2">
+        {/* Add form element to enable Enter key submit */}
+        <form
+          className="w-full space-y-3 mb-2"
+          onSubmit={e => {
+            e.preventDefault();
+            if (mode === "signin") handleSignIn();
+            else handleSignUp();
+          }}
+        >
           <input
             type="text"
             placeholder="Username"
             className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100 transition"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            autoFocus
           />
           {mode === "signup" && (
             <input
@@ -325,24 +334,29 @@ export default function Auth() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <button
-          disabled={loading}
-          className={`w-full py-2 rounded-lg text-white font-semibold shadow-md transition disabled:opacity-50 text-base mb-2 ${
-            mode === "signin"
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
-          onClick={mode === "signin" ? handleSignIn : handleSignUp}
-        >
-          {loading
-            ? mode === "signin"
-              ? "Signing in..."
-              : "Signing up..."
-            : mode === "signin"
-            ? "Sign In"
-            : "Sign Up"}
-        </button>
+          {mode === "signin" && (
+            <div className="w-full flex justify-end mb-2">
+              
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white font-semibold shadow-md transition disabled:opacity-50 text-base mb-2 ${
+              mode === "signin"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {loading
+              ? mode === "signin"
+                ? "Signing in..."
+                : "Signing up..."
+              : mode === "signin"
+              ? "Sign In"
+              : "Sign Up"}
+          </button>
+        </form>
         
         <p className="mt-2 text-xs text-gray-400 text-center w-full">
           {mode === "signin" ? (
