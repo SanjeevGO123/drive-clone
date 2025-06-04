@@ -21,6 +21,8 @@ Use Here: [Live Website](https://drive.sanjeevkashyap.software/)
   * `getFiles.ts` - Lists files and folders for a user
   * `generatepresignedURL.ts` - Provides presigned URLs for file uploads
   * `createFolder.ts` - Creates new folders in the user's storage
+  * `deleteFile.ts` - Deletes files from the user's storage
+  * `deleteFolder.ts` - Deletes folders and their contents
 * Secured by API Gateway (JWT auth via Cognito)
 * File storage in Amazon S3 (organized per user)
 * Metadata stored in DynamoDB (optional, for additional features)
@@ -50,6 +52,8 @@ project-root/              # React app
     ├── getFiles.ts
     └── generatepresignedURL.ts
     └── createFolder.ts
+    └── deleteFile.ts
+    └── deleteFolder.ts
 ```
 
 > 🔐 `.env.development` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
@@ -91,6 +95,8 @@ Ensure each file is individually deployed as a Lambda function:
 * `getFiles.ts`
 * `generatepresignedURL.ts`
 * `createFolder.ts`
+* `deleteFile.ts`
+* `deleteFolder.ts`
 
 Both should:
 
