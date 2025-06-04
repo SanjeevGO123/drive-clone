@@ -16,7 +16,7 @@ const API_URL = process.env.REACT_APP_API_URL || "";
 
 export default function Dashboard() {
   // Dark mode state
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("darkMode");
       if (saved !== null) return saved === "true";
@@ -40,7 +40,6 @@ export default function Dashboard() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
   const [uploadQueue, setUploadQueue] = useState<FileWithStatus[]>([]);
-  const [hoveredFile, setHoveredFile] = useState<FileItem | null>(null);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const [previewContent, setPreviewContent] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -254,11 +253,7 @@ export default function Dashboard() {
     }
   };
 
-  const filteredFiles = files.filter(
-    ({ key }) =>
-      key.startsWith(`${userId}/${currentPrefix}`) &&
-      !key.slice(`${userId}/${currentPrefix}`.length).includes("/")
-  );
+  
 
   const breadcrumbs = currentPrefix
     .split("/")

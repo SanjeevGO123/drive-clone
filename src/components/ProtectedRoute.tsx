@@ -1,5 +1,5 @@
-import React, { JSX } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { JSX } from "react";
+import {Navigate } from "react-router-dom";
 
 // ProtectedRoute checks if token exists in localStorage
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
