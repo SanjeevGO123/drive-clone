@@ -253,7 +253,14 @@ export default function Dashboard() {
     }
   };
 
-  
+  // Add back navigation
+  const canGoBack = currentPrefix.split('/').filter(Boolean).length > 0;
+  const goBack = () => {
+    if (!canGoBack) return;
+    const parts = currentPrefix.split('/').filter(Boolean);
+    const newPrefix = parts.slice(0, -1).join('/') + (parts.length > 1 ? '/' : '');
+    fetchFiles(newPrefix);
+  };
 
   const breadcrumbs = currentPrefix
     .split("/")
@@ -328,6 +335,15 @@ export default function Dashboard() {
       {/* Top bar */}
       <header className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-8 py-4 sticky top-0 z-20">
         <div className="flex items-center gap-4">
+          {/* Back button */}
+          <button
+            className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition disabled:opacity-40`}
+            onClick={goBack}
+            disabled={!canGoBack}
+            aria-label="Go back"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          </button>
           <h1 className="text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
             My Drive
           </h1>
@@ -500,7 +516,8 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {/* Folders */}
             {folders.map((folder) => (
-              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''}`}
+              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[200px] h-full flex flex-col justify-center items-center`}
+                style={{ minHeight: 200, height: '100%' }}
                 onClick={(e) => {
                   if (e.ctrlKey || e.metaKey) toggleSelect(folder);
                   else if (selected.size > 0) {
@@ -539,9 +556,9 @@ export default function Dashboard() {
                   </div>
                 )}
                 {/* Folder icon and name */}
-                <div className="flex flex-col items-center justify-center py-8">
+                <div className="flex flex-col items-center justify-center flex-1 w-full">
                   <div className="text-6xl text-yellow-400 dark:text-yellow-300 mb-2">📁</div>
-                  <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base" title={folder}>{folder}</span>
+                  <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2" title={folder}>{folder}</span>
                 </div>
               </div>
             ))}
