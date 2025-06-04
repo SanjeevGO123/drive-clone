@@ -40,6 +40,10 @@ export default function Dashboard() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
   const [uploadQueue, setUploadQueue] = useState<FileWithStatus[]>([]);
+  const [hoveredFile, setHoveredFile] = useState<FileItem | null>(null);
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [previewContent, setPreviewContent] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -81,10 +85,12 @@ export default function Dashboard() {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const newFiles: FileWithStatus[] = Array.from(e.target.files).map((file) => ({
-      file,
-      status: "pending",
-    }));
+    const newFiles: FileWithStatus[] = Array.from(e.target.files).map(
+      (file) => ({
+        file,
+        status: "pending",
+      })
+    );
     setUploadQueue((prev) => [...prev, ...newFiles]);
     for (const fileObj of newFiles) {
       await uploadFile(fileObj);
@@ -95,7 +101,9 @@ export default function Dashboard() {
   const uploadFile = async (fileObj: FileWithStatus) => {
     setUploadQueue((prev) =>
       prev.map((f) =>
-        f.file === fileObj.file ? { ...f, status: "uploading", errorMsg: undefined } : f
+        f.file === fileObj.file
+          ? { ...f, status: "uploading", errorMsg: undefined }
+          : f
       )
     );
     try {
@@ -128,12 +136,16 @@ export default function Dashboard() {
       if (!uploadRes.ok) throw new Error("Upload failed");
 
       setUploadQueue((prev) =>
-        prev.map((f) => (f.file === fileObj.file ? { ...f, status: "success" } : f))
+        prev.map((f) =>
+          f.file === fileObj.file ? { ...f, status: "success" } : f
+        )
       );
     } catch (err: any) {
       setUploadQueue((prev) =>
         prev.map((f) =>
-          f.file === fileObj.file ? { ...f, status: "error", errorMsg: err.message } : f
+          f.file === fileObj.file
+            ? { ...f, status: "error", errorMsg: err.message }
+            : f
         )
       );
     }
@@ -170,9 +182,10 @@ export default function Dashboard() {
     }
   };
 
-  const filteredFiles = files.filter(({ key }) =>
-    key.startsWith(`${userId}/${currentPrefix}`) &&
-    !key.slice(`${userId}/${currentPrefix}`.length).includes("/")
+  const filteredFiles = files.filter(
+    ({ key }) =>
+      key.startsWith(`${userId}/${currentPrefix}`) &&
+      !key.slice(`${userId}/${currentPrefix}`.length).includes("/")
   );
 
   const breadcrumbs = currentPrefix
@@ -182,6 +195,52 @@ export default function Dashboard() {
       name: part,
       prefix: arr.slice(0, idx + 1).join("/") + "/",
     }));
+  const getFileExtension = (fileName: string) => {
+    return fileName.split(".").pop()?.toLowerCase() || "";
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const ext = getFileExtension(fileName);
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) return "🖼️";
+    if (["pdf"].includes(ext)) return "📄";
+    if (["doc", "docx"].includes(ext)) return "📝";
+    if (["txt", "md"].includes(ext)) return "📄";
+    if (["mp4", "avi", "mov"].includes(ext)) return "🎥";
+    if (["mp3", "wav", "flac"].includes(ext)) return "🎵";
+    if (["zip", "rar", "7z"].includes(ext)) return "📦";
+    return "📄";
+  };
+
+  const loadPreviewContent = async (file: FileItem) => {
+    const fileName = file.key.slice(`${userId}/${currentPrefix}`.length);
+    const ext = getFileExtension(fileName);
+
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) {
+      return file.url; // Return URL for images
+    }
+
+    if (["txt", "md", "json", "js", "css", "html"].includes(ext)) {
+      try {
+        const response = await fetch(file.url);
+        const text = await response.text();
+        return text.slice(0, 500) + (text.length > 500 ? "..." : ""); // Truncate long text
+      } catch (error) {
+        return "Error loading file content";
+      }
+    }
+
+    return null;
+  };
+
+  const openFilePreview = async (file: FileItem) => {
+    setPreviewFile(file);
+    setPreviewLoading(true);
+    setPreviewContent(null);
+
+    const content = await loadPreviewContent(file);
+    setPreviewContent(content);
+    setPreviewLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -259,19 +318,18 @@ export default function Dashboard() {
             />
           </label>
           <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            // Optionally redirect or reload
-            window.location.reload();
-          }}
-          className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
-          aria-label="Logout"
-        >
-          Logout
-        </button>
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("username");
+              // Optionally redirect or reload
+              window.location.reload();
+            }}
+            className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
         </div>
-        
       </header>
 
       {/* Breadcrumbs */}
@@ -302,9 +360,13 @@ export default function Dashboard() {
       <main className="flex-grow max-w-7xl mx-auto px-8 py-6 grid grid-cols-1 gap-10">
         {/* Folders */}
         <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Folders</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+            Folders
+          </h2>
           {folders.length === 0 ? (
-            <p className="italic text-gray-400 dark:text-gray-500">No folders available</p>
+            <p className="italic text-gray-400 dark:text-gray-500">
+              No folders available
+            </p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {folders.map((folder) => (
@@ -331,33 +393,71 @@ export default function Dashboard() {
 
         {/* Files */}
         <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Files</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+            Files
+          </h2>
           {files.length === 0 ? (
-            <p className="italic text-gray-400 dark:text-gray-500">No files available</p>
+            <p className="italic text-gray-400 dark:text-gray-500">
+              No files available
+            </p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {files.map(({ key, url }) => {
-                // Extract file name relative to userId and prefix
                 const fileName = key.slice(`${userId}/${currentPrefix}`.length);
                 return (
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <div
                     key={key}
-                    className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    aria-label={`Open file ${fileName}`}
+                    className="relative"
+                    onMouseEnter={() => setHoveredFile({ key, url })}
+                    onMouseLeave={() => setHoveredFile(null)}
                   >
-                    <div className="text-6xl text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors select-none">
-                      📄
-                    </div>
-                    <span
-                      className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
-                      title={fileName}
+                    <button
+                      onClick={() => openFilePreview({ key, url })}
+                      className="group flex flex-col items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-700 shadow-sm dark:shadow-gray-600 hover:shadow-md dark:hover:shadow-gray-500 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                      aria-label={`Preview file ${fileName}`}
                     >
-                      {fileName}
-                    </span>
-                  </a>
+                      <div className="text-6xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors select-none">
+                        {getFileIcon(fileName)}
+                      </div>
+                      <span
+                        className="mt-2 truncate max-w-full text-gray-800 dark:text-gray-200 font-medium"
+                        title={fileName}
+                      >
+                        {fileName}
+                      </span>
+                    </button>
+
+                    {/* Hover Preview */}
+                    {hoveredFile?.key === key && (
+                      <div className="absolute z-10 left-full ml-2 top-0 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3">
+                        <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 truncate">
+                          {fileName}
+                        </div>
+                        {getFileExtension(fileName) &&
+                        ["jpg", "jpeg", "png", "gif", "webp"].includes(
+                          getFileExtension(fileName)
+                        ) ? (
+                          <img
+                            src={url}
+                            alt={fileName}
+                            className="w-full h-32 object-cover rounded border"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded border flex items-center justify-center">
+                            <div className="text-4xl">
+                              {getFileIcon(fileName)}
+                            </div>
+                          </div>
+                        )}
+                        <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                          Click to preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -367,7 +467,9 @@ export default function Dashboard() {
         {/* Upload Status */}
         {uploadQueue.length > 0 && (
           <section>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Upload Status</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+              Upload Status
+            </h2>
             <ul className="space-y-2">
               {uploadQueue.map(({ file, status, errorMsg }) => (
                 <li
@@ -405,6 +507,87 @@ export default function Dashboard() {
           </section>
         )}
       </main>
+      {/* File Preview Modal */}
+{previewFile && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl max-h-[90vh] w-full overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+          {previewFile.key.slice(`${userId}/${currentPrefix}`.length)}
+        </h3>
+        <div className="flex items-center gap-2">
+          <a
+            href={previewFile.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+          >
+            Open Original
+          </a>
+          <button
+            onClick={() => setPreviewFile(null)}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+      
+      <div className="p-4 overflow-auto max-h-[calc(90vh-8rem)]">
+        {previewLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-600 dark:text-gray-400">Loading preview...</div>
+          </div>
+        ) : (
+          <div>
+            {(() => {
+              const fileName = previewFile.key.slice(`${userId}/${currentPrefix}`.length);
+              const ext = getFileExtension(fileName);
+              
+              if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+                return (
+                  <img
+                    src={previewContent || previewFile.url}
+                    alt={fileName}
+                    className="max-w-full h-auto rounded"
+                  />
+                );
+              }
+              
+              if (ext === 'pdf') {
+                return (
+                  <iframe
+                    src={previewFile.url}
+                    className="w-full h-96 border rounded"
+                    title={fileName}
+                  />
+                );
+              }
+              
+              if (['txt', 'md', 'json', 'js', 'css', 'html'].includes(ext)) {
+                return (
+                  <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap overflow-auto">
+                    {previewContent || 'No preview available'}
+                  </pre>
+                );
+              }
+              
+              return (
+                <div className="text-center py-8">
+                  <div className="text-6xl mb-4">{getFileIcon(fileName)}</div>
+                  <div className="text-gray-600 dark:text-gray-400">
+                    Preview not available for this file type
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </div>
     </div>
+  </div>
+)}
+    </div>
+    
   );
 }
