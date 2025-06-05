@@ -1,149 +1,141 @@
-# 🚀 Drive Clone - Google Drive Inspired Cloud Storage App
+# 🚀 Drive Clone – Google Drive-Inspired Cloud Storage Platform
 
-A full-stack, AWS-native cloud storage solution inspired by Google Drive. Built using a modern React frontend with AWS Cognito authentication and a serverless backend deployed using AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
--
-Use Here: [Live Website](https://drive.sanjeevkashyap.software/)
----
-
-## 🧰 Tech Stack
-
-### Frontend:
-
-* React + TypeScript
-* TailwindCSS for styling
-* AWS Cognito (via `amazon-cognito-identity-js`) for authentication
-* Hosted on S3 + CloudFront CDN
-
-### Backend:
-
-* Serverless AWS Lambda functions:
-
-  * `getFiles.ts` - Lists files and folders for a user
-  * `generatepresignedURL.ts` - Provides presigned URLs for file uploads
-  * `createFolder.ts` - Creates new folders in the user's storage
-  * `deleteFile.ts` - Deletes files from the user's storage
-  * `deleteFolder.ts` - Deletes folders and their contents
-* Secured by API Gateway (JWT auth via Cognito)
-* File storage in Amazon S3 (organized per user)
-* Metadata stored in DynamoDB (optional, for additional features)
+A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
 ---
 
-## 🔒 Authentication Flow
+## 🧰 Technology Stack
 
-* AWS Cognito User Pools handle sign-up, login, and token issuance
-* Frontend uses the Cognito SDK to authenticate users and get a JWT token
-* All backend API requests require a valid `Authorization: Bearer <token>` header
+### Frontend
+- **React** (TypeScript)
+- **TailwindCSS** for rapid, responsive UI
+- **AWS Cognito** (via `amazon-cognito-identity-js`) for authentication
+- Hosted on **S3** with **CloudFront CDN**
+
+### Backend
+- **Serverless AWS Lambda Functions** (Node.js 22.x):
+  - `getFiles.ts` – List user files and folders
+  - `getpresignedURL.ts` – Generate presigned S3 upload URLs
+  - `createFolder.ts` – Create new folders
+  - `deleteFile.ts` – Delete files
+  - `deleteFolder.ts` – Delete folders and contents
+- **API Gateway** (JWT auth via Cognito)
+- **Amazon S3** for file storage (user-scoped)
+- **DynamoDB** for metadata (optional, for advanced features)
 
 ---
 
-## 📁 Folder Structure
+## 🔒 Authentication & Security
+- **AWS Cognito User Pools** for sign-up, login, and JWT issuance
+- Frontend authenticates and attaches JWT to all API requests
+- All backend APIs require a valid `Authorization: Bearer <token>` header
+- IAM roles strictly limit Lambda, S3, and DynamoDB access
+
+---
+
+## 📁 Project Structure
 
 ```
-project-root/              # React app
+project-root/
 ├── public/
 ├── src/
 │   ├── pages/
-│   ├── .env.development     # Local config (ignored in git)
+│   ├── components/
+│   ├── aws/
 │   ├── App.tsx
 │   └── ...
-│   └── ...
-└── backend/                # Lambda functions
-    ├── getFiles.ts
-    └── generatepresignedURL.ts
-    └── createFolder.ts
-    └── deleteFile.ts
-    └── deleteFolder.ts
+├── api/                # Lambda handlers
+│   ├── getFiles.ts
+│   ├── getpresignedURL.ts
+│   ├── createFolder.ts
+│   ├── deleteFile.ts
+│   └── deleteFolder.ts
+├── README.md
+└── ...
 ```
 
-> 🔐 `.env.development` contains sensitive info like API URL and Cognito Pool IDs. This file is git-ignored and should be populated manually in each environment.
+> **Note:** `.env.development` contains sensitive config (API URLs, Cognito IDs) and is git-ignored. Populate this file manually per environment.
 
 ---
 
 ## 🛠️ Local Development
 
 ### Prerequisites
+- Node.js ≥ 18
+- AWS Account & CLI configured
 
-* Node.js >= 18
-* AWS Account
-* AWS CLI configured
-
-### Setup Frontend
-
+### Frontend Setup
 ```bash
 npm install
 ```
-
-Create `.env.development` in the root of the React app with the following content:
-
+Create `.env.development` in the root with:
 ```env
 REACT_APP_API_URL=https://your-api-gateway-url
 REACT_APP_COGNITO_USER_POOL_ID=your_cognito_user_pool_id
 REACT_APP_COGNITO_CLIENT_ID=your_cognito_app_client_id
 ```
-
-Then run:
-
+Run locally:
 ```bash
 npm start
 ```
 
-### Deploy Backend
+### Backend Setup & Deployment
+- Each file in `api/` is a Lambda handler. Deploy each handler individually to AWS Lambda using the AWS Console, AWS CLI, or your preferred deployment tool:
 
-Ensure each file is individually deployed as a Lambda function:
+```bash
+# Example AWS CLI command to deploy a Lambda function
+aws lambda create-function --function-name your-function-name --runtime nodejs22.x --role your-execution-role-arn --handler handler-file-name.handler --zip-file fileb://path-to-your-zip-file
+```
 
-* `getFiles.ts`
-* `generatepresignedURL.ts`
-* `createFolder.ts`
-* `deleteFile.ts`
-* `deleteFolder.ts`
+---
 
-Both should:
+## 🚀 Production Deployment
 
-* Be protected behind API Gateway with Cognito JWT authorizer
-* Have access to the S3 bucket and DynamoDB (if used)
-* Use environment variables for sensitive data (e.g., S3 bucket name)
+- **Frontend:**
+  ```bash
+  npm run build
+  aws s3 sync build/ s3://your-frontend-bucket
+  ```
+- **Backend:**
+  - Deploy Lambda handlers individually as AWS Lambda functions
+- **CDN:**
+  - Configure CloudFront with S3 as origin for frontend, API Gateway for backend
+- **API Gateway:**
+  - Set up routes for each Lambda, protected by Cognito JWT authorizer
+- **Cognito:**
+  - Create User Pool & App Client, configure domain and sign-in UI
+- **S3:**
+  - Create bucket, set permissions, enable CORS
+- **DynamoDB:**
+  - (Optional) Create table for file metadata
+- **CI/CD:**
+  - Use AWS CodePipeline or GitHub Actions for automation
+
 ---
 
 ## 🧪 Features
 
-* 🔐 Secure Cognito login/signup
-* 📁 Hierarchical folder navigation with breadcrumbs
-* 📤 Drag-and-drop or multi-select file uploads
-* 🖼️ Google Drive-like UI built with Tailwind
-* ☁️ Real-time fetch of files/folders using Lambda
-* 🔗 Secure presigned S3 URLs for direct uploads
-
----
-
-## 🚀 Deployment
-
-* **Frontend**: Build and upload to S3 bucket
-
-```bash
-npm run build
-aws s3 sync dist/ s3://your-frontend-bucket-name
-```
-
-* **Backend**: Deploy each TypeScript function via Lambda (can use AWS Console or SAM/CDK for IaC)
-* **CDN**: Configure CloudFront with S3 origin for frontend and API Gateway as the backend for API routes
-* **API Gateway**: Set up routes for Lambda functions with Cognito authorizer
-* **Cognito**: Create a User Pool and App Client, configure domain, and set up sign-in/sign-up pages
-* **S3**: Create a bucket for file storage, set permissions, and enable CORS
-* **DynamoDB**: (Optional) Create a table for storing file metadata if needed
-* **CI/CD**: Use AWS CodePipeline for automated deployments
+- 🔐 Secure Cognito login/signup
+- 📁 Hierarchical folder navigation with breadcrumbs
+- 📤 Drag-and-drop or multi-select file uploads
+- 🖼️ Google Drive-like, responsive UI (Tailwind)
+- ☁️ Real-time file/folder fetch via Lambda
+- 🔗 Secure presigned S3 URLs for direct uploads
+- 📱 Mobile-first, fully responsive dashboard
+- 🛡️ Strict IAM, CORS, and security best practices
 
 ---
 
 ## 🧼 Best Practices
 
-* Keep sensitive data in `.env.development` and `.gitignore` it
-* Enable CORS and secure headers in API Gateway
-* Use IAM roles to restrict Lambda and S3 access
-* Enable CloudWatch logs for monitoring
+- Store sensitive data in `.env.development` (git-ignored)
+- Enable CORS and secure headers in API Gateway
+- Use IAM roles to restrict Lambda, S3, and DynamoDB access
+- Enable CloudWatch logs for monitoring and troubleshooting
+- Parameterize infrastructure (e.g., S3 bucket names) for portability
 
 ---
 
 ## 🤝 Acknowledgements
 
-Inspired by the Google Drive UX. Built for modern cloud-native app deployment on AWS.
+Inspired by the Google Drive UX. Built for modern, cloud-native deployment on AWS. Contributions and feedback welcome!
