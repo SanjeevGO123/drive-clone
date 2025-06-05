@@ -205,6 +205,10 @@ export default function Auth() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
+  useEffect(() => {
+    document.title = mode === "signin" ? "Sign in" : "Sign up";
+  }, [mode]);
+
   if (needOtp) {
     // Show OTP confirmation form
     return (
