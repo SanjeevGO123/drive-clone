@@ -258,11 +258,7 @@ export default function Login() {
         <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
       </div>
       <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-7 flex flex-col items-center relative border border-gray-200 dark:border-gray-800 z-10">
-        <img
-          src="https://ssl.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png"
-          alt="Google Drive Logo"
-          className="w-14 h-14 mb-3 drop-shadow-lg"
-        />
+        
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-1 tracking-tight">
           Sign {mode === "signin" ? "in" : "up"}
         </h2>
