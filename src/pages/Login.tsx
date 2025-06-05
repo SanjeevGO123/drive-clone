@@ -126,6 +126,7 @@ export default function Auth() {
     }
     frame = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frame);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Animate the gradient stops for color shifting
