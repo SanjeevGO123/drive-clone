@@ -333,8 +333,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Top bar */}
-      <header className="flex items-center justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-8 py-4 sticky top-0 z-20">
-        <div className="flex items-center gap-4">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-4 sm:px-8 py-4 sticky top-0 z-20 gap-3 sm:gap-0">
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           {/* Back button */}
           <button
             className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition disabled:opacity-40`}
@@ -344,11 +344,11 @@ export default function Dashboard() {
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h1 className="text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
             My Drive
           </h1>
           {/* Breadcrumbs styled like Google Drive */}
-          <nav className="ml-6 flex items-center text-base text-gray-600 dark:text-gray-400 select-none">
+          <nav className="hidden sm:flex ml-6 items-center text-base text-gray-600 dark:text-gray-400 select-none">
             <button
               className="hover:underline font-medium text-blue-600 dark:text-blue-300"
               onClick={() => fetchFiles("")}
@@ -371,7 +371,8 @@ export default function Dashboard() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Responsive action buttons */}
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto sm:flex-nowrap items-center justify-end">
           {/* View toggle */}
           <button
             className={`px-2 py-1 rounded ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`}
@@ -391,20 +392,21 @@ export default function Dashboard() {
           {!isCreatingFolder ? (
             <button
               onClick={() => setIsCreatingFolder(true)}
-              className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-auto"
               aria-label="Create new folder"
             >
               + New Folder
             </button>
           ) : (
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
               <input
                 autoFocus
                 type="text"
                 placeholder="Folder name"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 w-full sm:w-auto text-base sm:text-sm"
+                style={{ minWidth: 0 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") createFolder();
                   if (e.key === "Escape") {
@@ -413,28 +415,30 @@ export default function Dashboard() {
                   }
                 }}
               />
-              <button
-                onClick={createFolder}
-                className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
-              >
-                Create
-              </button>
-              <button
-                onClick={() => {
-                  setIsCreatingFolder(false);
-                  setNewFolderName("");
-                }}
-                className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200"
-                aria-label="Cancel folder creation"
-              >
-                ✕
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={createFolder}
+                  className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-green-400 w-full sm:w-auto"
+                >
+                  Create
+                </button>
+                <button
+                  onClick={() => {
+                    setIsCreatingFolder(false);
+                    setNewFolderName("");
+                  }}
+                  className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200 w-full sm:w-auto"
+                  aria-label="Cancel folder creation"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           )}
 
           <label
             htmlFor="file-upload"
-            className="cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-150 font-semibold select-none"
+            className="cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-150 font-semibold select-none w-full sm:w-auto text-center"
           >
             Upload
             <input
@@ -449,15 +453,37 @@ export default function Dashboard() {
             onClick={() => {
               localStorage.removeItem("token");
               localStorage.removeItem("username");
-              // Optionally redirect or reload
               window.location.reload();
             }}
-            className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 w-full sm:w-auto"
             aria-label="Logout"
           >
             Logout
           </button>
         </div>
+        {/* Mobile breadcrumbs below header */}
+        <nav className="flex sm:hidden flex-wrap gap-1 mt-2 text-sm text-gray-600 dark:text-gray-400 select-none">
+          <button
+            className="hover:underline font-medium text-blue-600 dark:text-blue-300"
+            onClick={() => fetchFiles("")}
+            aria-label="Go to root directory"
+          >
+            Drive
+          </button>
+          {breadcrumbs.length > 0 && <span className="mx-1">/</span>}
+          {breadcrumbs.map(({ name, prefix }, i) => (
+            <React.Fragment key={prefix}>
+              <button
+                className="hover:underline text-blue-600 dark:text-blue-300"
+                onClick={() => fetchFiles(prefix)}
+                aria-label={`Go to folder ${name}`}
+              >
+                {name}
+              </button>
+              {i < breadcrumbs.length - 1 && <span className="mx-1">/</span>}
+            </React.Fragment>
+          ))}
+        </nav>
       </header>
 
       {/* Toolbar for actions */}
