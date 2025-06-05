@@ -139,3 +139,19 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 ## 🤝 Acknowledgements
 
 Inspired by the Google Drive UX. Built for modern, cloud-native deployment on AWS. Contributions and feedback welcome!
+
+---
+
+## 🐳 Docker Usage
+
+You can build and run the app in a container using Docker:
+
+```powershell
+# Build the Docker image
+docker build -t drive-clone .
+
+# Run the container (serves on http://localhost:8080)
+docker run -p 8080:80 drive-clone
+```
+
+The app will be available at [http://localhost:8080](http://localhost:8080).
