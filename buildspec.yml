@@ -6,7 +6,7 @@ phases:
       nodejs: 22
     commands:
       - echo Installing dependencies...
-      - npm ci
+      - npm ci --legacy-peer-deps
 
   build:
     commands:
