@@ -138,4 +138,4 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ## 🤝 Acknowledgements
 
-Inspired by the Google Drive UX. Built for modern, cloud-native deployment on AWS. Contributions and feedback welcome!
+Inspired by the Google Drive UX. Built for modern, cloud-native deployment on AWS. Contributions and feedback welcome! 
