@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [folders, setFolders] = useState<string[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
+  // eslint-disable-next-line
   const [uploadQueue, setUploadQueue] = useState<FileWithStatus[]>([]);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const [previewContent, setPreviewContent] = useState<string | null>(null);
@@ -343,13 +344,23 @@ export default function Dashboard() {
   inset: -3px;
   z-index: 2;
   border-radius: 0.5rem;
-  background: linear-gradient(270deg, #ff0080, #7928ca, #007cf0, #00dfd8, #ff0080);
+  background: linear-gradient(270deg, 
+    #ff0080, /* pink */
+    #ff8c00, /* bright orange */
+    #ffef00, /* yellow */
+    #39ff14, /* bright green */
+    #00dfd8, /* cyan */
+    #007cf0, /* blue */
+    #7928ca, /* purple */
+    #ff0080 /* pink again for smooth loop */
+  );
   background-size: 400% 400%;
   animation: rainbowMove 12s linear infinite alternate;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s;
   border: 3px solid transparent;
+  box-shadow: 0 0 16px 4px #39ff14, 0 0 32px 8px #ff8c00, 0 0 24px 6px #ff0080, 0 0 12px 2px #00dfd8;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -914,6 +925,28 @@ export default function Dashboard() {
     </div>
   </div>
 )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
+          {toast.message}
+        </div>
+      )}
+      {/* Footer */}
+      <footer className="w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <span>
+          © {new Date().getFullYear()} Drive Clone by{' '}
+          <a
+            href="https://github.com/SanjeevGO123"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Sanjeev
+          </a>{' '}
+          &mdash; Built with React and AWS
+        </span>
+      </footer>
     </div>
   );
 }
