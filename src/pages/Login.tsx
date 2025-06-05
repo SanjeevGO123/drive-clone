@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { signIn, signUp, confirmSignUp } from "../aws/auth";
+import Iridescence from '../components/Iridescence'; 
 
-export default function Auth() {
+// Rename the component to match the file name for consistency and to avoid import errors
+export default function Login() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState(""); // only for signup
@@ -213,8 +215,12 @@ export default function Auth() {
   if (needOtp) {
     // Show OTP confirmation form
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-sm text-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center relative overflow-hidden">
+        {/* Iridescence background without className prop, use a wrapper div for styling */}
+        <div className="absolute inset-0 w-full h-full z-0 blur-xl">
+          <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
+        </div>
+        <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-sm text-center relative z-10">
           <h2 className="text-2xl font-semibold mb-4">Confirm Signup</h2>
           <p className="mb-6 text-gray-600">
             Enter the verification code sent to your email.
@@ -247,50 +253,9 @@ export default function Auth() {
   // Show sign in / sign up form
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Live animated background (Stripe-style) */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full z-0 pointer-events-none"
-      >
-        <svg className="absolute top-0 left-0 w-full h-full blur-2xl opacity-80" width="100%" height="100%" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="stripe1" x1="0" y1="0" x2="1920" y2="1080" gradientUnits="userSpaceOnUse">
-              <stop ref={gradRefs[0][0]} stopColor="#60a5fa" />
-              <stop ref={gradRefs[0][1]} offset="1" stopColor="#a78bfa" />
-            </linearGradient>
-            <linearGradient id="stripe2" x1="1920" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse">
-              <stop ref={gradRefs[1][0]} stopColor="#f472b6" />
-              <stop ref={gradRefs[1][1]} offset="1" stopColor="#facc15" />
-            </linearGradient>
-            <linearGradient id="stripe3" x1="0" y1="1080" x2="1920" y2="0" gradientUnits="userSpaceOnUse">
-              <stop ref={gradRefs[2][0]} stopColor="#34d399" />
-              <stop ref={gradRefs[2][1]} offset="1" stopColor="#818cf8" />
-            </linearGradient>
-            <linearGradient id="stripe4" x1="1920" y1="1080" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-              <stop ref={gradRefs[3][0]} stopColor="#fbbf24" />
-              <stop ref={gradRefs[3][1]} offset="1" stopColor="#f472b6" />
-            </linearGradient>
-            <linearGradient id="stripe5" x1="0" y1="540" x2="1920" y2="540" gradientUnits="userSpaceOnUse">
-              <stop ref={gradRefs[4][0]} stopColor="#38bdf8" />
-              <stop ref={gradRefs[4][1]} offset="1" stopColor="#f472b6" />
-            </linearGradient>
-          </defs>
-          <g ref={stripeRef1}>
-            <rect x="-400" y="-200" width="2400" height="320" rx="160" fill="url(#stripe1)"/>
-          </g>
-          <g ref={stripeRef2}>
-            <rect x="-400" y="200" width="2400" height="320" rx="160" fill="url(#stripe2)"/>
-          </g>
-          <g ref={stripeRef3}>
-            <rect x="-400" y="600" width="2400" height="320" rx="160" fill="url(#stripe3)"/>
-          </g>
-          <g ref={stripeRef4}>
-            <rect x="-400" y="1000" width="2400" height="320" rx="160" fill="url(#stripe4)"/>
-          </g>
-          <g ref={stripeRef5}>
-            <rect x="-400" y="1400" width="2400" height="320" rx="160" fill="url(#stripe5)"/>
-          </g>
-        </svg>
+      {/* Iridescence background for main form, same fix */}
+      <div className="absolute inset-0 w-full h-full z-0 blur-xl">
+        <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
       </div>
       <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-7 flex flex-col items-center relative border border-gray-200 dark:border-gray-800 z-10">
         <img
@@ -339,11 +304,6 @@ export default function Auth() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {mode === "signin" && (
-            <div className="w-full flex justify-end mb-2">
-              
-            </div>
-          )}
           <button
             type="submit"
             disabled={loading}

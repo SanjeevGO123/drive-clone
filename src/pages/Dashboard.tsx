@@ -1,4 +1,15 @@
 import React, { useEffect, useState } from "react";
+import Folder from '../components/Folder';
+import {
+  GlassImageIcon,
+  GlassPdfIcon,
+  GlassDocIcon,
+  GlassTextIcon,
+  GlassVideoIcon,
+  GlassAudioIcon,
+  GlassZipIcon,
+  GlassGenericIcon,
+} from '../components/GlassIcons';
 
 type FileItem = {
   key: string;
@@ -276,14 +287,14 @@ export default function Dashboard() {
 
   const getFileIcon = (fileName: string) => {
     const ext = getFileExtension(fileName);
-    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) return "🖼️";
-    if (["pdf"].includes(ext)) return "📄";
-    if (["doc", "docx"].includes(ext)) return "📝";
-    if (["txt", "md"].includes(ext)) return "📄";
-    if (["mp4", "avi", "mov"].includes(ext)) return "🎥";
-    if (["mp3", "wav", "flac"].includes(ext)) return "🎵";
-    if (["zip", "rar", "7z"].includes(ext)) return "📦";
-    return "📄";
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) return <GlassImageIcon className="w-10 h-10" />;
+    if (["pdf"].includes(ext)) return <GlassPdfIcon className="w-10 h-10" />;
+    if (["doc", "docx"].includes(ext)) return <GlassDocIcon className="w-10 h-10" />;
+    if (["txt", "md"].includes(ext)) return <GlassTextIcon className="w-10 h-10" />;
+    if (["mp4", "avi", "mov"].includes(ext)) return <GlassVideoIcon className="w-10 h-10" />;
+    if (["mp3", "wav", "flac"].includes(ext)) return <GlassAudioIcon className="w-10 h-10" />;
+    if (["zip", "rar", "7z"].includes(ext)) return <GlassZipIcon className="w-10 h-10" />;
+    return <GlassGenericIcon className="w-10 h-10" />;
   };
 
   const loadPreviewContent = async (file: FileItem) => {
@@ -636,10 +647,11 @@ export default function Dashboard() {
                   </div>
                 )}
                 {/* Folder icon and name */}
-                <div className="flex flex-col items-center justify-center flex-1 w-full">
-                  <div className="text-6xl text-yellow-400 dark:text-yellow-300 mb-2">📁</div>
+                <div className="flex flex-col items-center justify-center flex-1 w-full px-2">
+                  <Folder size={2} color="#00d8ff" className="custom-folder mb-1" />
                   <span
-                    className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2"
+                    className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-0 mt-1"
+                    style={{ wordBreak: 'break-word' }}
                     title={folder}
                   >
                     {folder}
