@@ -330,6 +330,40 @@ export default function Dashboard() {
   const clearSelection = () => setSelected(new Set());
   const isSelected = (key: string) => selected.has(key);
 
+  useEffect(() => {
+    // Only inject once
+    if (typeof window !== 'undefined' && !document.getElementById('rainbow-border-style')) {
+      const style = document.createElement('style');
+      style.id = 'rainbow-border-style';
+      style.textContent = `
+.rainbow-border { position: relative; z-index: 0; }
+.rainbow-border::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: 2;
+  border-radius: 0.5rem;
+  background: linear-gradient(270deg, #ff0080, #7928ca, #007cf0, #00dfd8, #ff0080);
+  background-size: 400% 400%;
+  animation: rainbowMove 12s linear infinite alternate;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border: 3px solid transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.rainbow-border:hover::after { opacity: 1; }
+@keyframes rainbowMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+`;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Top bar */}
@@ -542,7 +576,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
             {/* Folders */}
             {folders.map((folder) => (
-              <div key={folder} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
+              <div key={folder} className={`rainbow-border relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
                 style={{ minHeight: 120, height: '100%' }}
                 onClick={(e) => {
                   if (e.ctrlKey || e.metaKey) toggleSelect(folder);
@@ -584,7 +618,12 @@ export default function Dashboard() {
                 {/* Folder icon and name */}
                 <div className="flex flex-col items-center justify-center flex-1 w-full">
                   <div className="text-6xl text-yellow-400 dark:text-yellow-300 mb-2">📁</div>
-                  <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2" title={folder}>{folder}</span>
+                  <span
+                    className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2"
+                    title={folder}
+                  >
+                    {folder}
+                  </span>
                 </div>
               </div>
             ))}
@@ -592,7 +631,7 @@ export default function Dashboard() {
             {files.map(({ key, url }) => {
               const fileName = key.slice(`${userId}/${currentPrefix}`.length);
               return (
-                <div key={key} className={`relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
+                <div key={key} className={`rainbow-border relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
                   style={{ minHeight: 120, height: '100%' }}
                   onClick={(e) => {
                     if (e.ctrlKey || e.metaKey) toggleSelect(key);
@@ -634,7 +673,12 @@ export default function Dashboard() {
                   {/* File icon and name */}
                   <div className="flex flex-col items-center justify-center py-8">
                     <div className="text-6xl mb-2">{getFileIcon(fileName)}</div>
-                    <span className="truncate max-w-full text-gray-800 dark:text-gray-200 font-medium text-base" title={fileName}>{fileName}</span>
+                    <span
+                      className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2"
+                      title={fileName}
+                    >
+                      {fileName}
+                    </span>
                   </div>
                 </div>
               );
@@ -670,7 +714,7 @@ export default function Dashboard() {
                 <div className="col-span-6 flex items-center gap-3">
                   {isSelected(folder) && <span className="bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>}
                   <span className="text-2xl">📁</span>
-                  <span className="truncate font-medium text-gray-800 dark:text-gray-200" title={folder}>{folder}</span>
+                  <span className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto truncate font-medium text-gray-800 dark:text-gray-200" title={folder}>{folder}</span>
                 </div>
                 <div className="col-span-3 text-yellow-500">Folder</div>
                 <div className="col-span-3 flex gap-2 relative">
@@ -717,7 +761,7 @@ export default function Dashboard() {
                   <div className="col-span-6 flex items-center gap-3">
                     {isSelected(key) && <span className="bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>}
                     <span className="text-2xl">{getFileIcon(fileName)}</span>
-                    <span className="truncate font-medium text-gray-800 dark:text-gray-200" title={fileName}>{fileName}</span>
+                    <span className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto truncate font-medium text-gray-800 dark:text-gray-200" title={fileName}>{fileName}</span>
                   </div>
                   <div className="col-span-3 text-gray-500 dark:text-gray-400">File</div>
                   <div className="col-span-3 flex gap-2 relative">
@@ -862,10 +906,7 @@ export default function Dashboard() {
         </button>
         <button
           className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-          onClick={() => {
-            closeConfirmModal();
-            confirmModal.onConfirm && confirmModal.onConfirm();
-          }}
+          onClick={() => {            closeConfirmModal();            confirmModal.onConfirm && confirmModal.onConfirm();          }}
         >
           Delete
         </button>
@@ -873,14 +914,6 @@ export default function Dashboard() {
     </div>
   </div>
 )}
-
-{/* Toast Notification */}
-{toast && (
-  <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
-    {toast.message}
-  </div>
-)}
     </div>
-    
   );
 }
