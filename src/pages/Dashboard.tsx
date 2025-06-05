@@ -382,7 +382,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           {/* Back button */}
           <button
-            className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition disabled:opacity-40`}
+            className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 focus:ring-2 focus:ring-blue-400 shadow transition disabled:opacity-40 active:scale-95`}
             onClick={goBack}
             disabled={!canGoBack}
             aria-label="Go back"
@@ -395,7 +395,7 @@ export default function Dashboard() {
           {/* Breadcrumbs styled like Google Drive */}
           <nav className="hidden sm:flex ml-6 items-center text-base text-gray-600 dark:text-gray-400 select-none">
             <button
-              className="hover:underline font-medium text-blue-600 dark:text-blue-300"
+              className="hover:underline font-medium text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
               onClick={() => fetchFiles("")}
               aria-label="Go to root directory"
             >
@@ -405,7 +405,7 @@ export default function Dashboard() {
             {breadcrumbs.map(({ name, prefix }, i) => (
               <React.Fragment key={prefix}>
                 <button
-                  className="hover:underline text-blue-600 dark:text-blue-300"
+                  className="hover:underline text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
                   onClick={() => fetchFiles(prefix)}
                   aria-label={`Go to folder ${name}`}
                 >
@@ -420,14 +420,14 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-2 w-full sm:w-auto sm:flex-nowrap items-center justify-end">
           {/* View toggle */}
           <button
-            className={`px-2 py-1 rounded ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`}
+            className={`px-2 py-1 rounded-full shadow-sm border border-transparent ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 ring-2 ring-blue-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'} transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95`}
             onClick={() => setViewMode('grid')}
             aria-label="Grid view"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
           </button>
           <button
-            className={`px-2 py-1 rounded ${viewMode === 'list' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`}
+            className={`px-2 py-1 rounded-full shadow-sm border border-transparent ${viewMode === 'list' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 ring-2 ring-blue-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'} transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95`}
             onClick={() => setViewMode('list')}
             aria-label="List view"
           >
@@ -437,10 +437,12 @@ export default function Dashboard() {
           {!isCreatingFolder ? (
             <button
               onClick={() => setIsCreatingFolder(true)}
-              className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-auto"
+              className="flex items-center justify-center px-5 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95"
               aria-label="Create new folder"
+              type="button"
             >
-              + New Folder
+              <span className="text-lg font-bold mr-1">＋</span>
+              <span className="flex-1 text-center">New Folder</span>
             </button>
           ) : (
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
@@ -450,7 +452,7 @@ export default function Dashboard() {
                 placeholder="Folder name"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 w-full sm:w-auto text-base sm:text-sm"
+                className="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 w-full sm:w-auto text-base sm:text-sm shadow-sm"
                 style={{ minWidth: 0 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") createFolder();
@@ -463,17 +465,19 @@ export default function Dashboard() {
               <div className="flex gap-2">
                 <button
                   onClick={createFolder}
-                  className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-green-400 w-full sm:w-auto"
+                  className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 focus:ring-2 focus:ring-green-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95"
+                  type="button"
                 >
-                  Create
+                  <span className="flex-1 text-center">Create</span>
                 </button>
                 <button
                   onClick={() => {
                     setIsCreatingFolder(false);
                     setNewFolderName("");
                   }}
-                  className="text-gray-500 hover:text-gray-700 transition duration-150 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200 w-full sm:w-auto"
+                  className="flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-2 rounded-full transition duration-150 focus:outline-none w-full sm:w-auto active:scale-95"
                   aria-label="Cancel folder creation"
+                  type="button"
                 >
                   ✕
                 </button>
@@ -483,9 +487,10 @@ export default function Dashboard() {
 
           <label
             htmlFor="file-upload"
-            className="cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-150 font-semibold select-none w-full sm:w-auto text-center"
+            className="flex items-center justify-center cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 font-semibold select-none w-full sm:w-auto text-center transition active:scale-95"
           >
-            Upload
+            <span className="text-lg font-bold mr-1">⭳</span>
+            <span className="flex-1 text-center">Upload</span>
             <input
               id="file-upload"
               type="file"
@@ -500,16 +505,18 @@ export default function Dashboard() {
               localStorage.removeItem("username");
               window.location.reload();
             }}
-            className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 w-full sm:w-auto"
+            className="flex items-center justify-center px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95 font-semibold"
             aria-label="Logout"
+            type="button"
           >
-            Logout
+            <span className="text-lg font-bold mr-1">⎋</span>
+            <span className="flex-1 text-center">Logout</span>
           </button>
         </div>
         {/* Mobile breadcrumbs below header */}
         <nav className="flex sm:hidden flex-wrap gap-1 mt-2 text-sm text-gray-600 dark:text-gray-400 select-none">
           <button
-            className="hover:underline font-medium text-blue-600 dark:text-blue-300"
+            className="hover:underline font-medium text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
             onClick={() => fetchFiles("")}
             aria-label="Go to root directory"
           >
@@ -519,7 +526,7 @@ export default function Dashboard() {
           {breadcrumbs.map(({ name, prefix }, i) => (
             <React.Fragment key={prefix}>
               <button
-                className="hover:underline text-blue-600 dark:text-blue-300"
+                className="hover:underline text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
                 onClick={() => fetchFiles(prefix)}
                 aria-label={`Go to folder ${name}`}
               >
@@ -533,10 +540,10 @@ export default function Dashboard() {
 
       {/* Toolbar for actions */}
       {selected.size > 0 && (
-        <div className="flex items-center gap-2 px-8 py-2 bg-blue-50 dark:bg-blue-900 border-b border-blue-200 dark:border-blue-700 sticky top-[72px] z-10">
+        <div className="flex items-center gap-2 px-8 py-2 bg-blue-50 dark:bg-blue-900 border-b border-blue-200 dark:border-blue-700 sticky top-[72px] z-10 rounded-b-xl shadow-md animate-fade-in">
           <span className="text-blue-700 dark:text-blue-300 font-medium">{selected.size} selected</span>
           <button
-            className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+            className="px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-400 shadow-md transition active:scale-95 font-semibold"
             onClick={() => {
               // Delete all selected (files and folders) with confirmation
               const toDelete = Array.from(selected);
@@ -570,10 +577,10 @@ export default function Dashboard() {
               }
             }}
           >
-            Delete
+            <span className="text-lg font-bold mr-1">🗑️</span> Delete
           </button>
           <button
-            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+            className="px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-400 shadow-md transition active:scale-95 font-semibold"
             onClick={clearSelection}
           >
             Cancel
@@ -613,15 +620,17 @@ export default function Dashboard() {
                 </button>
                 {/* Dropdown menu for folder */}
                 {folderOptionsAnchor === folder && (
-                  <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
+                  <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-20 min-w-[140px] py-2 animate-fade-in">
                     <button
-                      className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                      className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFolderOptionsAnchor(null);
                         openDeleteConfirm('folder', folder, folder, () => deleteFolder(folder));
                       }}
+                      type="button"
                     >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
                       Delete
                     </button>
                   </div>
@@ -668,15 +677,17 @@ export default function Dashboard() {
                   </button>
                   {/* Dropdown menu for file */}
                   {fileOptionsAnchor === key && (
-                    <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
+                    <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-20 min-w-[140px] py-2 animate-fade-in">
                       <button
-                        className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                        className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                         onClick={(e) => {
                           e.stopPropagation();
                           setFileOptionsAnchor(null);
                           openDeleteConfirm('file', key, fileName, () => deleteFile(key));
                         }}
+                        type="button"
                       >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
                         Delete
                       </button>
                     </div>
@@ -742,13 +753,14 @@ export default function Dashboard() {
                   {folderOptionsAnchor === folder && (
                     <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
                       <button
-                        className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                        className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                         onClick={(e) => {
                           e.stopPropagation();
                           setFolderOptionsAnchor(null);
                           openDeleteConfirm('folder', folder, folder, () => deleteFolder(folder));
                         }}
                       >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
                         Delete
                       </button>
                     </div>
@@ -789,13 +801,14 @@ export default function Dashboard() {
                     {fileOptionsAnchor === key && (
                       <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
                         <button
-                          className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400"
+                          className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                           onClick={(e) => {
                             e.stopPropagation();
                             setFileOptionsAnchor(null);
                             openDeleteConfirm('file', key, fileName, () => deleteFile(key));
                           }}
                         >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
                           Delete
                         </button>
                       </div>
@@ -898,27 +911,31 @@ export default function Dashboard() {
 {/* Confirm Modal */}
 {confirmModal.open && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-gray-200 dark:border-gray-700 animate-fade-in">
+      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+        <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
         Confirm Delete
       </h3>
-      <p className="mb-6 text-gray-600 dark:text-gray-300">
-        Are you sure you want to delete this {confirmModal.type}? <span className="font-bold">{confirmModal.name}</span>?
+      <p className="mb-6 text-gray-600 dark:text-gray-300 text-base">
+        Are you sure you want to delete this <span className="capitalize font-semibold">{confirmModal.type}</span>? <span className="font-bold text-gray-900 dark:text-gray-100">{confirmModal.name}</span>?
         {confirmModal.type === 'folder' && (
           <span className="block text-xs text-red-500 mt-2">All files inside will be deleted.</span>
         )}
       </p>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 mt-4">
         <button
-          className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+          className="px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95"
           onClick={closeConfirmModal}
+          type="button"
         >
           Cancel
         </button>
         <button
-          className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-          onClick={() => {            closeConfirmModal();            confirmModal.onConfirm && confirmModal.onConfirm();          }}
+          className="px-5 py-2 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 focus:ring-2 focus:ring-red-400 shadow transition active:scale-95 flex items-center gap-2"
+          onClick={() => { closeConfirmModal(); confirmModal.onConfirm && confirmModal.onConfirm(); }}
+          type="button"
         >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
           Delete
         </button>
       </div>
