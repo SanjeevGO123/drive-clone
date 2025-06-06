@@ -26,14 +26,6 @@ uniform float uSpeed;
 varying vec2 vUv;
 
 void main() {
-  // Dynamic triangle-wave color for each channel
-  float period = 200.0;
-  float f = uTime / period;
-  float triR = 1.0 - abs(fract(f) * 2.0 - 1.0);
-  float triG = 1.0 - abs(fract(f + 1.0/3.0) * 2.0 - 1.0);
-  float triB = 1.0 - abs(fract(f + 2.0/3.0) * 2.0 - 1.0);
-  vec3 dynColor = vec3(triR, triG, triB);
-
   float mr = min(uResolution.x, uResolution.y);
   vec2 uv = (vUv.xy * 2.0 - 1.0) * uResolution.xy / mr;
 
@@ -48,7 +40,7 @@ void main() {
   }
   d += uTime * 0.5 * uSpeed;
   vec3 col = vec3(cos(uv * vec2(d, a)) * 0.6 + 0.4, cos(a + d) * 0.5 + 0.5);
-  col = cos(col * cos(vec3(d, a, 2.5)) * 0.5 + 0.5) * dynColor;
+  col = cos(col * cos(vec3(d, a, 2.5)) * 0.5 + 0.5) * uColor;
   gl_FragColor = vec4(col, 1.0);
 }
 `;
