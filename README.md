@@ -19,6 +19,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
   - `createFolder.ts` – Create new folders
   - `deleteFile.ts` – Delete files
   - `deleteFolder.ts` – Delete folders and contents
+  - `renameFile.ts` – Rename files 
 - **API Gateway** (JWT auth via Cognito)
 - **Amazon S3** for file storage (user-scoped)
 - **DynamoDB** for metadata (optional, for advanced features)
@@ -50,6 +51,8 @@ project-root/
 │   ├── createFolder.ts
 │   ├── deleteFile.ts
 │   └── deleteFolder.ts
+│   └── renameFile.ts
+├── package.json
 ├── README.md
 └── ...
 ```
