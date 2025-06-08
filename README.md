@@ -61,7 +61,7 @@ project-root/
 ## 🛠️ Local Development
 
 ### Prerequisites
-- Node.js ≥ 18
+- Node.js ≥ 20
 - AWS Account & CLI configured
 
 ### Frontend Setup
