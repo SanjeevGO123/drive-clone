@@ -68,7 +68,7 @@ export default function Dashboard() {
   const [renameModal, setRenameModal] = useState<{ open: boolean; key: string | null }>({ open: false, key: null });
   const [renameValue, setRenameValue] = useState("");
 
-  const fetchFiles = async (prefix: string) => {
+  const fetchFiles = async (prefix: string, pushState: boolean = true) => {
     try {
       const token = localStorage.getItem("token");
       if (!userId || !token) throw new Error("User not logged in");
@@ -90,13 +90,38 @@ export default function Dashboard() {
       setFolders(Array.isArray(data.folders) ? data.folders : []);
       setFiles(Array.isArray(data.files) ? data.files : []);
       setCurrentPrefix(prefix);
+      if (pushState) {
+        // Use hash for simplicity
+        window.history.pushState({}, '', `#/` + encodeURIComponent(prefix));
+      }
     } catch (err: any) {
       alert(err.message);
     }
   };
 
   useEffect(() => {
-    fetchFiles("");
+    // On mount, set currentPrefix from URL (hash or query param)
+    let prefix = '';
+    if (window.location.hash.startsWith('#/')) {
+      prefix = decodeURIComponent(window.location.hash.slice(2));
+    } else if (window.location.search.includes('prefix=')) {
+      const params = new URLSearchParams(window.location.search);
+      prefix = params.get('prefix') || '';
+    }
+    fetchFiles(prefix, false);
+    // Listen for browser navigation
+    const onPopState = () => {
+      let prefix = '';
+      if (window.location.hash.startsWith('#/')) {
+        prefix = decodeURIComponent(window.location.hash.slice(2));
+      } else if (window.location.search.includes('prefix=')) {
+        const params = new URLSearchParams(window.location.search);
+        prefix = params.get('prefix') || '';
+      }
+      fetchFiles(prefix, false);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   const enterFolder = (folderName: string) => {
