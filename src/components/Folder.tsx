@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Folder.css";
 
-const darkenColor = (hex, percent) => {
+const darkenColor = (hex: string, percent: number) => {
   let color = hex.startsWith("#") ? hex.slice(1) : hex;
   if (color.length === 3) {
     color = color
@@ -22,14 +22,21 @@ const darkenColor = (hex, percent) => {
   );
 };
 
+interface FolderProps {
+  color?: string;
+  size?: number;
+  items?: (React.ReactNode | null)[];
+  className?: string;
+}
+
 const Folder = ({
   color = "#00d8ff",
   size = 1,
   items = [],
   className = "",
-}) => {
+}: FolderProps) => {
   const maxItems = 3;
-  const papers = items.slice(0, maxItems);
+  const papers: (React.ReactNode | null)[] = items.slice(0, maxItems);
   while (papers.length < maxItems) {
     papers.push(null);
   }
@@ -52,8 +59,8 @@ const Folder = ({
   };
 
   const handlePaperMouseMove = (
-    e,
-    index
+    e: React.MouseEvent<HTMLDivElement>,
+    index: number
   ) => {
     if (!open) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -69,8 +76,8 @@ const Folder = ({
   };
 
   const handlePaperMouseLeave = (
-    e,
-    index
+    e: React.MouseEvent<HTMLDivElement>,
+    index: number
   ) => {
     setPaperOffsets((prev) => {
       const newOffsets = [...prev];
@@ -79,12 +86,13 @@ const Folder = ({
     });
   };
 
-  const folderStyle = {
-    "--folder-color": color,
-    "--folder-back-color": folderBackColor,
-    "--paper-1": paper1,
-    "--paper-2": paper2,
-    "--paper-3": paper3,
+  const folderStyle: React.CSSProperties = {
+    // Type assertion to allow CSS custom properties
+    ["--folder-color" as any]: color,
+    ["--folder-back-color" as any]: folderBackColor,
+    ["--paper-1" as any]: paper1,
+    ["--paper-2" as any]: paper2,
+    ["--paper-3" as any]: paper3,
   };
 
   const folderClassName = `folder ${open ? "open" : ""}`.trim();
