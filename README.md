@@ -120,7 +120,7 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 - 🔐 Secure Cognito login/signup
 - 📁 Hierarchical folder navigation with breadcrumbs
-- 📤 Drag-and-drop or multi-select file uploads
+- 📤 Multi-select file uploads
 - 🖼️ Google Drive-like, responsive UI (Tailwind)
 - ☁️ Real-time file/folder fetch via Lambda
 - 🔗 Secure presigned S3 URLs for direct uploads
