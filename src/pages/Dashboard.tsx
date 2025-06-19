@@ -419,19 +419,26 @@ export default function Dashboard() {
   const clearSelection = () => setSelected(new Set());
   const isSelected = (key: string) => selected.has(key);
 
+  // Utility to wrap filename after 10 chars
+  const wrapFileName = (name: string, maxLen = 10) => {
+    if (name.length <= maxLen) return name;
+    // Insert a zero-width space after every maxLen chars for wrapping
+    return name.replace(new RegExp(`(.{${maxLen}})`, 'g'), '$1\u200b');
+  };
+
   useEffect(() => {
     // Only inject once
     if (typeof window !== 'undefined' && !document.getElementById('rainbow-border-style')) {
       const style = document.createElement('style');
       style.id = 'rainbow-border-style';
       style.textContent = `
-.rainbow-border { position: relative; z-index: 0; }
+.rainbow-border { position: relative; z-index: 0; border-radius: 1rem !important; overflow: hidden; }
 .rainbow-border::after {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: 0;
   z-index: 2;
-  border-radius: 0.5rem;
+  border-radius: 1rem !important;
   background: linear-gradient(270deg, 
     #ff0080, /* pink */
     #ff8c00, /* bright orange */
@@ -464,36 +471,36 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 flex flex-col font-sans">
       {/* Top bar */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 px-4 sm:px-8 py-4 sticky top-0 z-20 gap-3 sm:gap-0">
-        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white/80 dark:bg-gray-900/80 shadow-xl dark:shadow-gray-900/60 px-6 sm:px-12 py-6 sticky top-0 z-30 gap-4 sm:gap-0 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
           {/* Back button */}
           <button
-            className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 focus:ring-2 focus:ring-blue-400 shadow transition disabled:opacity-40 active:scale-95`}
+            className={`mr-2 p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-900/60 text-gray-500 dark:text-gray-300 hover:bg-blue-100/60 dark:hover:bg-blue-900/60 focus:ring-2 focus:ring-blue-400 shadow transition disabled:opacity-40 active:scale-95`}
             onClick={goBack}
             disabled={!canGoBack}
             aria-label="Go back"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight select-none text-blue-700 dark:text-blue-400">
-            My Drive
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight select-none text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-emerald-500 to-indigo-600 dark:from-blue-400 dark:via-emerald-400 dark:to-indigo-400 drop-shadow-lg">
+            Drive
           </h1>
           {/* Breadcrumbs styled like Google Drive */}
-          <nav className="hidden sm:flex ml-6 items-center text-base text-gray-600 dark:text-gray-400 select-none">
+          <nav className="hidden sm:flex ml-8 items-center text-lg text-gray-600 dark:text-gray-400 select-none">
             <button
-              className="hover:underline font-medium text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
+              className="hover:underline font-semibold text-blue-600 dark:text-blue-300 rounded-full px-3 py-1 transition-colors hover:bg-blue-50/60 dark:hover:bg-blue-900/60"
               onClick={() => fetchFiles("")}
               aria-label="Go to root directory"
             >
-              Drive
+              Home
             </button>
             {breadcrumbs.length > 0 && <span className="mx-2">/</span>}
             {breadcrumbs.map(({ name, prefix }, i) => (
               <React.Fragment key={prefix}>
                 <button
-                  className="hover:underline text-blue-600 dark:text-blue-300 rounded-full px-2 py-1 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
+                  className="hover:underline text-blue-600 dark:text-blue-300 rounded-full px-3 py-1 transition-colors hover:bg-blue-50/60 dark:hover:bg-blue-900/60"
                   onClick={() => fetchFiles(prefix)}
                   aria-label={`Go to folder ${name}`}
                 >
@@ -505,7 +512,7 @@ export default function Dashboard() {
           </nav>
         </div>
         {/* Responsive action buttons */}
-        <div className="flex flex-wrap gap-2 w-full sm:w-auto sm:flex-nowrap items-center justify-end">
+        <div className="flex flex-wrap gap-3 w-full sm:w-auto sm:flex-nowrap items-center justify-end">
           {/* View toggle */}
           <button
             className={`px-2 py-1 rounded-full shadow-sm border border-transparent ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 ring-2 ring-blue-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'} transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95`}
@@ -525,11 +532,11 @@ export default function Dashboard() {
           {!isCreatingFolder ? (
             <button
               onClick={() => setIsCreatingFolder(true)}
-              className="flex items-center justify-center px-5 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95"
+              className="flex items-center justify-center px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-semibold hover:from-emerald-600 hover:to-blue-600 focus:ring-2 focus:ring-emerald-400 shadow-lg transition duration-150 w-full sm:w-auto active:scale-95 gap-2"
               aria-label="Create new folder"
               type="button"
             >
-              <span className="text-lg font-bold mr-1">＋</span>
+              <svg className='w-5 h-5 mr-1' fill='none' stroke='currentColor' strokeWidth='2' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' d='M12 4v16m8-8H4' /></svg>
               <span className="flex-1 text-center">New Folder</span>
             </button>
           ) : (
@@ -553,7 +560,7 @@ export default function Dashboard() {
               <div className="flex gap-2">
                 <button
                   onClick={createFolder}
-                  className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 focus:ring-2 focus:ring-green-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95"
+                  className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full hover:from-green-600 hover:to-emerald-600 focus:ring-2 focus:ring-green-400 shadow-lg transition duration-150 w-full sm:w-auto active:scale-95"
                   type="button"
                 >
                   <span className="flex-1 text-center">Create</span>
@@ -575,9 +582,9 @@ export default function Dashboard() {
 
           <label
             htmlFor="file-upload"
-            className="flex items-center justify-center cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 font-semibold select-none w-full sm:w-auto text-center transition active:scale-95"
+            className="flex items-center justify-center cursor-pointer px-5 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 focus:ring-2 focus:ring-blue-400 font-semibold select-none w-full sm:w-auto text-center transition active:scale-95 gap-2"
           >
-            <span className="text-lg font-bold mr-1">⭱</span>
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" /></svg>
             <span className="flex-1 text-center">Upload</span>
             <input
               id="file-upload"
@@ -593,11 +600,11 @@ export default function Dashboard() {
               localStorage.removeItem("username");
               window.location.reload();
             }}
-            className="flex items-center justify-center px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-400 shadow-md transition duration-150 w-full sm:w-auto active:scale-95 font-semibold"
+            className="flex items-center justify-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 focus:ring-2 focus:ring-red-400 shadow-lg transition duration-150 w-full sm:w-auto active:scale-95 font-semibold gap-2"
             aria-label="Logout"
             type="button"
           >
-            <span className="text-lg font-bold mr-1">⎋</span>
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" /></svg>
             <span className="flex-1 text-center">Logout</span>
           </button>
         </div>
@@ -676,14 +683,14 @@ export default function Dashboard() {
         </div>
       )}
 
-      <main className="flex-grow max-w-7xl mx-auto px-2 sm:px-4 md:px-8 py-4 md:py-6 w-full">
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-8 md:px-16 py-8 md:py-12 w-full">
         {/* Folders and Files in grid or list view */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-10">
             {/* Folders */}
             {folders.map((folder) => (
-              <div key={folder} className={`rainbow-border relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(folder) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
-                style={{ minHeight: 120, height: '100%' }}
+              <div key={folder} className={`rainbow-border overflow-hidden relative group rounded-2xl shadow-xl bg-white/80 dark:bg-gray-800/80 hover:shadow-2xl transition-shadow duration-200 ${isSelected(folder) ? 'ring-4 ring-blue-400/60' : ''} min-h-[140px] sm:min-h-[180px] md:min-h-[220px] h-full flex flex-col justify-center items-center backdrop-blur-xl`}
+                style={{ minHeight: 140, height: '100%' }}
                 onClick={(e) => {
                   if (e.ctrlKey || e.metaKey) toggleSelect(folder);
                   else if (selected.size > 0) {
@@ -694,23 +701,23 @@ export default function Dashboard() {
               >
                 {/* Selection checkmark */}
                 {isSelected(folder) && (
-                  <span className="absolute top-2 left-2 bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
+                  <span className="absolute top-3 left-3 bg-blue-600 text-white rounded-full p-1 shadow-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
                 )}
                 {/* 3-dots button for folder */}
                 <button
-                  className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200/70 dark:hover:bg-gray-700/70 shadow"
                   onClick={(e) => {
                     e.stopPropagation();
                     setFolderOptionsAnchor(folderOptionsAnchor === folder ? null : folder);
                   }}
                 >
-                  <span className="text-lg">⋮</span>
+                  <span className="text-xl">⋮</span>
                 </button>
                 {/* Dropdown menu for folder */}
                 {folderOptionsAnchor === folder && (
-                  <div className="absolute right-2 top-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-20 min-w-[140px] py-2 animate-fade-in">
+                  <div className="absolute right-3 top-14 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-30 min-w-[150px] py-2 animate-fade-in backdrop-blur-xl">
                     <button
-                      className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
+                      className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-red-600 dark:text-red-400 font-semibold hover:bg-red-50/80 dark:hover:bg-red-900/80 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFolderOptionsAnchor(null);
@@ -725,12 +732,12 @@ export default function Dashboard() {
                 )}
                 {/* Folder icon and name */}
                 <div className="flex flex-col items-center justify-center flex-1 w-full">
-                  <Folder size={2} color="#00d8ff" className="custom-folder mb-2" />
+                  <Folder size={2.2} color="#00d8ff" className="custom-folder mb-3 drop-shadow-xl" />
                   <span
-                    className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2"
+                    className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-semibold text-lg text-center px-2"
                     title={folder}
                   >
-                    {folder}
+                    {wrapFileName(folder)}
                   </span>
                 </div>
               </div>
@@ -739,8 +746,8 @@ export default function Dashboard() {
             {files.map(({ key, url }) => {
               const fileName = key.slice(`${userId}/${currentPrefix}`.length);
               return (
-                <div key={key} className={`rainbow-border relative group rounded-lg shadow-md bg-white dark:bg-gray-700 hover:shadow-lg transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-2 ring-blue-500' : ''} min-h-[120px] sm:min-h-[160px] md:min-h-[200px] h-full flex flex-col justify-center items-center`}
-                  style={{ minHeight: 120, height: '100%' }}
+                <div key={key} className={`rainbow-border relative group rounded-2xl shadow-xl bg-white/80 dark:bg-gray-800/80 hover:shadow-2xl transition-shadow duration-200 border border-transparent hover:border-blue-400 dark:hover:border-blue-300 ${isSelected(key) ? 'ring-4 ring-blue-400/60' : ''} min-h-[140px] sm:min-h-[180px] md:min-h-[220px] h-full flex flex-col justify-center items-center backdrop-blur-xl`}
+                  style={{ minHeight: 140, height: '100%' }}
                   onClick={(e) => {
                     if (e.ctrlKey || e.metaKey) toggleSelect(key);
                     else if (selected.size > 0) {
@@ -751,30 +758,30 @@ export default function Dashboard() {
                 >
                   {/* Selection checkmark */}
                   {isSelected(key) && (
-                    <span className="absolute top-2 left-2 bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
+                    <span className="absolute top-3 left-3 bg-blue-600 text-white rounded-full p-1 shadow-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
                   )}
                   {/* 3-dots button for file */}
                   <button
-                    className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                    className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200/70 dark:hover:bg-gray-700/70 shadow"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFileOptionsAnchor(fileOptionsAnchor === key ? null : key);
                     }}
                   >
-                    <span className="text-lg">⋮</span>
+                    <span className="text-xl">⋮</span>
                   </button>
                   {/* Dropdown menu for file */}
                   {fileOptionsAnchor === key && (
-                    <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-20 min-w-[120px]">
+                    <div className="absolute right-3 top-14 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-30 min-w-[150px] py-2 animate-fade-in backdrop-blur-xl">
                       <button
-                        className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-blue-600 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-left active:scale-95"
+                        className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-blue-600 dark:text-blue-400 font-semibold hover:bg-blue-50/80 dark:hover:bg-blue-900/80 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-left active:scale-95"
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setFileOptionsAnchor(null); renameFile(key); }}
                       >
                         Rename
                       </button>
                       <button
-                        className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
+                        className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-red-600 dark:text-red-400 font-semibold hover:bg-red-50/80 dark:hover:bg-red-900/80 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setFileOptionsAnchor(null); openDeleteConfirm('file', key, fileName, () => deleteFile(key)); }}
                       >
@@ -786,13 +793,13 @@ export default function Dashboard() {
                     </div>
                   )}
                   {/* File icon and name */}
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <div className="text-6xl mb-2">{getFileIcon(fileName)}</div>
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <div className="text-6xl mb-3 drop-shadow-xl">{getFileIcon(fileName)}</div>
                     <span
-                      className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-medium text-base text-center px-2"
+                      className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto text-gray-800 dark:text-gray-200 font-semibold text-lg text-center px-2"
                       title={fileName}
                     >
-                      {fileName}
+                      {wrapFileName(fileName)}
                     </span>
                   </div>
                 </div>
@@ -877,7 +884,7 @@ export default function Dashboard() {
                   <div className="col-span-6 flex items-center gap-3">
                     {isSelected(key) && <span className="bg-blue-600 text-white rounded-full p-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>}
                     <span className="text-2xl">{getFileIcon(fileName)}</span>
-                    <span className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto truncate font-medium text-gray-800 dark:text-gray-200" title={fileName}>{fileName}</span>
+                    <span className="break-words whitespace-normal w-full max-w-full overflow-hidden max-h-12 overflow-y-auto truncate font-medium text-gray-800 dark:text-gray-200" title={fileName}>{wrapFileName(fileName)}</span>
                   </div>
                   <div className="col-span-3 text-gray-500 dark:text-gray-400">File</div>
                   <div className="col-span-3 flex gap-2 relative">
@@ -930,73 +937,68 @@ export default function Dashboard() {
       </main>
       {/* File Preview Modal */}
 {previewFile && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl max-h-[90vh] w-full overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-xl">
+    <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden border border-gray-200 dark:border-gray-700 animate-fade-in backdrop-blur-xl">
+      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 truncate">
           {previewFile.key.slice(`${userId}/${currentPrefix}`.length)}
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <a
             href={previewFile.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-full hover:from-blue-600 hover:to-emerald-600 transition-colors text-sm font-semibold shadow"
           >
             Open Original
           </a>
           <button
             onClick={() => setPreviewFile(null)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl"
+            className="text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl rounded-full p-2 transition shadow hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             ✕
           </button>
         </div>
       </div>
-      
-      <div className="p-4 overflow-auto max-h-[calc(90vh-8rem)]">
+      <div className="p-6 overflow-auto max-h-[calc(90vh-8rem)]">
         {previewLoading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-600 dark:text-gray-400">Loading preview...</div>
+            <div className="text-gray-600 dark:text-gray-400 animate-pulse">Loading preview...</div>
           </div>
         ) : (
           <div>
             {(() => {
               const fileName = previewFile.key.slice(`${userId}/${currentPrefix}`.length);
               const ext = getFileExtension(fileName);
-              
-              if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+              if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) {
                 return (
                   <img
                     src={previewContent || previewFile.url}
                     alt={fileName}
-                    className="max-w-full h-auto rounded"
+                    className="max-w-full h-auto rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 mx-auto"
                   />
                 );
               }
-              
-              if (ext === 'pdf') {
+              if (ext === "pdf") {
                 return (
                   <iframe
                     src={previewFile.url}
-                    className="w-full h-96 border rounded"
+                    className="w-full h-96 border rounded-xl shadow-lg"
                     title={fileName}
                   />
                 );
               }
-              
-              if (['txt', 'md', 'json', 'js', 'css', 'html'].includes(ext)) {
+              if (["txt", "md", "json", "js", "css", "html"].includes(ext)) {
                 return (
-                  <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap overflow-auto">
+                  <pre className="bg-gray-100/80 dark:bg-gray-800/80 p-6 rounded-xl text-base text-gray-800 dark:text-gray-200 whitespace-pre-wrap overflow-auto shadow-inner border border-gray-200 dark:border-gray-700">
                     {previewContent || 'No preview available'}
                   </pre>
                 );
               }
-              
               return (
-                <div className="text-center py-8">
-                  <div className="text-6xl mb-4">{getFileIcon(fileName)}</div>
-                  <div className="text-gray-600 dark:text-gray-400">
+                <div className="text-center py-12">
+                  <div className="text-7xl mb-6">{getFileIcon(fileName)}</div>
+                  <div className="text-gray-600 dark:text-gray-400 text-lg">
                     Preview not available for this file type
                   </div>
                 </div>
@@ -1011,28 +1013,28 @@ export default function Dashboard() {
 
 {/* Confirm Modal */}
 {confirmModal.open && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-gray-200 dark:border-gray-700 animate-fade-in">
-      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-        <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xl">
+    <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-10 w-full max-w-md border border-gray-200 dark:border-gray-700 animate-fade-in backdrop-blur-xl">
+      <h3 className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-3">
+        <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
         Confirm Delete
       </h3>
-      <p className="mb-6 text-gray-600 dark:text-gray-300 text-base">
+      <p className="mb-8 text-gray-600 dark:text-gray-300 text-lg">
         Are you sure you want to delete this <span className="capitalize font-semibold">{confirmModal.type}</span>? <span className="font-bold text-gray-900 dark:text-gray-100">{confirmModal.name}</span>?
         {confirmModal.type === 'folder' && (
           <span className="block text-xs text-red-500 mt-2">All files inside will be deleted.</span>
         )}
       </p>
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end gap-3 mt-6">
         <button
-          className="px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95"
+          className="px-6 py-2 rounded-full bg-gray-100/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200/80 dark:hover:bg-gray-600/80 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95"
           onClick={closeConfirmModal}
           type="button"
         >
           Cancel
         </button>
         <button
-          className="px-5 py-2 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 focus:ring-2 focus:ring-red-400 shadow transition active:scale-95 flex items-center gap-2"
+          className="px-6 py-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:from-red-600 hover:to-pink-600 focus:ring-2 focus:ring-red-400 shadow transition active:scale-95 flex items-center gap-2"
           onClick={() => { closeConfirmModal(); confirmModal.onConfirm && confirmModal.onConfirm(); }}
           type="button"
         >
@@ -1046,30 +1048,30 @@ export default function Dashboard() {
 
 {/* Rename Modal */}
 {renameModal.open && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6 border border-gray-200 dark:border-gray-700 animate-fade-in">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xl">
+    <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl max-w-md w-full p-10 border border-gray-200 dark:border-gray-700 animate-fade-in backdrop-blur-xl">
+      <h3 className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mb-6">
         Rename File
       </h3>
       <input
         type="text"
         value={renameValue}
         onChange={(e) => setRenameValue(e.target.value)}
-        className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 mb-4"
+        className="w-full px-5 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 mb-6 text-lg shadow-sm"
         placeholder="Enter new file name"
         autoFocus
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-3">
         <button
           onClick={() => setRenameModal({ open: false, key: null })}
-          className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95"
+          className="px-6 py-2 rounded-full bg-gray-100/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-200/80 dark:hover:bg-gray-600/80 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95"
           type="button"
         >
           Cancel
         </button>
         <button
           onClick={handleRenameConfirm}
-          className="px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95 flex items-center gap-2"
+          className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-semibold hover:from-blue-600 hover:to-emerald-600 focus:ring-2 focus:ring-blue-400 shadow transition active:scale-95 flex items-center gap-2"
           type="button"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
