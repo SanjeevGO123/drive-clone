@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { signIn, signUp, confirmSignUp } from "../aws/auth";
-import Iridescence from '../components/Iridescence'; 
+import Iridescence from '../components/login/Iridescence'; 
 
 // Rename the component to match the file name for consistency and to avoid import errors
 export default function Login() {

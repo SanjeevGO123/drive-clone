@@ -1,5 +1,5 @@
 import React from 'react';
-import Folder from '../Folder';
+import Folder from './Folder';
 
 type FileItem = {
   key: string;
