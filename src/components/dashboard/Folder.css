@@ -1,3 +1,11 @@
+/* CSS for Folder component.
+   Defines styles for folder appearance, hover effects, and open state.
+   Variables:
+   - --folder-color: Main color of the folder.
+   - --folder-back-color: Background color of the folder.
+   - --paper-1, --paper-2, --paper-3: Colors for papers inside the folder.
+*/
+
 :root {
   --folder-color: #70a1ff;
   --folder-back-color: #4785ff;

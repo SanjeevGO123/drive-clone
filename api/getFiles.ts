@@ -1,3 +1,25 @@
+// This file defines the AWS Lambda function handler for fetching files and folders from S3.
+// The function expects an HTTP GET request with query parameters userId and prefix (optional).
+
+// Key Features:
+// - Fetches files and folders under the specified prefix in S3.
+// - Returns a response with the list of files and folders.
+
+// Environment Variables:
+// - BUCKET_NAME: The name of the S3 bucket.
+// - FILE_URL: The base URL for accessing files in S3.
+
+// Steps:
+// 1. Parse the query parameters to extract userId and prefix.
+// 2. Validate the input to ensure userId is provided.
+// 3. Use the ListObjectsV2Command to list files and folders under the prefix.
+// 4. Extract folders from CommonPrefixes and files from Contents.
+// 5. Return a response with the list of files and folders.
+
+// Error Handling:
+// - Logs errors to the console.
+// - Returns appropriate HTTP status codes and error messages.
+
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({});
@@ -25,7 +47,7 @@ export const handler = async (event) => {
     // Extract folders from CommonPrefixes
     const folders = (data.CommonPrefixes || []).map((cp) => {
       const fullPath = cp.Prefix;
-      const folderName = fullPath.slice(prefix.length).replace(/\/$/, ""); // remove trailing slash
+      const folderName = (fullPath || "").slice(prefix.length).replace(/\/$/, ""); // remove trailing slash
       return folderName;
     });
 
@@ -33,7 +55,7 @@ export const handler = async (event) => {
     const files = (data.Contents || [])
       .filter((obj) => {
         const key = obj.Key;
-        const relativePath = key.slice(prefix.length);
+        const relativePath = (key || "").slice(prefix.length);
         return key !== prefix && !relativePath.includes("/");
       })
       .map((obj) => ({

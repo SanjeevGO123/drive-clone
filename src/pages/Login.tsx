@@ -2,6 +2,39 @@ import React, { useState, useEffect, useRef } from "react";
 import { signIn, signUp, confirmSignUp } from "../aws/auth";
 import Iridescence from '../components/login/Iridescence'; 
 
+// This file defines the Login component, which provides the user interface for signing in and signing up.
+// It includes functionality for handling authentication, OTP verification, and dynamic UI updates.
+
+// Key Features:
+// - Sign in and sign up forms: Allows users to log in or create an account.
+// - OTP verification: Handles email-based verification for new accounts.
+// - Animated background: Uses the Iridescence component for a visually appealing background.
+// - Custom toast notifications: Displays feedback messages for user actions.
+// - Responsive design: Adapts to different screen sizes.
+
+// State Variables:
+// - mode: Tracks whether the user is signing in or signing up.
+// - username, email, password: Stores user input for authentication.
+// - otp: Stores the OTP code for verification.
+// - needOtp: Indicates whether OTP verification is required.
+// - loading: Tracks the loading state for asynchronous operations.
+// - customToast: Displays feedback messages for user actions.
+
+// Utility Functions:
+// - handleSignUp: Handles the sign-up process, including validation and API calls.
+// - handleSignIn: Handles the sign-in process, including validation and API calls.
+// - handleConfirm: Handles OTP verification and automatic sign-in after confirmation.
+
+// UI Elements:
+// - Animated background: Uses the Iridescence component for a dynamic visual effect.
+// - Forms: Includes input fields for username, email, password, and OTP.
+// - Buttons: Provides actions for signing in, signing up, and verifying OTP.
+// - Toast notifications: Displays feedback messages for user actions.
+
+// Responsive Design:
+// - Ensures the layout adapts to different screen sizes.
+// - Uses Tailwind CSS for styling.
+
 // Rename the component to match the file name for consistency and to avoid import errors
 export default function Login() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");

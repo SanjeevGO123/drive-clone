@@ -1,5 +1,11 @@
 import React from 'react';
 
+// SelectionToolbar component displays actions for selected items.
+// Props:
+// - selectedCount: Number of selected items.
+// - handleDelete: Function to delete selected items.
+// - clearSelection: Function to clear the selection.
+
 type SelectionToolbarProps = {
   selectedCount: number;
   handleDelete: () => void;

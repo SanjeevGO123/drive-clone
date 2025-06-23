@@ -11,6 +11,55 @@ import {
   UploadStatusBar 
 } from '../components/dashboard';
 
+// This file defines the Dashboard component, which serves as the main interface for the Drive Clone application.
+// It provides functionalities for file and folder management, including upload, preview, rename, delete, and navigation.
+// The component integrates various subcomponents for modular functionality and styling.
+
+// Key Features:
+// - Dark mode support: Automatically applies dark mode based on user preference.
+// - File and folder operations: Fetch, upload, delete, rename, and navigate.
+// - Preview: Displays file content or image previews.
+// - Toast notifications: Provides feedback for user actions.
+// - Responsive design: Adapts to different screen sizes.
+
+// State Variables:
+// - darkMode: Tracks the user's dark mode preference.
+// - folders, files: Stores the list of folders and files fetched from the server.
+// - currentPrefix: Represents the current folder path.
+// - uploadQueue: Manages the upload progress and status of files.
+// - previewFile, previewContent, previewLoading: Handles file preview functionality.
+// - isCreatingFolder, newFolderName: Manages folder creation state.
+// - fileOptionsAnchor, folderOptionsAnchor: Tracks context menu anchors for files and folders.
+// - toast: Displays notifications for user actions.
+// - confirmModal: Handles confirmation dialogs for delete operations.
+// - renameModal, renameValue: Manages rename modal state and input.
+// - viewMode: Toggles between grid and list views.
+// - selected: Tracks selected files and folders.
+
+// Utility Functions:
+// - fetchFiles: Fetches files and folders from the server.
+// - enterFolder: Navigates into a folder.
+// - handleUpload, uploadFile: Handles file uploads.
+// - createFolder: Creates a new folder.
+// - showToast: Displays toast notifications.
+// - openDeleteConfirm, closeConfirmModal: Manages delete confirmation dialogs.
+// - renameFile, handleRenameConfirm: Handles file renaming.
+// - deleteFile, deleteFolder: Deletes files and folders.
+// - goBack: Navigates to the parent folder.
+// - wrapFileName: Formats long file names for better display.
+
+// Subcomponents:
+// - Header: Displays the top navigation bar with breadcrumbs and upload/folder creation options.
+// - SelectionToolbar: Provides tools for managing selected files and folders.
+// - FileGrid, FileList: Renders files and folders in grid or list view.
+// - FilePreview: Displays file content or image previews.
+// - ConfirmModal: Handles delete confirmation dialogs.
+// - RenameModal: Manages file renaming.
+// - Toast: Displays notifications.
+// - UploadStatusBar: Shows upload progress and status.
+
+// Footer: Displays copyright information and links.
+
 type FileItem = {
   key: string;
   url: string;

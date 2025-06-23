@@ -1,5 +1,10 @@
 import React from 'react';
 
+// UploadStatusBar component displays the status of file uploads.
+// Props:
+// - uploadQueue: Array of files with their upload status.
+// - onClose: Function to close the status bar.
+
 type FileWithStatus = {
   file: File;
   status: "pending" | "uploading" | "success" | "error";

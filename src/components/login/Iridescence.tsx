@@ -1,6 +1,15 @@
-import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
+import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 
+// This file defines the Iridescence component, which renders a dynamic WebGL-based visual effect.
+// The effect is created using the OGL library and shaders (vertex and fragment) for rendering.
+// Props:
+// - color: RGB values for the base color of the effect (default: [1, 1, 1]).
+// - speed: Controls the animation speed (default: 1.0).
+// - amplitude: Determines the intensity of mouse-based distortion (default: 0.1).
+// - mouseReact: Enables or disables mouse interaction (default: true).
+
+// Vertex shader: Defines the geometry and passes UV coordinates to the fragment shader.
 const vertexShader = `
 attribute vec2 uv;
 attribute vec2 position;
@@ -13,6 +22,7 @@ void main() {
 }
 `;
 
+// Fragment shader: Implements the visual effect using time, resolution, mouse position, and other uniforms.
 const fragmentShader = `
 precision highp float;
 
@@ -45,6 +55,7 @@ void main() {
 }
 `;
 
+// Iridescence component: Sets up the WebGL renderer, shaders, and mouse interaction.
 interface IridescenceProps {
   color?: [number, number, number];
   speed?: number;

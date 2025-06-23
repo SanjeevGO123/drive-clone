@@ -1,6 +1,29 @@
 import React from 'react';
 import Folder from './Folder';
 
+// FileGrid component displays files and folders in a grid layout.
+// Props:
+// - folders: Array of folder names.
+// - files: Array of file objects with keys and URLs.
+// - currentPrefix: Current folder prefix.
+// - userId: ID of the user.
+// - isSelected: Function to check if an item is selected.
+// - toggleSelect: Function to toggle selection of an item.
+// - setSelected: Function to set selected items.
+// - enterFolder: Function to navigate into a folder.
+// - openFilePreview: Function to preview a file.
+// - wrapFileName: Function to wrap file names for display.
+// - openDeleteConfirm: Function to open delete confirmation modal.
+// - deleteFolder: Function to delete a folder.
+// - deleteFile: Function to delete a file.
+// - renameFile: Function to rename a file.
+// - getFileIcon: Function to get the icon for a file.
+// - selected: Set of selected items.
+// - folderOptionsAnchor: Anchor for folder options menu.
+// - setFolderOptionsAnchor: Function to set folder options anchor.
+// - fileOptionsAnchor: Anchor for file options menu.
+// - setFileOptionsAnchor: Function to set file options anchor.
+
 type FileItem = {
   key: string;
   url: string;

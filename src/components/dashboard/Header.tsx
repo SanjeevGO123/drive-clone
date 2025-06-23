@@ -1,5 +1,20 @@
 import React from 'react';
 
+// Header component displays the top navigation bar.
+// Props:
+// - canGoBack: Boolean indicating if the user can navigate back.
+// - goBack: Function to navigate back.
+// - fetchFiles: Function to fetch files.
+// - breadcrumbs: Array of breadcrumb objects.
+// - isCreatingFolder: Boolean indicating if a folder is being created.
+// - setIsCreatingFolder: Function to set folder creation state.
+// - newFolderName: Name of the new folder.
+// - setNewFolderName: Function to set the new folder name.
+// - createFolder: Function to create a new folder.
+// - handleUpload: Function to handle file uploads.
+// - viewMode: Current view mode ('grid' or 'list').
+// - setViewMode: Function to set the view mode.
+
 type HeaderProps = {
   canGoBack: boolean;
   goBack: () => void;

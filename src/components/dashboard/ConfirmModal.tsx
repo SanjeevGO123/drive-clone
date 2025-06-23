@@ -1,5 +1,13 @@
 import React from 'react';
 
+// ConfirmModal component handles the confirmation dialog for deleting files or folders.
+// Props:
+// - isOpen: Boolean to control modal visibility.
+// - type: Type of item being deleted ('file' or 'folder').
+// - name: Name of the item being deleted.
+// - onConfirm: Callback for confirming the action.
+// - onCancel: Callback for canceling the action.
+
 type ConfirmModalProps = {
   isOpen: boolean;
   type: 'file' | 'folder' | null;

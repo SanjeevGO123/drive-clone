@@ -1,5 +1,10 @@
 import React from 'react';
 
+// Toast component displays notifications.
+// Props:
+// - message: Notification message.
+// - type: Type of notification ('error' or 'success').
+
 type ToastProps = {
   message?: string;
   type?: 'error' | 'success';

@@ -1,5 +1,13 @@
 import React from 'react';
 
+// RenameModal component handles the modal for renaming files.
+// Props:
+// - isOpen: Boolean to control modal visibility.
+// - value: Current value of the input field.
+// - onChange: Function to handle input changes.
+// - onConfirm: Function to confirm the rename action.
+// - onCancel: Function to cancel the rename action.
+
 type RenameModalProps = {
   isOpen: boolean;
   value: string;

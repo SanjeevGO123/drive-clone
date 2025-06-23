@@ -29,6 +29,12 @@ interface FolderProps {
   className?: string;
 }
 
+// Folder component renders a folder icon with optional papers inside.
+// Props:
+// - color: Color of the folder.
+// - size: Size of the folder.
+// - items: Array of items (papers) inside the folder.
+// - className: Additional CSS classes for the folder.
 const Folder = ({
   color = "#00d8ff",
   size = 1,

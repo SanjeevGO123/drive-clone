@@ -1,5 +1,16 @@
 import React from 'react';
 
+// FilePreview component displays a preview of the selected file.
+// Props:
+// - previewFile: The file being previewed.
+// - setPreviewFile: Function to set the preview file.
+// - previewLoading: Boolean indicating if the preview is loading.
+// - previewContent: Content of the preview file.
+// - userId: ID of the user.
+// - currentPrefix: Current folder prefix.
+// - getFileExtension: Function to get the file extension.
+// - getFileIcon: Function to get the icon for a file.
+
 type FileItem = {
   key: string;
   url: string;
