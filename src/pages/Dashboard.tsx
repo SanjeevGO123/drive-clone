@@ -10,6 +10,7 @@ import {
   Toast, 
   UploadStatusBar 
 } from '../components/dashboard';
+import { Toaster } from '../components/ui/toaster';
 
 // This file defines the Dashboard component, which serves as the main interface for the Drive Clone application.
 // It provides functionalities for file and folder management, including upload, preview, rename, delete, and navigation.
@@ -108,10 +109,6 @@ export default function Dashboard() {
 
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
-
-  // Add state for options menu
-  const [fileOptionsAnchor, setFileOptionsAnchor] = useState<string | null>(null);
-  const [folderOptionsAnchor, setFolderOptionsAnchor] = useState<string | null>(null);
 
   // Toast and Modal state
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
@@ -603,10 +600,6 @@ export default function Dashboard() {
             renameFile={renameFile}
             getFileIcon={getFileIcon}
             selected={selected}
-            folderOptionsAnchor={folderOptionsAnchor}
-            setFolderOptionsAnchor={setFolderOptionsAnchor}
-            fileOptionsAnchor={fileOptionsAnchor}
-            setFileOptionsAnchor={setFileOptionsAnchor}
           />
         ) : (          <FileList 
             folders={folders}
@@ -624,10 +617,6 @@ export default function Dashboard() {
             renameFile={renameFile}
             getFileIcon={getFileIcon}
             selected={selected}
-            folderOptionsAnchor={folderOptionsAnchor}
-            setFolderOptionsAnchor={setFolderOptionsAnchor}
-            fileOptionsAnchor={fileOptionsAnchor}
-            setFileOptionsAnchor={setFileOptionsAnchor}
             wrapFileName={wrapFileName}
           />
         )}
@@ -686,6 +675,7 @@ export default function Dashboard() {
         uploadQueue={uploadQueue}
         onClose={() => setUploadQueue([])}
       />
+      <Toaster />
     </div>
   );
 }

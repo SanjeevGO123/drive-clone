@@ -1,5 +1,13 @@
 import React from 'react';
 import Folder from './Folder';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
+import { MoreVertical, Trash2, Edit } from 'lucide-react';
 
 // FileGrid component displays files and folders in a grid layout.
 // Props:
@@ -46,10 +54,6 @@ type FileGridProps = {
   renameFile: (oldKey: string) => void;
   getFileIcon: (fileName: string) => React.ReactNode;
   selected: Set<string>;
-  folderOptionsAnchor: string | null;
-  setFolderOptionsAnchor: (anchor: string | null) => void;
-  fileOptionsAnchor: string | null;
-  setFileOptionsAnchor: (anchor: string | null) => void;
 };
 
 const FileGrid: React.FC<FileGridProps> = ({
@@ -69,10 +73,6 @@ const FileGrid: React.FC<FileGridProps> = ({
   renameFile,
   getFileIcon,
   selected,
-  folderOptionsAnchor,
-  setFolderOptionsAnchor,
-  fileOptionsAnchor,
-  setFileOptionsAnchor,
 }) => {
   return (
     <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-10">
@@ -96,32 +96,30 @@ const FileGrid: React.FC<FileGridProps> = ({
             <span className="absolute top-3 left-3 bg-blue-600 text-white rounded-full p-1 shadow-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
           )}
           {/* 3-dots button for folder */}
-          <button
-            className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200/70 dark:hover:bg-gray-700/70 shadow"
-            onClick={(e) => {
-              e.stopPropagation();
-              setFolderOptionsAnchor(folderOptionsAnchor === folder ? null : folder);
-            }}
-          >
-            <span className="text-xl">⋮</span>
-          </button>
-          {/* Dropdown menu for folder */}
-          {folderOptionsAnchor === folder && (
-            <div className="absolute right-3 top-14 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-30 min-w-[150px] py-2 animate-fade-in backdrop-blur-xl">
-              <button
-                className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-red-600 dark:text-red-400 font-semibold hover:bg-red-50/80 dark:hover:bg-red-900/80 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-3 right-3 h-8 w-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setFolderOptionsAnchor(null);
                   openDeleteConfirm('folder', folder, folder, () => deleteFolder(folder));
                 }}
-                type="button"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" /></svg>
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
-              </button>
-            </div>
-          )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {/* Folder icon and name */}
           <div className="flex flex-col items-center justify-center flex-1 w-full">
             <Folder size={2.2} color="#00d8ff" className="custom-folder mb-3 drop-shadow-xl" />
@@ -156,38 +154,39 @@ const FileGrid: React.FC<FileGridProps> = ({
               <span className="absolute top-3 left-3 bg-blue-600 text-white rounded-full p-1 shadow-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></span>
             )}
             {/* 3-dots button for file */}
-            <button
-              className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200/70 dark:hover:bg-gray-700/70 shadow"
-              onClick={(e) => {
-                e.stopPropagation();
-                setFileOptionsAnchor(fileOptionsAnchor === key ? null : key);
-              }}
-            >
-              <span className="text-xl">⋮</span>
-            </button>
-            {/* Dropdown menu for file */}
-            {fileOptionsAnchor === key && (
-              <div className="absolute right-3 top-14 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-30 min-w-[150px] py-2 animate-fade-in backdrop-blur-xl">
-                <button
-                  className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-blue-600 dark:text-blue-400 font-semibold hover:bg-blue-50/80 dark:hover:bg-blue-900/80 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-left active:scale-95"
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setFileOptionsAnchor(null); renameFile(key); }}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-3 right-3 h-8 w-8"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-2.828 0L9 13zm-4 6h16" /></svg>
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    renameFile(key);
+                  }}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
                   Rename
-                </button>
-                <button
-                  className="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-red-600 dark:text-red-400 font-semibold hover:bg-red-50/80 dark:hover:bg-red-900/80 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors text-left active:scale-95"
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setFileOptionsAnchor(null); openDeleteConfirm('file', key, fileName, () => deleteFile(key)); }}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openDeleteConfirm('file', key, fileName, () => deleteFile(key));
+                  }}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a2 2 0 012 2v2H7V5a2 2 0 012-2zm0 0V3m0 2v2" />
-                  </svg>
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete
-                </button>
-              </div>
-            )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {/* File icon and name */}
             <div className="flex flex-col items-center justify-center py-10">
               <div className="text-6xl mb-3 drop-shadow-xl">{getFileIcon(fileName)}</div>

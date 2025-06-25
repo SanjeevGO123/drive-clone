@@ -1,4 +1,5 @@
 import React from 'react';
+import { useToast } from '../../hooks/use-toast';
 
 // Toast component displays notifications.
 // Props:
@@ -11,13 +12,19 @@ type ToastProps = {
 };
 
 const Toast: React.FC<ToastProps> = ({ message, type }) => {
-  if (!message || !type) return null;
-  
-  return (
-    <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all ${type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
-      {message}
-    </div>
-  );
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    if (message && type) {
+      toast({
+        title: type === 'error' ? 'Error' : 'Success',
+        description: message,
+        variant: type === 'error' ? 'destructive' : 'default',
+      });
+    }
+  }, [message, type, toast]);
+
+  return null; // The Toaster component will handle rendering
 };
 
 export default Toast;
