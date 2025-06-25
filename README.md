@@ -259,11 +259,14 @@ This project uses **shadcn/ui** for consistent, accessible, and customizable com
 ### Key Components Used:
 - **Button** - Primary actions, navigation, form submissions
 - **Input** - Text inputs with proper focus states and validation
+- **Input OTP** - One-time password verification with 6-digit code input
 - **Dialog** - Modal dialogs for confirmations and forms
 - **DropdownMenu** - Context menus for file/folder actions
 - **Breadcrumb** - Navigation breadcrumbs with proper accessibility
 - **Toast** - Non-intrusive notifications for user feedback
 - **Card** - Content containers with consistent styling
+- **Progress** - Upload progress indicators with color coding
+- **Form** - Structured form layouts with proper spacing and validation
 
 ### Theming:
 - CSS custom properties for light/dark mode support
@@ -364,18 +367,19 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ## 🧪 Features
 
-- 🔐 Secure Cognito login/signup with modern UI
+- 🔐 Secure Cognito login/signup with modern shadcn/ui components
 - 📁 Hierarchical folder navigation with shadcn/ui breadcrumbs
-- 📤 Multi-select file uploads with progress tracking
-- 🖼️ Google Drive-like, responsive UI using shadcn/ui components
+- 📤 Multi-select file uploads with progress tracking using shadcn/ui Progress
+- 🖼️ Google Drive-like, responsive UI using shadcn/ui components throughout
 - ☁️ Real-time file/folder operations via Lambda functions
 - 🔗 Secure presigned S3 URLs for direct uploads
 - 📱 Mobile-first, fully responsive dashboard
 - 🛡️ Strict IAM, CORS, and security best practices
 - ♿ Full accessibility support with ARIA labels and keyboard navigation
-- 🎨 Modern component library with consistent theming
-- 🔔 Toast notifications for user feedback
-- 📋 Context menus for file operations
+- 🎨 Modern component library with consistent theming and dark mode
+- 🔔 Toast notifications for user feedback using shadcn/ui Toast system
+- 📋 Context menus for file operations using shadcn/ui DropdownMenu
+- 🔐 OTP verification with shadcn/ui Input OTP component
 - 🌙 Dark mode support via CSS custom properties
 
 ---

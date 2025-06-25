@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
-import { MoreVertical, Trash2, Edit, Folder, File } from 'lucide-react';
+import { MoreVertical, Trash2, Edit } from 'lucide-react';
 
 // FileList component displays files and folders in a list layout.
 // Props:

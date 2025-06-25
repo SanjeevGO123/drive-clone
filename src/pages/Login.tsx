@@ -1,6 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { signIn, signUp, confirmSignUp } from "../aws/auth";
-import Iridescence from '../components/login/Iridescence'; 
+import Iridescence from '../components/login/Iridescence';
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Form, FormItem, FormLabel } from "../components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../components/ui/input-otp";
+import { useToast } from "../components/ui/use-toast";
+import { Toaster } from "../components/ui/toaster";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import { AlertCircle } from "lucide-react"; 
 
 // This file defines the Login component, which provides the user interface for signing in and signing up.
 // It includes functionality for handling authentication, OTP verification, and dynamic UI updates.
@@ -44,24 +60,47 @@ export default function Login() {
   const [otp, setOtp] = useState("");
   const [needOtp, setNeedOtp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [customToast, setCustomToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorTitle, setErrorTitle] = useState("Error");
+  const { toast } = useToast();
 
   // Handle sign up
   const handleSignUp = async () => {
     if (!username || !password || !email) {
-      setCustomToast({ message: "Please fill in all fields.", type: "error" });
+      toast({
+        title: "Error",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
       return;
     }
     setLoading(true);
     try {
       await signUp(username, password, email);
-      setCustomToast({ message: "Signup successful! Check your email for the verification code.", type: "success" });
+      toast({
+        title: "Success",
+        description: "Signup successful! Check your email for the verification code.",
+      });
       setNeedOtp(true);
     } catch (err: any) {
-      setCustomToast({ message: "Signup failed: " + err.message, type: "error" });
+      // Show error dialog for critical signup errors like user already exists
+      if (err.code === "UsernameExistsException" || err.message.includes("already exists")) {
+        setErrorTitle("Username Already Taken");
+        setErrorMessage("This username is already taken. Please choose a different username.");
+        setShowErrorDialog(true);
+      } else if (err.code === "InvalidParameterException" || err.code === "InvalidPasswordException") {
+        setErrorTitle("Password Requirements");
+        setErrorMessage(`Password requirements not met: ${err.message}`);
+        setShowErrorDialog(true);
+      } else {
+        // For other errors, use toast for less critical ones
+        toast({
+          title: "Error",
+          description: "Signup failed: " + err.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -79,7 +118,10 @@ export default function Login() {
       if (err.code === "UserNotConfirmedException") {
         setNeedOtp(true);
       } else {
-        setCustomToast({ message: "Login failed: " + err.message, type: "error" });
+        // Show error dialog for login failures
+        setErrorTitle("Login Failed");
+        setErrorMessage(`Login failed: ${err.message}`);
+        setShowErrorDialog(true);
       }
     } finally {
       setLoading(false);
@@ -89,20 +131,32 @@ export default function Login() {
   // Handle OTP confirm (both signup & signin cases)
   const handleConfirm = async () => {
     if (!otp) {
-      setCustomToast({ message: "Please enter the OTP sent to your email.", type: "error" });
+      toast({
+        title: "Error",
+        description: "Please enter the OTP sent to your email.",
+        variant: "destructive",
+      });
       return;
     }
     setLoading(true);
     try {
       await confirmSignUp(username, otp);
-      setCustomToast({ message: "Verification successful! Signing you in...", type: "success" });
+      toast({
+        title: "Success",
+        description: "Verification successful! Signing you in...",
+      });
       // After confirm, sign in automatically
       const token = await signIn(username, password);
       localStorage.setItem("token", token);
       localStorage.setItem("username", username);
       window.location.href = "/dashboard";
     } catch (err: any) {
-      setCustomToast({ message: "Failed to confirm signup: " + err.message, type: "error" });
+      // Show error dialog for wrong OTP
+      setErrorTitle("Verification Failed");
+      setErrorMessage(err.message || "Invalid verification code. Please try again.");
+      setShowErrorDialog(true);
+      // Also clear the OTP input
+      setOtp("");
     } finally {
       setLoading(false);
     }
@@ -253,32 +307,68 @@ export default function Login() {
         <div className="absolute inset-0 w-full h-full z-0 blur-xl">
           <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
         </div>
-        <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-sm text-center relative z-10">
-          <h2 className="text-2xl font-semibold mb-4">Confirm Signup</h2>
-          <p className="mb-6 text-gray-600">
-            Enter the verification code sent to your email.
-          </p>
-          <input
-            type="text"
-            placeholder="OTP code"
-            className="w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring focus:border-blue-400"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-          <button
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50"
-            onClick={handleConfirm}
-          >
-            {loading ? "Verifying..." : "Verify & Sign In"}
-          </button>
-          {/* Custom Toast Notification */}
-          {customToast && (
-            <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all mt-6 ${customToast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
-              {customToast.message}
-            </div>
-          )}
-        </div>
+        <Card className="w-full max-w-sm relative z-10">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-semibold">Confirm Signup</CardTitle>
+            <CardDescription>
+              Enter the verification code sent to your email.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form className="space-y-6">
+              <FormItem className="flex flex-col items-center space-y-2">
+                <FormLabel htmlFor="otp">Verification Code</FormLabel>
+                <InputOTP 
+                  value={otp} 
+                  onChange={setOtp}
+                  maxLength={6}
+                  className="justify-center"
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </FormItem>
+              <Button
+                disabled={loading}
+                className="w-full"
+                onClick={handleConfirm}
+              >
+                {loading ? "Verifying..." : "Verify & Sign In"}
+              </Button>
+            </Form>
+          </CardContent>
+        </Card>
+        
+        {/* Error Dialog */}
+        <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="w-5 h-5" />
+                {errorTitle}
+              </DialogTitle>
+              <DialogDescription>
+                {errorMessage}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button 
+                onClick={() => setShowErrorDialog(false)}
+                className="w-full"
+              >
+                Try Again
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        <Toaster />
       </div>
     );
   }
@@ -290,98 +380,126 @@ export default function Login() {
       <div className="absolute inset-0 w-full h-full z-0 blur-xl">
         <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
       </div>
-      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-7 flex flex-col items-center relative border border-gray-200 dark:border-gray-800 z-10">
-        
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-1 tracking-tight">
-          Sign {mode === "signin" ? "in" : "up"}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {mode === "signin"
-            ? "to continue to Drive Clone"
-            : "Create your Google-style account"}
-        </p>
-        {/* Add form element to enable Enter key submit */}
-        <form
-          className="w-full space-y-3 mb-2"
-          onSubmit={e => {
-            e.preventDefault();
-            if (mode === "signin") handleSignIn();
-            else handleSignUp();
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Username"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100 transition"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoFocus
-          />
-          {mode === "signup" && (
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100 transition"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          )}
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100 transition"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 rounded-lg text-white font-semibold shadow-md transition disabled:opacity-50 text-base mb-2 ${
-              mode === "signin"
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-green-600 hover:bg-green-700"
-            }`}
+      <Card className="w-full max-w-sm relative z-10">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-semibold tracking-tight">
+            Sign {mode === "signin" ? "in" : "up"}
+          </CardTitle>
+          <CardDescription>
+            {mode === "signin"
+              ? "to continue to Drive Clone"
+              : "Create your Google-style account"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form
+            onSubmit={e => {
+              e.preventDefault();
+              if (mode === "signin") handleSignIn();
+              else handleSignUp();
+            }}
           >
-            {loading
-              ? mode === "signin"
-                ? "Signing in..."
-                : "Signing up..."
-              : mode === "signin"
-              ? "Sign In"
-              : "Sign Up"}
-          </button>
-        </form>
-        
-        <p className="mt-2 text-xs text-gray-400 text-center w-full">
-          {mode === "signin" ? (
-            <>
-              Don't have an account?{" "}
-              <button
-                className="text-blue-600 hover:underline focus:outline-none"
-                onClick={() => setMode("signup")}
-              >
-                Sign up
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                className="text-blue-600 hover:underline focus:outline-none"
-                onClick={() => setMode("signin")}
-              >
-                Sign in
-              </button>
-            </>
-          )}
-        </p>
-        {/* Custom Toast Notification */}
-        {customToast && (
-          <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white transition-all mt-6 ${customToast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
-            {customToast.message}
-          </div>
-        )}
-      </div>
+            <FormItem>
+              <FormLabel htmlFor="username">Username</FormLabel>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoFocus
+              />
+            </FormItem>
+            {mode === "signup" && (
+              <FormItem>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </FormItem>
+            )}
+            <FormItem>
+              <FormLabel htmlFor="password">Password</FormLabel>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </FormItem>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+              variant={mode === "signin" ? "default" : "secondary"}
+            >
+              {loading
+                ? mode === "signin"
+                  ? "Signing in..."
+                  : "Signing up..."
+                : mode === "signin"
+                ? "Sign In"
+                : "Sign Up"}
+            </Button>
+          </Form>
+          
+          <p className="mt-4 text-xs text-muted-foreground text-center">
+            {mode === "signin" ? (
+              <>
+                Don't have an account?{" "}
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs"
+                  onClick={() => setMode("signup")}
+                >
+                  Sign up
+                </Button>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs"
+                  onClick={() => setMode("signin")}
+                >
+                  Sign in
+                </Button>
+              </>
+            )}
+          </p>
+        </CardContent>
+      </Card>
+      
+      {/* Error Dialog */}
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-5 h-5" />
+              {errorTitle}
+            </DialogTitle>
+            <DialogDescription>
+              {errorMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowErrorDialog(false)}
+              className="w-full"
+            >
+              Try Again
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Toaster />
     </div>
   );
 }
