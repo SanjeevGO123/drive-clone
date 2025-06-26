@@ -10,7 +10,10 @@ import {
   Toast, 
   UploadStatusBar 
 } from '../components/dashboard';
+import LoadingSkeleton from '../components/dashboard/LoadingSkeleton';
 import { Toaster } from '../components/ui/toaster';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 // This file defines the Dashboard component, which serves as the main interface for the Drive Clone application.
 // It provides functionalities for file and folder management, including upload, preview, rename, delete, and navigation.
@@ -101,6 +104,8 @@ export default function Dashboard() {
   const [folders, setFolders] = useState<string[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   // eslint-disable-next-line
   const [uploadQueue, setUploadQueue] = useState<FileWithStatus[]>([]);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
@@ -127,6 +132,8 @@ export default function Dashboard() {
 
   const fetchFiles = async (prefix: string, pushState: boolean = true) => {
     try {
+      setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
       if (!userId || !token) throw new Error("User not logged in");
 
@@ -152,7 +159,10 @@ export default function Dashboard() {
         window.history.pushState({}, '', `#/` + encodeURIComponent(prefix));
       }
     } catch (err: any) {
-      alert(err.message);
+      setError(err.message);
+      console.error("Failed to fetch files:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -582,43 +592,66 @@ export default function Dashboard() {
       />
 
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-8 md:px-16 py-8 md:py-12 w-full">
-        {/* Folders and Files in grid or list view */}
-        {viewMode === 'grid' ? (          <FileGrid 
-            folders={folders}
-            files={files}
-            currentPrefix={currentPrefix}
-            userId={userId}
-            isSelected={isSelected}
-            toggleSelect={toggleSelect}
-            setSelected={setSelected}
-            enterFolder={enterFolder}
-            openFilePreview={openFilePreview}
-            wrapFileName={wrapFileName}
-            openDeleteConfirm={openDeleteConfirm}
-            deleteFolder={deleteFolder}
-            deleteFile={deleteFile}
-            renameFile={renameFile}
-            getFileIcon={getFileIcon}
-            selected={selected}
-          />
-        ) : (          <FileList 
-            folders={folders}
-            files={files}
-            currentPrefix={currentPrefix}
-            userId={userId}
-            isSelected={isSelected}
-            toggleSelect={toggleSelect}
-            setSelected={setSelected}
-            enterFolder={enterFolder}
-            openFilePreview={openFilePreview}
-            openDeleteConfirm={openDeleteConfirm}
-            deleteFolder={deleteFolder}
-            deleteFile={deleteFile}
-            renameFile={renameFile}
-            getFileIcon={getFileIcon}
-            selected={selected}
-            wrapFileName={wrapFileName}
-          />
+        {/* Error state */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+              <button 
+                onClick={() => fetchFiles(currentPrefix)} 
+                className="ml-2 underline hover:no-underline"
+              >
+                Try again
+              </button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Loading state */}
+        {isLoading ? (
+          <LoadingSkeleton view={viewMode} count={12} />
+        ) : (
+          /* Folders and Files in grid or list view */
+          viewMode === 'grid' ? (
+            <FileGrid 
+              folders={folders}
+              files={files}
+              currentPrefix={currentPrefix}
+              userId={userId}
+              isSelected={isSelected}
+              toggleSelect={toggleSelect}
+              setSelected={setSelected}
+              enterFolder={enterFolder}
+              openFilePreview={openFilePreview}
+              wrapFileName={wrapFileName}
+              openDeleteConfirm={openDeleteConfirm}
+              deleteFolder={deleteFolder}
+              deleteFile={deleteFile}
+              renameFile={renameFile}
+              getFileIcon={getFileIcon}
+              selected={selected}
+            />
+          ) : (
+            <FileList 
+              folders={folders}
+              files={files}
+              currentPrefix={currentPrefix}
+              userId={userId}
+              isSelected={isSelected}
+              toggleSelect={toggleSelect}
+              setSelected={setSelected}
+              enterFolder={enterFolder}
+              openFilePreview={openFilePreview}
+              openDeleteConfirm={openDeleteConfirm}
+              deleteFolder={deleteFolder}
+              deleteFile={deleteFile}
+              renameFile={renameFile}
+              getFileIcon={getFileIcon}
+              selected={selected}
+              wrapFileName={wrapFileName}
+            />
+          )
         )}
       </main>
 

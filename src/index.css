@@ -15,7 +15,7 @@
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 44%;
     --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
     --destructive: 0 84.2% 60.2%;
@@ -38,7 +38,7 @@
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 20.2% 68%;
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
@@ -54,6 +54,89 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-medium;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.6;
+  }
+  
+  /* Improved text visibility and contrast */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
+    color: hsl(var(--foreground));
+  }
+  
+  /* Better contrast for muted text */
+  .text-muted-foreground {
+    @apply text-slate-600 dark:text-slate-300;
+  }
+  
+  /* Enhanced button text visibility */
+  button {
+    @apply font-medium;
+    color: inherit;
+  }
+  
+  /* Improved input contrast */
+  input, textarea {
+    @apply font-medium;
+    color: hsl(var(--foreground));
+  }
+  
+  /* Better visibility for cards and containers */
+  .bg-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  
+  /* Enhanced link visibility */
+  a {
+    @apply font-medium;
+    color: hsl(var(--primary));
+  }
+  
+  /* Better text contrast in dark mode */
+  .dark .text-gray-800 {
+    @apply text-gray-100;
+  }
+  
+  .dark .text-gray-700 {
+    @apply text-gray-200;
+  }
+  
+  .dark .text-gray-600 {
+    @apply text-gray-300;
+  }
+  
+  .dark .text-gray-500 {
+    @apply text-gray-400;
+  }
+  
+  /* Improved focus visibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  
+  /* Better hover states */
+  .hover\:bg-accent:hover {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+}
+
+@layer utilities {
+  .animate-caret-blink {
+    animation: caret-blink 1.25s ease-out infinite;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
   }
 }
