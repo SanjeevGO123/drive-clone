@@ -271,6 +271,7 @@ const FileList: React.FC<FileListProps> = ({
           const fileName = key.slice(`${userId}/${currentPrefix}`.length);
           const fileExtension = fileName.split('.').pop() || '';
           const fileTypeStyle = getFileTypeStyle(fileExtension);
+          
           return (
             <div key={key} className={`grid grid-cols-12 items-center px-6 py-3 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer transition-colors ${isSelected(key) ? 'bg-blue-100 dark:bg-blue-900' : ''}`}                  onClick={(e) => {
                     if (e.ctrlKey || e.metaKey) toggleSelect(key);

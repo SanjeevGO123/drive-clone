@@ -1,8 +1,6 @@
 import React from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb';
-import { ArrowLeft, Grid3x3, List, Plus, Upload, LogOut, X, Folder } from 'lucide-react';
+import { ArrowLeft, Grid3x3, List, Plus, Upload, LogOut, X } from 'lucide-react';
 
 // Header component displays the top navigation bar.
 // Props:
