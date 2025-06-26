@@ -2,17 +2,45 @@
 
 A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend using **shadcn/ui** components and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
+✨ **Latest Update:** Fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
+
+---
+
+## 🎨 Design Features
+
+### Modern UI with shadcn/ui
+- **Consistent Design System** - Unified component library with semantic theming
+- **Enhanced Accessibility** - ARIA labels, keyboard navigation, screen reader support
+- **Color-Coded File Types** - Visual file type identification with badges
+- **Loading States** - Skeleton loading animations for better UX
+- **Error Handling** - User-friendly error dialogs and alerts
+- **Dark Mode Support** - Full light/dark theme implementation
+
+### File Type Color System
+- 🔴 **PDF Files** - Red badges for easy identification
+- 🟢 **Spreadsheets** - Green for Excel/CSV files  
+- 🔵 **Documents** - Blue for Word documents
+- 🟠 **Presentations** - Orange for PowerPoint files
+- 🟣 **Images** - Purple for photos and graphics
+- 🟡 **Archives** - Yellow for ZIP/RAR files
+- 🩷 **Videos** - Pink for media files
+- 🟦 **Audio** - Indigo for music files
+- 🟢 **Code** - Emerald for programming files
+- ⚫ **Text/Other** - Gray for plain text and unknown types
+
 ---
 
 ## 🧰 Technology Stack
 
 ### Frontend
-- **React** (TypeScript)
-- **shadcn/ui** - Modern, accessible component library
-- **TailwindCSS** for rapid, responsive UI
-- **Lucide React** for consistent iconography
-- **AWS Cognito** (via `amazon-cognito-identity-js`) for authentication
-- Hosted on **S3** with **CloudFront CDN**
+- **React** (TypeScript) with modern hooks and context
+- **shadcn/ui** - Complete modern, accessible component library
+- **TailwindCSS** for rapid, responsive UI with custom design tokens
+- **Lucide React** for consistent, beautiful iconography
+- **AWS Cognito** (via `amazon-cognito-identity-js`) for secure authentication
+- **React Hook Form** with validation for form management
+- **Class Variance Authority** for component variant styling
+- Hosted on **S3** with **CloudFront CDN** for global distribution
 
 ### Backend
 - **Serverless AWS Lambda Functions** (Node.js 22.x):
@@ -254,32 +282,39 @@ All endpoints may return the following error responses:
 
 ## 🎨 UI Components (shadcn/ui)
 
-This project uses **shadcn/ui** for consistent, accessible, and customizable components:
+This project uses **shadcn/ui** for consistent, accessible, and customizable components with complete TypeScript support:
 
-### Key Components Used:
-- **Button** - Primary actions, navigation, form submissions
-- **Input** - Text inputs with proper focus states and validation
-- **Input OTP** - One-time password verification with 6-digit code input
-- **Dialog** - Modal dialogs for confirmations and forms
-- **DropdownMenu** - Context menus for file/folder actions
+### Core Components Used:
+- **Button** - Multiple variants (default, destructive, outline, secondary, ghost, link)
+- **Input** - Enhanced text inputs with proper focus states and validation
+- **Input OTP** - Six-digit one-time password verification with auto-focus
+- **Dialog** - Modal dialogs for confirmations, forms, and error messages
+- **DropdownMenu** - Context menus for file/folder actions with keyboard navigation
 - **Breadcrumb** - Navigation breadcrumbs with proper accessibility
-- **Toast** - Non-intrusive notifications for user feedback
-- **Card** - Content containers with consistent styling
-- **Progress** - Upload progress indicators with color coding
-- **Form** - Structured form layouts with proper spacing and validation
+- **Toast & Toaster** - Non-intrusive notifications with auto-dismiss
+- **Card** - Content containers with header, content, and footer sections
+- **Progress** - Upload progress indicators with color-coded states
+- **Form & Label** - Structured form layouts with validation states
+- **Badge** - Color-coded file type indicators with semantic variants
+- **Separator** - Visual content dividers with orientation support
+- **Skeleton** - Loading placeholders for better perceived performance
+- **Alert** - Important messages with icons and proper styling
 
-### Theming:
-- CSS custom properties for light/dark mode support
-- Tailwind CSS for utility-first styling
-- Consistent color palette with semantic naming
-- Responsive design with mobile-first approach
+### Advanced Features:
+- **Loading States** - Skeleton components for grid and list views
+- **Error Handling** - User-friendly error dialogs for authentication failures
+- **File Type Recognition** - Color-coded badges for different file extensions
+- **Enhanced Navigation** - Breadcrumb navigation with folder hierarchy
+- **Responsive Design** - Mobile-first approach with adaptive layouts
 
-### Accessibility Features:
-- ARIA labels and descriptions
-- Keyboard navigation support
-- Focus management for modals and dropdowns
-- Screen reader compatibility
-- High contrast mode support
+### Theming & Accessibility:
+- **CSS Custom Properties** - Semantic color tokens for light/dark modes
+- **WCAG Compliant** - AA accessibility standards throughout
+- **Keyboard Navigation** - Full keyboard support for all interactive elements
+- **Focus Management** - Proper focus trapping in modals and dropdowns
+- **Screen Reader Support** - Comprehensive ARIA labels and descriptions
+- **High Contrast** - Enhanced visibility in all lighting conditions
+- **Responsive Typography** - Scalable text with proper line heights
 
 ---
 
@@ -287,23 +322,63 @@ This project uses **shadcn/ui** for consistent, accessible, and customizable com
 
 ```
 project-root/
-├── public/
+├── public/                 # Static assets
+│   ├── favicon.ico
+│   ├── index.html
+│   └── manifest.json
 ├── src/
-│   ├── pages/
-│   ├── components/
-│   ├── aws/
-│   ├── App.tsx
-│   └── ...
-├── api/                # Lambda handlers
-│   ├── getFiles.ts
-│   ├── getpresignedURL.ts
-│   ├── createFolder.ts
-│   ├── deleteFile.ts
-│   └── deleteFolder.ts
-│   └── renameFile.ts
-├── package.json
-├── README.md
-└── ...
+│   ├── pages/             # Main application pages
+│   │   ├── Dashboard.tsx  # Main file management interface
+│   │   └── Login.tsx      # Authentication page with OTP
+│   ├── components/        # Reusable UI components
+│   │   ├── dashboard/     # Dashboard-specific components
+│   │   │   ├── Header.tsx           # Navigation header with breadcrumbs
+│   │   │   ├── FileGrid.tsx         # Grid view for files/folders
+│   │   │   ├── FileList.tsx         # List view for files/folders
+│   │   │   ├── FilePreview.tsx      # File preview modal
+│   │   │   ├── ConfirmModal.tsx     # Delete confirmation dialog
+│   │   │   ├── RenameModal.tsx      # File rename dialog
+│   │   │   ├── SelectionToolbar.tsx # Bulk action toolbar
+│   │   │   ├── UploadStatusBar.tsx  # Upload progress display
+│   │   │   ├── LoadingSkeleton.tsx  # Loading placeholder
+│   │   │   └── Toast.tsx            # Notification component
+│   │   ├── ui/            # shadcn/ui components
+│   │   │   ├── button.tsx           # Button variants
+│   │   │   ├── input.tsx            # Input fields
+│   │   │   ├── input-otp.tsx        # OTP verification input
+│   │   │   ├── dialog.tsx           # Modal dialogs
+│   │   │   ├── dropdown-menu.tsx    # Context menus
+│   │   │   ├── breadcrumb.tsx       # Navigation breadcrumbs
+│   │   │   ├── toast.tsx            # Toast notifications
+│   │   │   ├── card.tsx             # Content containers
+│   │   │   ├── progress.tsx         # Progress indicators
+│   │   │   ├── form.tsx             # Form components
+│   │   │   ├── label.tsx            # Form labels
+│   │   │   ├── badge.tsx            # File type badges
+│   │   │   ├── separator.tsx        # Content dividers
+│   │   │   ├── skeleton.tsx         # Loading placeholders
+│   │   │   ├── alert.tsx            # Alert messages
+│   │   │   └── use-toast.ts         # Toast hook
+│   │   └── login/         # Authentication components
+│   │       └── Iridescence.tsx      # Background animation
+│   ├── aws/               # AWS service configurations
+│   │   └── auth.ts        # Cognito authentication setup
+│   ├── App.tsx            # Main application component
+│   ├── index.tsx          # Application entry point
+│   └── index.css          # Global styles with CSS variables
+├── api/                   # Lambda function handlers
+│   ├── getFiles.ts        # List user files and folders
+│   ├── getpresignedURL.ts # Generate presigned S3 upload URLs
+│   ├── createFolder.ts    # Create new folders
+│   ├── deleteFile.ts      # Delete individual files
+│   ├── deleteFolder.ts    # Delete folders and contents
+│   └── renameFile.ts      # Rename files and folders
+├── tailwind.config.js     # Tailwind CSS configuration
+├── tsconfig.json          # TypeScript configuration
+├── package.json           # Dependencies and scripts
+├── buildspec.yml          # AWS CodeBuild configuration
+├── Dockerfile             # Container configuration
+└── README.md              # Project documentation
 ```
 
 > **Note:** `.env.development` contains sensitive config (API URLs, Cognito IDs) and is git-ignored. Populate this file manually per environment.
@@ -318,17 +393,30 @@ project-root/
 
 ### Frontend Setup
 ```bash
+# Install dependencies
 npm install
+
+# Install additional shadcn/ui components (if needed)
+npx shadcn-ui@latest add button input dialog toast card progress
 ```
+
 Create `.env.development` in the root with:
 ```env
 REACT_APP_API_URL=https://your-api-gateway-url
 REACT_APP_COGNITO_USER_POOL_ID=your_cognito_user_pool_id
 REACT_APP_COGNITO_CLIENT_ID=your_cognito_app_client_id
 ```
+
 Run locally:
 ```bash
+# Start development server
 npm start
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
 ```
 
 ### Backend Setup & Deployment
@@ -367,30 +455,75 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ## 🧪 Features
 
-- 🔐 Secure Cognito login/signup with modern shadcn/ui components
-- 📁 Hierarchical folder navigation with shadcn/ui breadcrumbs
-- 📤 Multi-select file uploads with progress tracking using shadcn/ui Progress
-- 🖼️ Google Drive-like, responsive UI using shadcn/ui components throughout
-- ☁️ Real-time file/folder operations via Lambda functions
-- 🔗 Secure presigned S3 URLs for direct uploads
-- 📱 Mobile-first, fully responsive dashboard
-- 🛡️ Strict IAM, CORS, and security best practices
-- ♿ Full accessibility support with ARIA labels and keyboard navigation
-- 🎨 Modern component library with consistent theming and dark mode
-- 🔔 Toast notifications for user feedback using shadcn/ui Toast system
-- 📋 Context menus for file operations using shadcn/ui DropdownMenu
-- 🔐 OTP verification with shadcn/ui Input OTP component
-- 🌙 Dark mode support via CSS custom properties
+### Authentication & Security
+- 🔐 **Secure Cognito Authentication** - Modern sign-up/login with shadcn/ui forms
+- 🔑 **OTP Verification** - Six-digit code verification with auto-focus input
+- 🛡️ **Error Handling** - User-friendly error dialogs for wrong OTP, duplicate signup
+- 🎯 **JWT Token Management** - Automatic token refresh and validation
+
+### File Management
+- 📁 **Hierarchical Folder Navigation** - Breadcrumb navigation with folder hierarchy
+- 📤 **Multi-select File Uploads** - File selection with progress tracking
+- 🏷️ **Color-Coded File Types** - Visual file type identification with badges
+- 📋 **Context Menus** - Right-click actions for files and folders
+- ✏️ **Rename Operations** - Inline renaming with validation
+- 🗑️ **Batch Delete** - Multi-select delete with confirmation dialogs
+
+### User Experience
+- 🖼️ **Google Drive-like Interface** - Familiar and intuitive design
+- 📱 **Mobile-First Responsive** - Optimized for all screen sizes
+- 🌙 **Dark Mode Support** - Full light/dark theme implementation
+- ⚡ **Loading States** - Skeleton animations for better perceived performance
+- 🔔 **Toast Notifications** - Non-intrusive feedback for all actions
+- ♿ **Full Accessibility** - WCAG compliant with keyboard navigation
+
+### Technical Features
+- ☁️ **Real-time Operations** - Instant file/folder operations via Lambda
+- 🔗 **Presigned S3 URLs** - Secure direct uploads to S3
+- � **Upload Progress** - Real-time progress tracking with color coding
+- 🔄 **Auto-refresh** - Automatic content updates after operations
+- 🛡️ **Strict Security** - IAM roles, CORS, and security best practices
+- 📈 **Scalable Architecture** - Serverless backend with global CDN
+
+### Enhanced UI Components
+- 🎨 **Modern Component Library** - Complete shadcn/ui integration
+- 🏷️ **Smart File Badges** - Color-coded badges for 10+ file types
+- 📏 **Improved Spacing** - Larger, more comfortable click targets
+- 🎯 **Better Visibility** - Enhanced contrast and typography
+- � **Loading Skeletons** - Smooth loading transitions
+- ⚠️ **Error Alerts** - Contextual error messages with retry options
 
 ---
 
-## 🧼 Best Practices
+## 🧼 Best Practices & Architecture
 
-- Store sensitive data in `.env.development` (git-ignored)
-- Enable CORS and secure headers in API Gateway
-- Use IAM roles to restrict Lambda, S3, and DynamoDB access
-- Enable CloudWatch logs for monitoring and troubleshooting
-- Parameterize infrastructure (e.g., S3 bucket names) for portability
+### Frontend Architecture
+- **Component-Based Design** - Modular, reusable React components
+- **TypeScript First** - Full type safety with strict mode enabled
+- **Custom Hooks** - Shared logic for authentication, file operations
+- **State Management** - Context API for global state, local state for components
+- **Error Boundaries** - Graceful error handling and user feedback
+
+### UI/UX Best Practices
+- **Accessibility First** - WCAG 2.1 AA compliance throughout
+- **Progressive Enhancement** - Core functionality works without JavaScript
+- **Mobile-First Design** - Responsive layouts starting from mobile
+- **Performance Optimization** - Lazy loading, code splitting, image optimization
+- **User Feedback** - Loading states, error messages, success confirmations
+
+### Security Best Practices
+- **JWT Token Management** - Secure token storage and automatic refresh
+- **Input Validation** - Client and server-side validation for all inputs
+- **CORS Configuration** - Proper cross-origin resource sharing setup
+- **IAM Least Privilege** - Minimal permissions for all AWS resources
+- **Environment Variables** - Sensitive data stored securely (git-ignored)
+
+### Development Practices
+- **Code Quality** - ESLint, Prettier for consistent code formatting
+- **Type Safety** - Comprehensive TypeScript coverage
+- **Component Documentation** - Inline documentation for all components
+- **Git Workflow** - Feature branches, pull requests, code reviews
+- **Testing Strategy** - Unit tests for components, integration tests for workflows
 
 ---
 
