@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { signIn, signUp, confirmSignUp } from "../aws/auth";
-import Iridescence from '../components/login/Iridescence';
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -16,7 +15,74 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { AlertCircle } from "lucide-react"; 
+import { AlertCircle } from "lucide-react";
+
+// Animated Background Component
+const AnimatedBackground = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Base gradient mesh with more colors */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-400 via-emerald-400 via-pink-400 to-orange-400"></div>
+      
+      {/* Animated mesh layers */}
+      <div className="absolute inset-0">
+        {/* Large flowing gradient shapes with more vibrant colors */}
+        <div 
+          className="absolute w-[150vw] h-[150vh] -top-1/2 -left-1/2 opacity-80 animate-mesh-1"
+          style={{
+            background: 'radial-gradient(ellipse 80vw 40vh at 20% 50%, rgba(120, 119, 198, 0.8) 0%, transparent 50%), radial-gradient(ellipse 60vw 30vh at 80% 30%, rgba(255, 119, 198, 0.6) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        <div 
+          className="absolute w-[150vw] h-[150vh] -top-1/2 -right-1/2 opacity-70 animate-mesh-2"
+          style={{
+            background: 'radial-gradient(ellipse 70vw 35vh at 80% 70%, rgba(255, 184, 119, 0.7) 0%, transparent 50%), radial-gradient(ellipse 50vw 25vh at 20% 20%, rgba(119, 255, 198, 0.6) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        <div 
+          className="absolute w-[150vw] h-[150vh] -bottom-1/2 -left-1/2 opacity-75 animate-mesh-3"
+          style={{
+            background: 'radial-gradient(ellipse 90vw 45vh at 30% 40%, rgba(198, 119, 255, 0.6) 0%, transparent 50%), radial-gradient(ellipse 40vw 20vh at 70% 80%, rgba(119, 255, 119, 0.8) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        <div 
+          className="absolute w-[150vw] h-[150vh] -bottom-1/2 -right-1/2 opacity-65 animate-mesh-4"
+          style={{
+            background: 'radial-gradient(ellipse 65vw 32vh at 60% 60%, rgba(119, 198, 255, 0.7) 0%, transparent 50%), radial-gradient(ellipse 75vw 38vh at 40% 10%, rgba(255, 119, 162, 0.6) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        {/* Additional vibrant layers for more color variety */}
+        <div 
+          className="absolute w-[140vw] h-[140vh] -top-1/3 left-1/4 opacity-60 animate-mesh-5"
+          style={{
+            background: 'radial-gradient(ellipse 55vw 28vh at 50% 60%, rgba(34, 197, 94, 0.7) 0%, transparent 50%), radial-gradient(ellipse 45vw 22vh at 30% 40%, rgba(168, 85, 247, 0.5) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        <div 
+          className="absolute w-[130vw] h-[130vh] bottom-1/4 -right-1/3 opacity-55 animate-mesh-6"
+          style={{
+            background: 'radial-gradient(ellipse 60vw 30vh at 40% 30%, rgba(14, 165, 233, 0.6) 0%, transparent 50%), radial-gradient(ellipse 35vw 18vh at 80% 70%, rgba(236, 72, 153, 0.7) 0%, transparent 50%)'
+          }}
+        ></div>
+        
+        <div 
+          className="absolute w-[120vw] h-[120vh] top-1/3 -left-1/4 opacity-65 animate-mesh-7"
+          style={{
+            background: 'radial-gradient(ellipse 50vw 25vh at 70% 50%, rgba(16, 185, 129, 0.8) 0%, transparent 50%), radial-gradient(ellipse 30vw 15vh at 20% 80%, rgba(245, 158, 11, 0.6) 0%, transparent 50%)'
+          }}
+        ></div>
+      </div>
+      
+      {/* Enhanced overlay for depth with more color stops */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 via-emerald-500/15 via-rose-500/10 to-orange-500/20"></div>
+    </div>
+  );
+}; 
 
 // This file defines the Login component, which provides the user interface for signing in and signing up.
 // It includes functionality for handling authentication, OTP verification, and dynamic UI updates.
@@ -215,139 +281,6 @@ export default function Login() {
     }
   };
 
-  // UI
-
-  // Stripe-style live animated SVG background using React refs and requestAnimationFrame
-  const stripeRef1 = useRef<SVGGElement>(null);
-  const stripeRef2 = useRef<SVGGElement>(null);
-  const stripeRef3 = useRef<SVGGElement>(null);
-  const stripeRef4 = useRef<SVGGElement>(null);
-  const stripeRef5 = useRef<SVGGElement>(null);
-  // Gradient stop refs for color animation
-  const gradRefs = [
-    [useRef<SVGStopElement>(null), useRef<SVGStopElement>(null)],
-    [useRef<SVGStopElement>(null), useRef<SVGStopElement>(null)],
-    [useRef<SVGStopElement>(null), useRef<SVGStopElement>(null)],
-    [useRef<SVGStopElement>(null), useRef<SVGStopElement>(null)],
-    [useRef<SVGStopElement>(null), useRef<SVGStopElement>(null)],
-  ];
-  // Add random phase/speed/amp for each bar for full randomness
-  const barParams = useRef([
-    { px: Math.random() * 1000, py: Math.random() * 1000, rx: Math.random() * 10, sx: 120 + Math.random() * 80, sy: 120 + Math.random() * 80, sr: 4 + Math.random() * 2, spx: 1.2 + Math.random(), spy: 1.7 + Math.random(), spr: 2 + Math.random(), hue: Math.random() * 360 },
-    { px: Math.random() * 1000, py: Math.random() * 1000, rx: Math.random() * 10, sx: 180 + Math.random() * 80, sy: 180 + Math.random() * 80, sr: 4 + Math.random() * 2, spx: 1.5 + Math.random(), spy: 1.2 + Math.random(), spr: 2.5 + Math.random(), hue: Math.random() * 360 },
-    { px: Math.random() * 1000, py: Math.random() * 1000, rx: Math.random() * 10, sx: 160 + Math.random() * 80, sy: 90 + Math.random() * 80, sr: 4 + Math.random() * 2, spx: 1.3 + Math.random(), spy: 1.1 + Math.random(), spr: 1.5 + Math.random(), hue: Math.random() * 360 },
-    { px: Math.random() * 1000, py: Math.random() * 1000, rx: 4 + Math.random() * 10, sx: 140 + Math.random() * 80, sy: 140 + Math.random() * 80, sr: 4 + Math.random() * 2, spx: 1.7 + Math.random(), spy: 1.3 + Math.random(), spr: 2.2 + Math.random(), hue: Math.random() * 360 },
-    { px: Math.random() * 1000, py: Math.random() * 1000, rx: 4 + Math.random() * 10, sx: 200 + Math.random() * 80, sy: 200 + Math.random() * 80, sr: 4 + Math.random() * 2, spx: 1.1 + Math.random(), spy: 1.4 + Math.random(), spr: 1.8 + Math.random(), hue: Math.random() * 360 },
-  ]);
-
-  useEffect(() => {
-    let t = 0;
-    let frame: number;
-    function animate() {
-      t += 0.016;
-      const params = barParams.current;
-      params.forEach((p, i) => {
-        // Animate bar movement
-        const gRef = [stripeRef1, stripeRef2, stripeRef3, stripeRef4, stripeRef5][i];
-        if (gRef.current) {
-          (gRef.current as SVGGElement).setAttribute(
-            "transform",
-            `translate(${Math.sin(t / p.spx + p.px) * p.sx},${Math.sin(t / p.spy + p.py) * p.sy}) rotate(${Math.sin(t / p.spr + p.rx) * p.sr})`
-          );
-        }
-        // Animate gradient color (hue shift)
-        p.hue = (p.hue + 0.3 + Math.abs(Math.sin(t / (2 + i)))) % 360;
-        const stop1 = gradRefs[i][0].current;
-        const stop2 = gradRefs[i][1].current;
-        if (stop1 && stop2) {
-          stop1.setAttribute("stop-color", `hsl(${p.hue}, 90%, 70%)`);
-          stop2.setAttribute("stop-color", `hsl(${(p.hue + 60 + i * 40) % 360}, 90%, 70%)`);
-        }
-      });
-      frame = window.requestAnimationFrame(animate);
-    }
-    frame = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Animate the gradient stops for color shifting
-  useEffect(() => {
-    let t = 0;
-    let frame: number;
-    // Helper to shift hue
-    function shiftHue(hex: string, deg: number) {
-      // Convert hex to RGB
-      let r = parseInt(hex.slice(1, 3), 16);
-      let g = parseInt(hex.slice(3, 5), 16);
-      let b = parseInt(hex.slice(5, 7), 16);
-      // Convert RGB to HSL
-      r /= 255; g /= 255; b /= 255;
-      const max = Math.max(r, g, b), min = Math.min(r, g, b);
-      let h = 0, s = 0, l = (max + min) / 2;
-      if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-      }
-      h = (h * 360 + deg) % 360;
-      if (h < 0) h += 360;
-      // Convert HSL back to RGB
-      s = Math.max(0, Math.min(1, s));
-      l = Math.max(0, Math.min(1, l));
-      let c = (1 - Math.abs(2 * l - 1)) * s;
-      let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-      let m = l - c / 2;
-      let r1 = 0, g1 = 0, b1 = 0;
-      if (0 <= h && h < 60) { r1 = c; g1 = x; b1 = 0; }
-      else if (60 <= h && h < 120) { r1 = x; g1 = c; b1 = 0; }
-      else if (120 <= h && h < 180) { r1 = 0; g1 = c; b1 = x; }
-      else if (180 <= h && h < 240) { r1 = 0; g1 = x; b1 = c; }
-      else if (240 <= h && h < 300) { r1 = x; g1 = 0; b1 = c; }
-      else { r1 = c; g1 = 0; b1 = x; }
-      let R = Math.round((r1 + m) * 255);
-      let G = Math.round((g1 + m) * 255);
-      let B = Math.round((b1 + m) * 255);
-      return `#${R.toString(16).padStart(2, '0')}${G.toString(16).padStart(2, '0')}${B.toString(16).padStart(2, '0')}`;
-    }
-    // Each bar gets its own base colors and phase
-    const baseStops = [
-      ["#60a5fa", "#a78bfa"],
-      ["#f472b6", "#facc15"],
-      ["#34d399", "#818cf8"],
-      ["#fbbf24", "#f472b6"],
-      ["#38bdf8", "#f472b6"],
-    ];
-    const stopIds = [
-      ["stripe1-stop1", "stripe1-stop2"],
-      ["stripe2-stop1", "stripe2-stop2"],
-      ["stripe3-stop1", "stripe3-stop2"],
-      ["stripe4-stop1", "stripe4-stop2"],
-      ["stripe5-stop1", "stripe5-stop2"],
-    ];
-    const barPhase = [0, 0.7, 1.4, 2.1, 2.8];
-    function animate() {
-      t += 0.016;
-      for (let i = 0; i < 5; ++i) {
-        const deg = (Math.sin(t + barPhase[i]) * 60 + t * 40 + i * 60) % 360;
-        const c1 = shiftHue(baseStops[i][0], deg);
-        const c2 = shiftHue(baseStops[i][1], -deg);
-        const stop1 = document.getElementById(stopIds[i][0]);
-        const stop2 = document.getElementById(stopIds[i][1]);
-        if (stop1) stop1.setAttribute("stop-color", c1);
-        if (stop2) stop2.setAttribute("stop-color", c2);
-      }
-      frame = window.requestAnimationFrame(animate);
-    }
-    frame = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
-
   useEffect(() => {
     document.title = mode === "signin" ? "Sign in" : "Sign up";
   }, [mode]);
@@ -355,12 +288,9 @@ export default function Login() {
   if (needOtp) {
     // Show OTP confirmation form
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center relative overflow-hidden">
-        {/* Iridescence background without className prop, use a wrapper div for styling */}
-        <div className="absolute inset-0 w-full h-full z-0 blur-xl">
-          <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
-        </div>
-        <Card className="w-full max-w-sm relative z-10">
+      <div className="min-h-screen relative flex items-center justify-center p-4">
+        <AnimatedBackground />
+        <Card className="w-full max-w-sm relative z-10 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-2xl" style={{ filter: 'none', backdropFilter: 'none' }}>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-semibold">Confirm Signup</CardTitle>
             <CardDescription>
@@ -428,12 +358,9 @@ export default function Login() {
 
   // Show sign in / sign up form
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Iridescence background for main form, same fix */}
-      <div className="absolute inset-0 w-full h-full z-0 blur-xl">
-        <Iridescence color={[1,1,1]} mouseReact={true} amplitude={0.1} speed={1.0} />
-      </div>
-      <Card className="w-full max-w-sm relative z-10">
+    <div className="min-h-screen relative flex flex-col items-center justify-center p-4">
+      <AnimatedBackground />
+      <Card className="w-full max-w-sm relative z-10 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-2xl" style={{ filter: 'none', backdropFilter: 'none' }}>
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-semibold tracking-tight">
             Sign {mode === "signin" ? "in" : "up"}

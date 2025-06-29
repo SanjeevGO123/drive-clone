@@ -127,6 +127,75 @@
   .animate-caret-blink {
     animation: caret-blink 1.25s ease-out infinite;
   }
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animate-mesh-1 {
+    animation: mesh-move-1 20s ease-in-out infinite;
+  }
+  .animate-mesh-2 {
+    animation: mesh-move-2 25s ease-in-out infinite;
+  }
+  .animate-mesh-3 {
+    animation: mesh-move-3 30s ease-in-out infinite;
+  }
+  .animate-mesh-4 {
+    animation: mesh-move-4 22s ease-in-out infinite;
+  }
+  .animate-mesh-5 {
+    animation: mesh-move-5 28s ease-in-out infinite;
+  }
+  .animate-mesh-6 {
+    animation: mesh-move-6 18s ease-in-out infinite;
+  }
+  .animate-mesh-7 {
+    animation: mesh-move-7 24s ease-in-out infinite;
+  }
+  .animation-delay-1000 {
+    animation-delay: 1s;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-3000 {
+    animation-delay: 3s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  .animation-delay-5000 {
+    animation-delay: 5s;
+  }
+  .animation-delay-6000 {
+    animation-delay: 6s;
+  }
+  .animation-delay-7000 {
+    animation-delay: 7s;
+  }
+  .animate-color-shift {
+    animation: color-shift-1 10s infinite linear;
+  }
+  .animate-color-shift-2 {
+    animation: color-shift-2 12s infinite linear;
+  }
+  .animate-color-shift-3 {
+    animation: color-shift-3 8s infinite linear;
+  }
+  .animate-color-shift-4 {
+    animation: color-shift-4 14s infinite linear;
+  }
+  .animate-color-shift-5 {
+    animation: color-shift-5 9s infinite linear;
+  }
+  .animate-color-shift-6 {
+    animation: color-shift-6 11s infinite linear;
+  }
+  .animate-color-shift-7 {
+    animation: color-shift-7 13s infinite linear;
+  }
+  .animate-color-shift-8 {
+    animation: color-shift-8 15s infinite linear;
+  }
 }
 
 @keyframes caret-blink {
@@ -138,5 +207,119 @@
   20%,
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes mesh-move-1 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(-45%, -55%) rotate(2deg) scale(1.1);
+  }
+  50% {
+    transform: translate(-55%, -45%) rotate(-1deg) scale(0.9);
+  }
+  75% {
+    transform: translate(-48%, -52%) rotate(1deg) scale(1.05);
+  }
+}
+
+@keyframes mesh-move-2 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  30% {
+    transform: translate(-52%, -48%) rotate(-2deg) scale(1.05);
+  }
+  60% {
+    transform: translate(-47%, -53%) rotate(1.5deg) scale(0.95);
+  }
+  90% {
+    transform: translate(-51%, -49%) rotate(-0.5deg) scale(1.02);
+  }
+}
+
+@keyframes mesh-move-3 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translate(-53%, -47%) rotate(1deg) scale(1.08);
+  }
+  40% {
+    transform: translate(-46%, -54%) rotate(-1.5deg) scale(0.92);
+  }
+  80% {
+    transform: translate(-49%, -51%) rotate(0.8deg) scale(1.03);
+  }
+}
+
+@keyframes mesh-move-4 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  35% {
+    transform: translate(-48%, -52%) rotate(-1.2deg) scale(1.06);
+  }
+  70% {
+    transform: translate(-52%, -48%) rotate(1.8deg) scale(0.94);
+  }
+}
+
+@keyframes mesh-move-5 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(-53%, -47%) rotate(1.5deg) scale(1.08);
+  }
+  50% {
+    transform: translate(-47%, -53%) rotate(-2deg) scale(0.92);
+  }
+  75% {
+    transform: translate(-51%, -49%) rotate(0.8deg) scale(1.04);
+  }
+}
+
+@keyframes mesh-move-6 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  40% {
+    transform: translate(-46%, -54%) rotate(-1.8deg) scale(1.12);
+  }
+  80% {
+    transform: translate(-54%, -46%) rotate(2.2deg) scale(0.88);
+  }
+}
+
+@keyframes mesh-move-7 {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  30% {
+    transform: translate(-52%, -48%) rotate(1.2deg) scale(1.05);
+  }
+  60% {
+    transform: translate(-48%, -52%) rotate(-1.5deg) scale(0.96);
+  }
+  90% {
+    transform: translate(-50%, -50%) rotate(0.5deg) scale(1.02);
   }
 }
