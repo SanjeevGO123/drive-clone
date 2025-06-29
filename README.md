@@ -2,11 +2,17 @@
 
 A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend using **shadcn/ui** components and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
-✨ **Latest Update:** Fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
+✨ **Latest Update:** Enhanced with Stripe-inspired animated mesh gradient backgrounds, strong password requirements with real-time validation, and fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
 
 ---
 
 ## 🎨 Design Features
+
+### Animated Background & Visual Effects
+- **Stripe-Inspired Mesh Gradient** - Animated, vibrant mesh background with organic movement
+- **Modern Visual Identity** - Clean, professional aesthetic with no blur on content cards
+- **Smooth Animations** - Custom CSS keyframes for fluid, continuous background motion
+- **Vibrant Color Palette** - Rich purple, pink, orange, green, blue, teal, and amber gradients
 
 ### Modern UI with shadcn/ui
 - **Consistent Design System** - Unified component library with semantic theming
@@ -56,8 +62,23 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 
 ---
 
+## 📸 Screenshots
+
+### Login Page
+![Login Page](./screenshots/login-page.png)
+*Modern login interface with Stripe-inspired animated mesh gradient background and clean authentication form*
+
+### Drive Dashboard
+![Drive Dashboard](./screenshots/drive-dashboard.png)
+*File management dashboard with color-coded file types, modern UI components, and intuitive navigation*
+
+---
+
 ## 🔒 Authentication & Security
 - **AWS Cognito User Pools** for sign-up, login, and JWT issuance
+- **Strong Password Requirements** - Enforced minimum 8 characters with uppercase, lowercase, numbers, and special characters
+- **Real-time Password Validation** - Live feedback on password requirements during signup
+- **Smart Error Handling** - Toast notifications for password validation failures and authentication errors
 - Frontend authenticates and attaches JWT to all API requests
 - All backend APIs require a valid `Authorization: Bearer <token>` header
 - IAM roles strictly limit Lambda, S3, and DynamoDB access
@@ -360,7 +381,7 @@ project-root/
 │   │   │   ├── alert.tsx            # Alert messages
 │   │   │   └── use-toast.ts         # Toast hook
 │   │   └── login/         # Authentication components
-│   │       └── Iridescence.tsx      # Background animation
+│   │       └── Iridescence.tsx      # Animated mesh gradient background
 │   ├── aws/               # AWS service configurations
 │   │   └── auth.ts        # Cognito authentication setup
 │   ├── App.tsx            # Main application component
@@ -457,9 +478,12 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ### Authentication & Security
 - 🔐 **Secure Cognito Authentication** - Modern sign-up/login with shadcn/ui forms
-- 🔑 **OTP Verification** - Six-digit code verification with auto-focus input
-- 🛡️ **Error Handling** - User-friendly error dialogs for wrong OTP, duplicate signup
+- � **Strong Password Requirements** - Enforced 8+ characters with uppercase, lowercase, numbers, and special characters
+- ⚡ **Real-time Password Validation** - Live feedback on password strength and requirements
+- �🔑 **OTP Verification** - Six-digit code verification with auto-focus input
+- 🛡️ **Error Handling** - User-friendly error dialogs for wrong OTP, duplicate signup, and password validation
 - 🎯 **JWT Token Management** - Automatic token refresh and validation
+- 🔔 **Smart Notifications** - Toast alerts for authentication errors and password requirements
 
 ### File Management
 - 📁 **Hierarchical Folder Navigation** - Breadcrumb navigation with folder hierarchy
@@ -471,6 +495,8 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ### User Experience
 - 🖼️ **Google Drive-like Interface** - Familiar and intuitive design
+- 🎨 **Stripe-Inspired Visuals** - Animated mesh gradient backgrounds with vibrant colors
+- ✨ **Modern Visual Identity** - Clean cards without blur effects for maximum readability
 - 📱 **Mobile-First Responsive** - Optimized for all screen sizes
 - 🌙 **Dark Mode Support** - Full light/dark theme implementation
 - ⚡ **Loading States** - Skeleton animations for better perceived performance
