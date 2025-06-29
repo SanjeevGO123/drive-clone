@@ -70,11 +70,15 @@ export default function Login() {
     const requirements = [];
     let isValid = true;
 
+    if (password.length < 8) {
+      requirements.push("At least 8 characters long");
+      isValid = false;
+    }
     if (!/[0-9]/.test(password)) {
       requirements.push("Contains at least 1 number");
       isValid = false;
     }
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       requirements.push("Contains at least 1 special character");
       isValid = false;
     }
@@ -484,12 +488,16 @@ export default function Login() {
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-muted-foreground">Password requirements:</p>
                   <div className="space-y-1">
+                    <div className={`flex items-center text-xs ${password.length >= 8 ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{password.length >= 8 ? '✓' : '✗'}</span>
+                      At least 8 characters long
+                    </div>
                     <div className={`flex items-center text-xs ${/[0-9]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
                       <span className="mr-2">{/[0-9]/.test(password) ? '✓' : '✗'}</span>
                       Contains at least 1 number
                     </div>
-                    <div className={`flex items-center text-xs ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
-                      <span className="mr-2">{/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? '✓' : '✗'}</span>
+                    <div className={`flex items-center text-xs ${/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) ? '✓' : '✗'}</span>
                       Contains at least 1 special character
                     </div>
                     <div className={`flex items-center text-xs ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
