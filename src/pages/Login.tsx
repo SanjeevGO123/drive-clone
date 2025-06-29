@@ -84,15 +84,19 @@ export default function Login() {
       });
       setNeedOtp(true);
     } catch (err: any) {
-      // Show error dialog for critical signup errors like user already exists
+      // Show error dialog for username already taken
       if (err.code === "UsernameExistsException" || err.message.includes("already exists")) {
         setErrorTitle("Username Already Taken");
         setErrorMessage("This username is already taken. Please choose a different username.");
         setShowErrorDialog(true);
       } else if (err.code === "InvalidParameterException" || err.code === "InvalidPasswordException") {
-        setErrorTitle("Password Requirements");
-        setErrorMessage(`Password requirements not met: ${err.message}`);
-        setShowErrorDialog(true);
+        // Show toast for password criteria errors
+        toast({
+          title: "Password Requirements",
+          description:
+            "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.",
+          variant: "destructive",
+        });
       } else {
         // For other errors, use toast for less critical ones
         toast({

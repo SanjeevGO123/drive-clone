@@ -9,6 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb';
+// ...existing imports...
 import { ArrowLeft, Grid3x3, List, Plus, Upload, LogOut, X } from 'lucide-react';
 
 // Header component displays the top navigation bar.
