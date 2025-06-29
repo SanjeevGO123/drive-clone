@@ -343,63 +343,37 @@ This project uses **shadcn/ui** for consistent, accessible, and customizable com
 
 ```
 project-root/
-├── public/                 # Static assets
-│   ├── favicon.ico
-│   ├── index.html
-│   └── manifest.json
+├── public/                # Static assets
+│   └── index.html
 ├── src/
-│   ├── pages/             # Main application pages
-│   │   ├── Dashboard.tsx  # Main file management interface
-│   │   └── Login.tsx      # Authentication page with OTP
-│   ├── components/        # Reusable UI components
-│   │   ├── dashboard/     # Dashboard-specific components
-│   │   │   ├── Header.tsx           # Navigation header with breadcrumbs
-│   │   │   ├── FileGrid.tsx         # Grid view for files/folders
-│   │   │   ├── FileList.tsx         # List view for files/folders
-│   │   │   ├── FilePreview.tsx      # File preview modal
-│   │   │   ├── ConfirmModal.tsx     # Delete confirmation dialog
-│   │   │   ├── RenameModal.tsx      # File rename dialog
-│   │   │   ├── SelectionToolbar.tsx # Bulk action toolbar
-│   │   │   ├── UploadStatusBar.tsx  # Upload progress display
-│   │   │   ├── LoadingSkeleton.tsx  # Loading placeholder
-│   │   │   └── Toast.tsx            # Notification component
-│   │   ├── ui/            # shadcn/ui components
-│   │   │   ├── button.tsx           # Button variants
-│   │   │   ├── input.tsx            # Input fields
-│   │   │   ├── input-otp.tsx        # OTP verification input
-│   │   │   ├── dialog.tsx           # Modal dialogs
-│   │   │   ├── dropdown-menu.tsx    # Context menus
-│   │   │   ├── breadcrumb.tsx       # Navigation breadcrumbs
-│   │   │   ├── toast.tsx            # Toast notifications
-│   │   │   ├── card.tsx             # Content containers
-│   │   │   ├── progress.tsx         # Progress indicators
-│   │   │   ├── form.tsx             # Form components
-│   │   │   ├── label.tsx            # Form labels
-│   │   │   ├── badge.tsx            # File type badges
-│   │   │   ├── separator.tsx        # Content dividers
-│   │   │   ├── skeleton.tsx         # Loading placeholders
-│   │   │   ├── alert.tsx            # Alert messages
-│   │   │   └── use-toast.ts         # Toast hook
-│   │   └── login/         # Authentication components
-│   │       └── Iridescence.tsx      # Animated mesh gradient background
-│   ├── aws/               # AWS service configurations
-│   │   └── auth.ts        # Cognito authentication setup
-│   ├── App.tsx            # Main application component
-│   ├── index.tsx          # Application entry point
-│   └── index.css          # Global styles with CSS variables
-├── api/                   # Lambda function handlers
-│   ├── getFiles.ts        # List user files and folders
-│   ├── getpresignedURL.ts # Generate presigned S3 upload URLs
-│   ├── createFolder.ts    # Create new folders
-│   ├── deleteFile.ts      # Delete individual files
-│   ├── deleteFolder.ts    # Delete folders and contents
-│   └── renameFile.ts      # Rename files and folders
-├── tailwind.config.js     # Tailwind CSS configuration
-├── tsconfig.json          # TypeScript configuration
-├── package.json           # Dependencies and scripts
-├── buildspec.yml          # AWS CodeBuild configuration
-├── Dockerfile             # Container configuration
-└── README.md              # Project documentation
+│   ├── pages/            # Main application pages
+│   │   ├── Dashboard.tsx
+│   │   └── Login.tsx
+│   ├── components/       # Reusable UI components
+│   │   ├── dashboard/    # Dashboard-specific components
+│   │   │   ├── FileGrid.tsx
+│   │   │   ├── Header.tsx
+│   │   │   └── ...
+│   │   ├── ui/          # shadcn/ui components
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   └── ...
+│   │   └── ProtectedRoute.tsx
+│   ├── aws/             # AWS service configurations
+│   │   └── auth.ts
+│   ├── hooks/           # Custom React hooks
+│   │   └── use-toast.ts
+│   ├── lib/             # Utility functions
+│   │   └── utils.ts
+│   └── App.tsx
+├── api/                 # Lambda function handlers
+│   ├── getFiles.ts
+│   ├── createFolder.ts
+│   ├── deleteFile.ts
+│   └── ...
+├── screenshots/         # Project screenshots
+├── package.json
+└── README.md
 ```
 
 > **Note:** `.env.development` contains sensitive config (API URLs, Cognito IDs) and is git-ignored. Populate this file manually per environment.
