@@ -65,12 +65,57 @@ export default function Login() {
   const [errorTitle, setErrorTitle] = useState("Error");
   const { toast } = useToast();
 
+  // Password validation function
+  const validatePassword = (password: string) => {
+    const requirements = [];
+    let isValid = true;
+
+    if (!/[0-9]/.test(password)) {
+      requirements.push("Contains at least 1 number");
+      isValid = false;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      requirements.push("Contains at least 1 special character");
+      isValid = false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      requirements.push("Contains at least 1 uppercase letter");
+      isValid = false;
+    }
+    if (!/[a-z]/.test(password)) {
+      requirements.push("Contains at least 1 lowercase letter");
+      isValid = false;
+    }
+
+    return { isValid, requirements };
+  };
+
   // Handle sign up
   const handleSignUp = async () => {
     if (!username || !password || !email) {
       toast({
         title: "Error",
         description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password requirements before making API request
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Password Requirements",
+        description: (
+          <div className="space-y-1">
+            <p>Password must contain:</p>
+            <ul className="list-disc list-inside space-y-1 text-xs">
+              {passwordValidation.requirements.map((req, index) => (
+                <li key={index}>{req}</li>
+              ))}
+            </ul>
+          </div>
+        ),
         variant: "destructive",
       });
       return;
@@ -435,6 +480,29 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              {mode === "signup" && password && (
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-muted-foreground">Password requirements:</p>
+                  <div className="space-y-1">
+                    <div className={`flex items-center text-xs ${/[0-9]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{/[0-9]/.test(password) ? '✓' : '✗'}</span>
+                      Contains at least 1 number
+                    </div>
+                    <div className={`flex items-center text-xs ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? '✓' : '✗'}</span>
+                      Contains at least 1 special character
+                    </div>
+                    <div className={`flex items-center text-xs ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{/[A-Z]/.test(password) ? '✓' : '✗'}</span>
+                      Contains at least 1 uppercase letter
+                    </div>
+                    <div className={`flex items-center text-xs ${/[a-z]/.test(password) ? 'text-green-600' : 'text-red-500'}`}>
+                      <span className="mr-2">{/[a-z]/.test(password) ? '✓' : '✗'}</span>
+                      Contains at least 1 lowercase letter
+                    </div>
+                  </div>
+                </div>
+              )}
             </FormItem>
             <Button
               type="submit"
