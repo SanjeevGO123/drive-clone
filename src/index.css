@@ -1,3 +1,97 @@
+/* --- Liquid Glass Toggle Knob Smooth Animation --- */
+.liquid-glass-toggle-knob {
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.3) inset;
+  backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: visible;
+}
+
+.liquid-glass-toggle-knob::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+  filter: blur(3px);
+  opacity: 0.8;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.liquid-glass-toggle-knob::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  top: 15%;
+  width: 40%;
+  height: 35%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.2) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0.5px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hover effect for the toggle knob */
+.liquid-glass-toggle-knob:hover::before {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.liquid-glass-toggle-knob:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px 0 rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.4) inset;
+}
+
+/* --- Liquid Glass Toggle Knob Morphing Animation --- */
+.liquid-glass-toggle-knob {
+  background: rgba(255,255,255,0.6);
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10), 0 0 0 2px rgba(255,255,255,0.25) inset;
+  backdrop-filter: blur(8px) saturate(180%);
+  border-radius: 50%;
+  transition: box-shadow 0.2s, background 0.2s;
+  position: relative;
+  overflow: visible;
+}
+.liquid-glass-toggle-knob::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  top: 20%;
+  width: 50%;
+  height: 40%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.1) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+}
+.liquid-glass-toggle-knob.animating {
+  animation: liquid-glass-morph 0.45s cubic-bezier(.7,1.7,.7,1) forwards;
+}
+@keyframes liquid-glass-morph {
+  0% {
+    transform: scaleX(1) scaleY(1);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+  }
+  30% {
+    transform: scaleX(1.25) scaleY(0.85);
+    border-radius: 45% 55% 55% 45% / 55% 45% 55% 45%;
+    box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
+  }
+  60% {
+    transform: scaleX(0.85) scaleY(1.15);
+    border-radius: 55% 45% 45% 55% / 45% 55% 45% 55%;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.12);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+  }
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -231,6 +325,12 @@
   }
   .animate-color-shift-8 {
     animation: color-shift-8 15s infinite linear;
+  }
+  .animate-liquid-toggle {
+    animation: liquid-toggle 1.2s cubic-bezier(.68,-0.55,.27,1.55) infinite alternate;
+  }
+  .animate-liquid-toggle-rev {
+    animation: liquid-toggle-rev 1.2s cubic-bezier(.68,-0.55,.27,1.55) infinite alternate;
   }
 }
 
@@ -1014,3 +1114,16 @@
       0 6px 20px var(--badge-shadow-color, rgba(0, 0, 0, 0.2)),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
+
+@keyframes liquid-toggle {
+  0% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(1); }
+  30% { border-radius: 60% 40% 55% 45% / 45% 55% 60% 40%; transform: scale(1.08); }
+  60% { border-radius: 40% 60% 45% 55% / 55% 45% 40% 60%; transform: scale(1.12); }
+  100% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(1); }
+}
+@keyframes liquid-toggle-rev {
+  0% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(1.12); }
+  30% { border-radius: 60% 40% 55% 45% / 45% 55% 60% 40%; transform: scale(1.08); }
+  60% { border-radius: 40% 60% 45% 55% / 55% 45% 40% 60%; transform: scale(1); }
+  100% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(1); }
+}

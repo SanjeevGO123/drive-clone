@@ -24,11 +24,11 @@ const AnimatedBackground = () => {
       {/* Deep glass base with subtle gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900"></div>
       
-      {/* Ultra-fluid liquid orbs with intense movement */}
+      {/* Static liquid orbs (no animation) */}
       <div className="absolute inset-0">
-        {/* Primary large liquid blob - intense movement */}
+        {/* Primary large liquid blob - static */}
         <div 
-          className="absolute w-[500px] h-[500px] opacity-60 animate-liquid-ultra-1"
+          className="absolute w-[500px] h-[500px] opacity-60"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.9) 0%, rgba(168, 85, 247, 0.7) 30%, rgba(59, 130, 246, 0.5) 60%, transparent 90%)',
             filter: 'blur(60px)',
@@ -38,9 +38,9 @@ const AnimatedBackground = () => {
           }}
         ></div>
         
-        {/* Secondary flowing blob - wild movement */}
+        {/* Secondary blob - static */}
         <div 
-          className="absolute w-[600px] h-[400px] opacity-50 animate-liquid-ultra-2"
+          className="absolute w-[600px] h-[400px] opacity-50"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(236, 72, 153, 0.8) 0%, rgba(219, 39, 119, 0.6) 25%, rgba(147, 51, 234, 0.4) 70%, transparent 95%)',
             filter: 'blur(80px)',
@@ -50,9 +50,9 @@ const AnimatedBackground = () => {
           }}
         ></div>
         
-        {/* Tertiary organic blob - chaotic movement */}
+        {/* Tertiary blob - static */}
         <div 
-          className="absolute w-[450px] h-[550px] opacity-55 animate-liquid-ultra-3"
+          className="absolute w-[450px] h-[550px] opacity-55"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.7) 0%, rgba(34, 197, 94, 0.5) 40%, rgba(59, 130, 246, 0.3) 80%, transparent 100%)',
             filter: 'blur(70px)',
@@ -62,9 +62,9 @@ const AnimatedBackground = () => {
           }}
         ></div>
         
-        {/* Fourth blob - erratic movement */}
+        {/* Fourth blob - static */}
         <div 
-          className="absolute w-[350px] h-[450px] opacity-45 animate-liquid-ultra-4"
+          className="absolute w-[350px] h-[450px] opacity-45"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(251, 146, 60, 0.8) 0%, rgba(245, 101, 101, 0.6) 35%, rgba(168, 85, 247, 0.4) 75%, transparent 100%)',
             filter: 'blur(55px)',
@@ -74,9 +74,9 @@ const AnimatedBackground = () => {
           }}
         ></div>
         
-        {/* Fifth blob - gentle but noticeable movement */}
+        {/* Fifth blob - static */}
         <div 
-          className="absolute w-[380px] h-[380px] opacity-40 animate-liquid-ultra-5"
+          className="absolute w-[380px] h-[380px] opacity-40"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.7) 0%, rgba(99, 102, 241, 0.5) 50%, rgba(59, 130, 246, 0.3) 85%, transparent 100%)',
             filter: 'blur(65px)',
@@ -86,9 +86,9 @@ const AnimatedBackground = () => {
           }}
         ></div>
         
-        {/* Sixth smaller accent blob - rapid movement */}
+        {/* Sixth blob - static */}
         <div 
-          className="absolute w-[280px] h-[320px] opacity-35 animate-liquid-ultra-6"
+          className="absolute w-[280px] h-[320px] opacity-35"
           style={{
             background: 'radial-gradient(ellipse at center, rgba(217, 70, 239, 0.9) 0%, rgba(147, 51, 234, 0.6) 40%, transparent 80%)',
             filter: 'blur(45px)',
