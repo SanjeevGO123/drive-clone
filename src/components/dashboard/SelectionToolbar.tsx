@@ -33,7 +33,7 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
       <span className="text-blue-700 dark:text-blue-300 font-medium">{selectedCount} selected</span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2 btn-liquid-glass-blue">
             <MoreHorizontal className="h-4 w-4" />
             Actions
           </Button>

@@ -17,69 +17,102 @@ import {
 } from "../components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 
-// Animated Background Component
+// Apple-Style Liquid Glass Background Component
 const AnimatedBackground = () => {
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Base gradient mesh with more colors */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-400 via-emerald-400 via-pink-400 to-orange-400"></div>
+      {/* Deep glass base with subtle gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900"></div>
       
-      {/* Animated mesh layers */}
+      {/* Ultra-fluid liquid orbs with intense movement */}
       <div className="absolute inset-0">
-        {/* Large flowing gradient shapes with more vibrant colors */}
+        {/* Primary large liquid blob - intense movement */}
         <div 
-          className="absolute w-[150vw] h-[150vh] -top-1/2 -left-1/2 opacity-80 animate-mesh-1"
+          className="absolute w-[500px] h-[500px] opacity-60 animate-liquid-ultra-1"
           style={{
-            background: 'radial-gradient(ellipse 80vw 40vh at 20% 50%, rgba(120, 119, 198, 0.8) 0%, transparent 50%), radial-gradient(ellipse 60vw 30vh at 80% 30%, rgba(255, 119, 198, 0.6) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.9) 0%, rgba(168, 85, 247, 0.7) 30%, rgba(59, 130, 246, 0.5) 60%, transparent 90%)',
+            filter: 'blur(60px)',
+            borderRadius: '63% 37% 54% 46% / 55% 48% 52% 45%',
+            top: '-10%',
+            left: '-15%'
           }}
         ></div>
         
+        {/* Secondary flowing blob - wild movement */}
         <div 
-          className="absolute w-[150vw] h-[150vh] -top-1/2 -right-1/2 opacity-70 animate-mesh-2"
+          className="absolute w-[600px] h-[400px] opacity-50 animate-liquid-ultra-2"
           style={{
-            background: 'radial-gradient(ellipse 70vw 35vh at 80% 70%, rgba(255, 184, 119, 0.7) 0%, transparent 50%), radial-gradient(ellipse 50vw 25vh at 20% 20%, rgba(119, 255, 198, 0.6) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(236, 72, 153, 0.8) 0%, rgba(219, 39, 119, 0.6) 25%, rgba(147, 51, 234, 0.4) 70%, transparent 95%)',
+            filter: 'blur(80px)',
+            borderRadius: '42% 58% 70% 30% / 45% 25% 75% 55%',
+            top: '30%',
+            right: '-20%'
           }}
         ></div>
         
+        {/* Tertiary organic blob - chaotic movement */}
         <div 
-          className="absolute w-[150vw] h-[150vh] -bottom-1/2 -left-1/2 opacity-75 animate-mesh-3"
+          className="absolute w-[450px] h-[550px] opacity-55 animate-liquid-ultra-3"
           style={{
-            background: 'radial-gradient(ellipse 90vw 45vh at 30% 40%, rgba(198, 119, 255, 0.6) 0%, transparent 50%), radial-gradient(ellipse 40vw 20vh at 70% 80%, rgba(119, 255, 119, 0.8) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.7) 0%, rgba(34, 197, 94, 0.5) 40%, rgba(59, 130, 246, 0.3) 80%, transparent 100%)',
+            filter: 'blur(70px)',
+            borderRadius: '38% 62% 25% 75% / 68% 55% 45% 32%',
+            bottom: '-10%',
+            left: '10%'
           }}
         ></div>
         
+        {/* Fourth blob - erratic movement */}
         <div 
-          className="absolute w-[150vw] h-[150vh] -bottom-1/2 -right-1/2 opacity-65 animate-mesh-4"
+          className="absolute w-[350px] h-[450px] opacity-45 animate-liquid-ultra-4"
           style={{
-            background: 'radial-gradient(ellipse 65vw 32vh at 60% 60%, rgba(119, 198, 255, 0.7) 0%, transparent 50%), radial-gradient(ellipse 75vw 38vh at 40% 10%, rgba(255, 119, 162, 0.6) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(251, 146, 60, 0.8) 0%, rgba(245, 101, 101, 0.6) 35%, rgba(168, 85, 247, 0.4) 75%, transparent 100%)',
+            filter: 'blur(55px)',
+            borderRadius: '71% 29% 43% 57% / 34% 66% 34% 66%',
+            top: '50%',
+            left: '40%'
           }}
         ></div>
         
-        {/* Additional vibrant layers for more color variety */}
+        {/* Fifth blob - gentle but noticeable movement */}
         <div 
-          className="absolute w-[140vw] h-[140vh] -top-1/3 left-1/4 opacity-60 animate-mesh-5"
+          className="absolute w-[380px] h-[380px] opacity-40 animate-liquid-ultra-5"
           style={{
-            background: 'radial-gradient(ellipse 55vw 28vh at 50% 60%, rgba(34, 197, 94, 0.7) 0%, transparent 50%), radial-gradient(ellipse 45vw 22vh at 30% 40%, rgba(168, 85, 247, 0.5) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.7) 0%, rgba(99, 102, 241, 0.5) 50%, rgba(59, 130, 246, 0.3) 85%, transparent 100%)',
+            filter: 'blur(65px)',
+            borderRadius: '55% 45% 68% 32% / 49% 36% 64% 51%',
+            bottom: '20%',
+            right: '25%'
           }}
         ></div>
         
+        {/* Sixth smaller accent blob - rapid movement */}
         <div 
-          className="absolute w-[130vw] h-[130vh] bottom-1/4 -right-1/3 opacity-55 animate-mesh-6"
+          className="absolute w-[280px] h-[320px] opacity-35 animate-liquid-ultra-6"
           style={{
-            background: 'radial-gradient(ellipse 60vw 30vh at 40% 30%, rgba(14, 165, 233, 0.6) 0%, transparent 50%), radial-gradient(ellipse 35vw 18vh at 80% 70%, rgba(236, 72, 153, 0.7) 0%, transparent 50%)'
-          }}
-        ></div>
-        
-        <div 
-          className="absolute w-[120vw] h-[120vh] top-1/3 -left-1/4 opacity-65 animate-mesh-7"
-          style={{
-            background: 'radial-gradient(ellipse 50vw 25vh at 70% 50%, rgba(16, 185, 129, 0.8) 0%, transparent 50%), radial-gradient(ellipse 30vw 15vh at 20% 80%, rgba(245, 158, 11, 0.6) 0%, transparent 50%)'
+            background: 'radial-gradient(ellipse at center, rgba(217, 70, 239, 0.9) 0%, rgba(147, 51, 234, 0.6) 40%, transparent 80%)',
+            filter: 'blur(45px)',
+            borderRadius: '47% 53% 36% 64% / 72% 28% 72% 28%',
+            top: '15%',
+            right: '10%'
           }}
         ></div>
       </div>
       
-      {/* Enhanced overlay for depth with more color stops */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 via-emerald-500/15 via-rose-500/10 to-orange-500/20"></div>
+      {/* Enhanced glass texture layers */}
+      <div className="absolute inset-0 opacity-40">
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/8 via-transparent to-white/12"></div>
+        <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-white/6 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
+      </div>
+      
+      {/* Ultra-subtle animated grain for glass realism */}
+      <div 
+        className="absolute inset-0 opacity-30 mix-blend-overlay animate-grain"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      ></div>
     </div>
   );
 }; 
@@ -290,7 +323,7 @@ export default function Login() {
     return (
       <div className="min-h-screen relative flex items-center justify-center p-4">
         <AnimatedBackground />
-        <Card className="w-full max-w-sm relative z-10 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-2xl" style={{ filter: 'none', backdropFilter: 'none' }}>
+        <Card className="w-full max-w-sm relative z-10 glassmorphism-card">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-semibold">Confirm Signup</CardTitle>
             <CardDescription>
@@ -360,7 +393,7 @@ export default function Login() {
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-4">
       <AnimatedBackground />
-      <Card className="w-full max-w-sm relative z-10 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-2xl" style={{ filter: 'none', backdropFilter: 'none' }}>
+      <Card className="w-full max-w-sm relative z-10 glassmorphism-card">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-semibold tracking-tight">
             Sign {mode === "signin" ? "in" : "up"}

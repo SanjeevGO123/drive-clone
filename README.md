@@ -2,17 +2,17 @@
 
 A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend using **shadcn/ui** components and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
-✨ **Latest Update:** Enhanced with Stripe-inspired animated mesh gradient backgrounds, strong password requirements with real-time validation, and fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
+✨ **Latest Update:** Enhanced with cutting-edge liquid glass backgrounds, glassmorphism UI elements, strong password requirements with real-time validation, and fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
 
 ---
 
 ## 🎨 Design Features
 
 ### Animated Background & Visual Effects
-- **Stripe-Inspired Mesh Gradient** - Animated, vibrant mesh background with organic movement
-- **Modern Visual Identity** - Clean, professional aesthetic with no blur on content cards
-- **Smooth Animations** - Custom CSS keyframes for fluid, continuous background motion
-- **Vibrant Color Palette** - Rich purple, pink, orange, green, blue, teal, and amber gradients
+- **Liquid Glass Effect** - Modern liquid glass background with floating orbs and glassmorphism
+- **Advanced Animations** - Smooth, organic movements with morphing shapes and gradients
+- **Glassmorphism UI** - Translucent cards with backdrop blur and subtle glass textures
+- **Rich Color Palette** - Deep purples, vibrant pinks, emerald greens, and electric blues
 
 ### Modern UI with shadcn/ui
 - **Consistent Design System** - Unified component library with semantic theming
@@ -66,7 +66,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 
 ### Login Page
 ![Login Page](./screenshots/login-page.png)
-*Modern login interface with Stripe-inspired animated mesh gradient background and clean authentication form*
+*Modern login interface with liquid glass background featuring floating orbs and glassmorphism card design*
 
 ### Drive Dashboard
 ![Drive Dashboard](./screenshots/drive-dashboard.png)
@@ -469,8 +469,8 @@ aws lambda create-function --function-name your-function-name --runtime nodejs22
 
 ### User Experience
 - 🖼️ **Google Drive-like Interface** - Familiar and intuitive design
-- 🎨 **Stripe-Inspired Visuals** - Animated mesh gradient backgrounds with vibrant colors
-- ✨ **Modern Visual Identity** - Clean cards without blur effects for maximum readability
+- 🎨 **Liquid Glass Visuals** - Modern glassmorphism with floating orbs and advanced blur effects
+- ✨ **Modern Visual Identity** - Glassmorphism cards with translucent effects for premium feel
 - 📱 **Mobile-First Responsive** - Optimized for all screen sizes
 - 🌙 **Dark Mode Support** - Full light/dark theme implementation
 - ⚡ **Loading States** - Skeleton animations for better perceived performance

@@ -52,7 +52,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} className="btn-liquid-glass-gray">
             Cancel
           </Button>
           <Button
@@ -61,7 +61,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onCancel();
               onConfirm && onConfirm();
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 btn-liquid-glass-red"
           >
             <Trash2 className="h-4 w-4" />
             Delete

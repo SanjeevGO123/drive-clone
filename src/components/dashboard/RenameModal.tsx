@@ -53,10 +53,10 @@ const RenameModal: React.FC<RenameModalProps> = ({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} className="btn-liquid-glass-gray">
             Cancel
           </Button>
-          <Button onClick={onConfirm} className="flex items-center gap-2">
+          <Button onClick={onConfirm} className="flex items-center gap-2 btn-liquid-glass-blue">
             <Check className="h-4 w-4" />
             Rename
           </Button>
