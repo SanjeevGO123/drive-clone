@@ -234,7 +234,7 @@ const FileGrid: React.FC<FileGridProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-3 right-3 h-8 w-8"
+                className="absolute top-3 right-3 h-8 w-8 btn-liquid-glass-gray"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="h-4 w-4" />
@@ -300,7 +300,7 @@ const FileGrid: React.FC<FileGridProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute top-3 right-3 h-8 w-8"
+                  className="absolute top-3 right-3 h-8 w-8 btn-liquid-glass-gray"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical className="h-4 w-4" />

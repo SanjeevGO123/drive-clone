@@ -69,7 +69,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={goBack}
           disabled={!canGoBack}
           aria-label="Go back"
-          className="mr-2"
+          className={`mr-2 ${!canGoBack ? 'btn-liquid-glass-gray opacity-50' : 'btn-liquid-glass-blue'}`}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({
                   variant="ghost"
                   onClick={() => fetchFiles("")}
                   aria-label="Go to root directory"
-                  className="font-semibold text-blue-600 dark:text-blue-300 hover:bg-blue-50/60 dark:hover:bg-blue-900/60 h-auto p-2"
+                  className="font-semibold text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-2"
                 >
                   Home
                 </Button>
@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({
                         variant="ghost"
                         onClick={() => fetchFiles(prefix)}
                         aria-label={`Go to folder ${name}`}
-                        className="text-blue-600 dark:text-blue-300 hover:bg-blue-50/60 dark:hover:bg-blue-900/60 h-auto p-2"
+                        className="text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-2"
                       >
                         {name}
                       </Button>
@@ -125,6 +125,7 @@ const Header: React.FC<HeaderProps> = ({
           size="icon"
           onClick={() => setViewMode('grid')}
           aria-label="Grid view"
+          className={viewMode === 'grid' ? 'btn-liquid-glass-purple' : 'btn-liquid-glass-gray'}
         >
           <Grid3x3 className="h-4 w-4" />
         </Button>
@@ -133,6 +134,7 @@ const Header: React.FC<HeaderProps> = ({
           size="icon"
           onClick={() => setViewMode('list')}
           aria-label="List view"
+          className={viewMode === 'list' ? 'btn-liquid-glass-purple' : 'btn-liquid-glass-gray'}
         >
           <List className="h-4 w-4" />
         </Button>
@@ -140,7 +142,7 @@ const Header: React.FC<HeaderProps> = ({
         {!isCreatingFolder ? (
           <Button
             onClick={() => setIsCreatingFolder(true)}
-            className="flex items-center gap-2 w-full sm:w-auto"
+            className="flex items-center gap-2 w-full sm:w-auto btn-liquid-glass-blue"
             aria-label="Create new folder"
           >
             <Plus className="h-4 w-4" />
@@ -166,7 +168,7 @@ const Header: React.FC<HeaderProps> = ({
             <div className="flex gap-2">
               <Button
                 onClick={createFolder}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto btn-liquid-glass-green"
               >
                 Create
               </Button>
@@ -178,6 +180,7 @@ const Header: React.FC<HeaderProps> = ({
                   setNewFolderName("");
                 }}
                 aria-label="Cancel folder creation"
+                className="btn-liquid-glass-gray"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -185,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        <Button asChild className="w-full sm:w-auto">
+        <Button asChild className="w-full sm:w-auto btn-liquid-glass-amber">
           <label htmlFor="file-upload" className="flex items-center gap-2 cursor-pointer">
             <Upload className="h-4 w-4" />
             Upload
@@ -205,7 +208,7 @@ const Header: React.FC<HeaderProps> = ({
             localStorage.removeItem("username");
             window.location.reload();
           }}
-          className="flex items-center gap-2 w-full sm:w-auto"
+          className="flex items-center gap-2 w-full sm:w-auto btn-liquid-glass-red"
           aria-label="Logout"
         >
           <LogOut className="h-4 w-4" />
@@ -222,7 +225,7 @@ const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 onClick={() => fetchFiles("")}
                 aria-label="Go to root directory"
-                className="font-medium text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900 h-auto p-1"
+                className="font-medium text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
               >
                 Drive
               </Button>
@@ -243,7 +246,7 @@ const Header: React.FC<HeaderProps> = ({
                       size="sm"
                       onClick={() => fetchFiles(prefix)}
                       aria-label={`Go to folder ${name}`}
-                      className="text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900 h-auto p-1"
+                      className="text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
                     >
                       {name}
                     </Button>
