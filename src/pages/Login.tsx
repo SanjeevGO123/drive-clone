@@ -398,9 +398,9 @@ export default function Login() {
           <CardTitle className="text-2xl font-semibold tracking-tight">
             Sign {mode === "signin" ? "in" : "up"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-white/90 font-medium">
             {mode === "signin"
-              ? "to continue to Drive Clone"
+              ? "to continue to Google Drive"
               : "Create your Google-style account"}
           </CardDescription>
         </CardHeader>
@@ -488,13 +488,13 @@ export default function Login() {
             </Button>
           </Form>
           
-          <p className="mt-4 text-xs text-muted-foreground text-center">
+          <p className="mt-4 text-xs text-white/80 text-center font-medium">
             {mode === "signin" ? (
               <>
                 Don't have an account?{" "}
                 <Button
                   variant="link"
-                  className="h-auto p-0 text-xs"
+                  className="h-auto p-0 text-xs text-blue-400 hover:text-blue-300 font-semibold"
                   onClick={() => setMode("signup")}
                 >
                   Sign up
@@ -505,7 +505,7 @@ export default function Login() {
                 Already have an account?{" "}
                 <Button
                   variant="link"
-                  className="h-auto p-0 text-xs"
+                  className="h-auto p-0 text-xs text-blue-400 hover:text-blue-300 font-semibold"
                   onClick={() => setMode("signin")}
                 >
                   Sign in
