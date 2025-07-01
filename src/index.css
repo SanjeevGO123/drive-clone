@@ -1127,3 +1127,26 @@
   60% { border-radius: 40% 60% 45% 55% / 55% 45% 40% 60%; transform: scale(1); }
   100% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(1); }
 }
+
+/* Custom Theme Toggle Knob Styles - Override any conflicting styles */
+.theme-toggle-knob {
+  position: relative;
+  overflow: visible;
+}
+
+.theme-toggle-knob:hover {
+  /* Override any existing hover transforms */
+  transform: translateY(-50%) !important;
+}
+
+.theme-toggle-knob::before,
+.theme-toggle-knob::after {
+  display: none; /* Disable any pseudo-elements from conflicting styles */
+}
+
+/* Ensure our custom class takes precedence */
+.theme-toggle-knob.theme-toggle-knob {
+  background: inherit;
+  border-radius: 50%;
+  transition: all 0.5s ease-out;
+}

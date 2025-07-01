@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { ThemeToggle } from '../ui/theme-toggle';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,7 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb';
-import { ArrowLeft, Grid3x3, List, Plus, Upload, LogOut, X, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, Grid3x3, List, Plus, Upload, LogOut, X } from 'lucide-react';
 
 // Header component displays the top navigation bar.
 // Props:
@@ -58,23 +59,6 @@ const Header: React.FC<HeaderProps> = ({
   viewMode,
   setViewMode,
 }) => {
-  const [darkMode, setDarkMode] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' || document.documentElement.classList.contains('dark');
-    }
-    return false;
-  });
-
-  React.useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
-
   return (
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white/80 dark:bg-gray-900/80 shadow-xl dark:shadow-gray-900/60 px-6 sm:px-12 py-6 sticky top-0 z-30 gap-4 sm:gap-0 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
       <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
@@ -230,36 +214,9 @@ const Header: React.FC<HeaderProps> = ({
           <LogOut className="h-4 w-4" />
           Logout
         </Button>
-        {/* Dark mode toggle */}
-        <div className="ml-4">
-          <button
-            aria-label="Toggle dark mode"
-            className={`relative w-14 h-8 rounded-full border-2 border-blue-400 bg-white/30 dark:bg-gray-900/40 shadow-lg flex items-center transition-colors duration-300 btn-liquid-glass-blue overflow-hidden`}
-            style={{
-              boxShadow: '0 4px 20px 0 rgba(59,130,246,0.10), 0 1.5px 4px 0 rgba(59,130,246,0.10)'
-            }}
-            onClick={() => setDarkMode((d) => !d)}
-          >
-            <span
-              className={`absolute left-0 top-0 h-full w-full pointer-events-none transition-all duration-500 ${darkMode ? 'bg-gradient-to-r from-blue-900/40 via-indigo-700/30 to-blue-400/20' : 'bg-gradient-to-r from-blue-200/30 via-white/40 to-blue-100/20'}`}
-              style={{ zIndex: 1 }}
-            ></span>
-            <span
-              className={`liquid-glass-toggle-knob absolute top-1/2 w-6 h-6 rounded-full shadow-md flex items-center justify-center transition-all duration-500 ${darkMode ? 'right-1 left-auto bg-blue-700/80' : 'left-1 right-auto bg-white/80'} -translate-y-1/2`}
-              style={{
-                boxShadow: darkMode
-                  ? '0 2px 8px 0 rgba(59,130,246,0.25), 0 1.5px 4px 0 rgba(59,130,246,0.10)'
-                  : '0 2px 8px 0 rgba(59,130,246,0.10), 0 1.5px 4px 0 rgba(59,130,246,0.10)',
-                zIndex: 2,
-                transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-              }}
-            >
-              {darkMode ? <Moon className="w-4 h-4 text-white" /> : <Sun className="w-4 h-4 text-blue-600" />}
-            </span>
-            {/* Liquid animation effect (background blob) */}
-            <span className={`absolute left-1 top-1 w-6 h-6 rounded-full pointer-events-none transition-all duration-700 ${darkMode ? 'scale-110 bg-blue-400/30 blur-md animate-liquid-toggle' : 'scale-100 bg-blue-200/30 blur-md animate-liquid-toggle-rev'}`} style={{zIndex:0}}></span>
-          </button>
-        </div>
+        
+        {/* Dark mode toggle with liquid glass design */}
+        <ThemeToggle className="ml-4" />
       </div>
       {/* Mobile breadcrumbs below header */}
       <Breadcrumb className="flex sm:hidden mt-2">

@@ -80,27 +80,6 @@ const userId = localStorage.getItem("username") || "";
 const API_URL = process.env.REACT_APP_API_URL || "";
 
 export default function Dashboard() {
-  // Dark mode state
-  const [darkMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("darkMode");
-      if (saved !== null) return saved === "true";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
-
-  // Apply or remove dark class on <html>
-  useEffect(() => {
-    const html = document.documentElement;
-    if (darkMode) {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-    localStorage.setItem("darkMode", darkMode.toString());
-  }, [darkMode]);
-
   const [folders, setFolders] = useState<string[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [currentPrefix, setCurrentPrefix] = useState("");
