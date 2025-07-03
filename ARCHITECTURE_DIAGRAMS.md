@@ -4,28 +4,26 @@
 
 ```mermaid
 graph TB
-    subgraph "User Layer"
+    subgraph "Public Access Layer"
         User[👤 User Browser]
         ReactApp[🖥️ React Application]
-    end
-    
-    subgraph "CDN Layer"
         CloudFront[🌐 CloudFront CDN]
         S3Static[🪣 S3 Static Hosting]
     end
     
-    subgraph "Authentication Layer"
+    subgraph "Authentication Layer (Gateway)"
         Cognito[🔐 AWS Cognito]
         UserPool[👥 User Pool]
         IdentityPool[🎫 Identity Pool]
-    end
-    
-    subgraph "API Layer"
-        APIGateway[🌉 API Gateway]
         JWTAuth[🔑 JWT Authorizer]
     end
     
-    subgraph "Compute Layer"
+    subgraph "Protected API Layer"
+        APIGateway[🌉 API Gateway]
+        AuthBarrier{� Auth Required}
+    end
+    
+    subgraph "Compute Layer (JWT Required)"
         GetFiles[⚡ getFiles Lambda]
         GetURL[⚡ getPresignedURL Lambda]
         CreateFolder[⚡ createFolder Lambda]
@@ -34,7 +32,7 @@ graph TB
         RenameFile[⚡ renameFile Lambda]
     end
     
-    subgraph "Storage Layer"
+    subgraph "Storage Layer (User-Scoped)"
         S3Storage[🗄️ S3 File Storage]
         DynamoDB[🗃️ DynamoDB Metadata]
     end
@@ -45,30 +43,32 @@ graph TB
         XRay[🔍 X-Ray]
     end
     
-    %% User Flow
+    %% Public Access Flow
     User --> ReactApp
     ReactApp --> CloudFront
     CloudFront --> S3Static
     
-    %% Authentication Flow
+    %% Authentication Flow (Required for API Access)
     ReactApp --> Cognito
     Cognito --> UserPool
     Cognito --> IdentityPool
+    UserPool --> JWTAuth
     
-    %% API Flow
+    %% API Access Control
     ReactApp --> APIGateway
-    APIGateway --> JWTAuth
+    APIGateway --> AuthBarrier
+    AuthBarrier --> JWTAuth
     JWTAuth --> Cognito
     
-    %% Lambda Functions
-    APIGateway --> GetFiles
-    APIGateway --> GetURL
-    APIGateway --> CreateFolder
-    APIGateway --> DeleteFile
-    APIGateway --> DeleteFolder
-    APIGateway --> RenameFile
+    %% Protected Lambda Access (Only After JWT Validation)
+    AuthBarrier -->|JWT Valid| GetFiles
+    AuthBarrier -->|JWT Valid| GetURL
+    AuthBarrier -->|JWT Valid| CreateFolder
+    AuthBarrier -->|JWT Valid| DeleteFile
+    AuthBarrier -->|JWT Valid| DeleteFolder
+    AuthBarrier -->|JWT Valid| RenameFile
     
-    %% Storage Access
+    %% Storage Access (User-Scoped)
     GetFiles --> S3Storage
     GetURL --> S3Storage
     CreateFolder --> S3Storage
@@ -80,7 +80,7 @@ graph TB
     GetURL --> DynamoDB
     DeleteFile --> DynamoDB
     
-    %% Monitoring
+    %% Monitoring (All Services)
     APIGateway --> CloudWatch
     GetFiles --> CloudWatch
     GetURL --> CloudWatch
@@ -104,19 +104,18 @@ graph TB
     RenameFile --> XRay
     
     %% Styling
-    classDef userClass fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
-    classDef frontendClass fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
-    classDef cdnClass fill:#e8f5e8,stroke:#4caf50,stroke-width:2px
-    classDef authClass fill:#fff3e0,stroke:#ff9800,stroke-width:2px
-    classDef apiClass fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    classDef publicClass fill:#e8f5e8,stroke:#4caf50,stroke-width:2px
+    classDef authClass fill:#fff3e0,stroke:#ff9800,stroke-width:3px
+    classDef protectedClass fill:#fce4ec,stroke:#e91e63,stroke-width:2px
     classDef computeClass fill:#e1f5fe,stroke:#00bcd4,stroke-width:2px
     classDef storageClass fill:#f1f8e9,stroke:#8bc34a,stroke-width:2px
     classDef monitorClass fill:#fafafa,stroke:#757575,stroke-width:2px
+    classDef authBarrierClass fill:#f3e5f5,stroke:#9c27b0,stroke-width:4px
     
-    class User,ReactApp userClass
-    class CloudFront,S3Static cdnClass
-    class Cognito,UserPool,IdentityPool authClass
-    class APIGateway,JWTAuth apiClass
+    class User,ReactApp,CloudFront,S3Static publicClass
+    class Cognito,UserPool,IdentityPool,JWTAuth authClass
+    class APIGateway protectedClass
+    class AuthBarrier authBarrierClass
     class GetFiles,GetURL,CreateFolder,DeleteFile,DeleteFolder,RenameFile computeClass
     class S3Storage,DynamoDB storageClass
     class CloudWatch,CloudTrail,XRay monitorClass
@@ -220,22 +219,22 @@ flowchart LR
         React[⚛️ React App]
     end
     
-    subgraph "AWS Edge"
+    subgraph "AWS Edge (Public)"
         CF[☁️ CloudFront]
         S3Web[🪣 S3 Website]
     end
     
-    subgraph "Authentication"
+    subgraph "Authentication Gateway"
         Cognito[🔐 Cognito]
         JWT[🎫 JWT Token]
     end
     
-    subgraph "API Layer"
+    subgraph "Protected API Layer"
         APIGW[🌉 API Gateway]
         Auth[🔑 Authorizer]
     end
     
-    subgraph "Business Logic"
+    subgraph "Business Logic (JWT Required)"
         L1[⚡ getFiles]
         L2[⚡ getPresignedURL]
         L3[⚡ createFolder]
@@ -244,29 +243,36 @@ flowchart LR
         L6[⚡ renameFile]
     end
     
-    subgraph "Data Storage"
+    subgraph "Data Storage (User-Scoped)"
         S3[🗄️ S3 Storage]
         DDB[🗃️ DynamoDB]
     end
     
+    %% Public Access Flow
     Browser --> React
     React --> CF
     CF --> S3Web
     
+    %% Authentication Required Flow
     React --> Cognito
     Cognito --> JWT
+    JWT --> React
     
+    %% Protected API Access (JWT Required)
     React --> APIGW
     APIGW --> Auth
     Auth --> Cognito
+    Auth -.->|JWT Valid| APIGW
     
-    APIGW --> L1
-    APIGW --> L2
-    APIGW --> L3
-    APIGW --> L4
-    APIGW --> L5
-    APIGW --> L6
+    %% Business Logic (Only After Auth)
+    APIGW -.->|Authorized| L1
+    APIGW -.->|Authorized| L2
+    APIGW -.->|Authorized| L3
+    APIGW -.->|Authorized| L4
+    APIGW -.->|Authorized| L5
+    APIGW -.->|Authorized| L6
     
+    %% Data Access (User-Scoped)
     L1 --> S3
     L2 --> S3
     L2 --> DDB
@@ -557,6 +563,99 @@ graph TB
     RPO --> GlobalTable
     Failover --> Route53
     Testing --> HealthCheck
+```
+
+## Authentication Flow & Access Control
+
+```mermaid
+graph TB
+    subgraph "Public Access Zone"
+        User[👤 User]
+        ReactApp[🖥️ React App]
+        CloudFront[🌐 CloudFront]
+        S3Static[🪣 S3 Static Website]
+        LoginPage[🔐 Login/Signup Page]
+    end
+    
+    subgraph "Authentication Barrier"
+        Cognito[🔐 AWS Cognito]
+        UserPool[👥 User Pool]
+        JWTToken[🎫 JWT Token]
+        AuthCheck{🔍 Auth Check}
+    end
+    
+    subgraph "Protected Zone (JWT Required)"
+        APIGateway[🌉 API Gateway]
+        JWTAuth[🔑 JWT Authorizer]
+        Dashboard[📊 Dashboard]
+        
+        subgraph "Lambda Functions"
+            GetFiles[⚡ getFiles]
+            GetURL[⚡ getPresignedURL]
+            CreateFolder[⚡ createFolder]
+            DeleteFile[⚡ deleteFile]
+            DeleteFolder[⚡ deleteFolder]
+            RenameFile[⚡ renameFile]
+        end
+        
+        subgraph "User-Scoped Storage"
+            S3Storage[🗄️ S3 User Files]
+            DynamoDB[🗃️ DynamoDB Metadata]
+        end
+    end
+    
+    %% Public Access Flow
+    User --> ReactApp
+    ReactApp --> CloudFront
+    CloudFront --> S3Static
+    S3Static --> LoginPage
+    
+    %% Authentication Process
+    LoginPage --> Cognito
+    Cognito --> UserPool
+    UserPool --> JWTToken
+    JWTToken --> AuthCheck
+    
+    %% Access Control Decision
+    AuthCheck -->|Valid JWT| Dashboard
+    AuthCheck -->|Invalid/No JWT| LoginPage
+    
+    %% Protected API Access
+    Dashboard --> APIGateway
+    APIGateway --> JWTAuth
+    JWTAuth --> Cognito
+    JWTAuth -->|JWT Valid| GetFiles
+    JWTAuth -->|JWT Valid| GetURL
+    JWTAuth -->|JWT Valid| CreateFolder
+    JWTAuth -->|JWT Valid| DeleteFile
+    JWTAuth -->|JWT Valid| DeleteFolder
+    JWTAuth -->|JWT Valid| RenameFile
+    
+    %% Data Access (User-Scoped)
+    GetFiles --> S3Storage
+    GetURL --> S3Storage
+    GetURL --> DynamoDB
+    CreateFolder --> S3Storage
+    DeleteFile --> S3Storage
+    DeleteFile --> DynamoDB
+    DeleteFolder --> S3Storage
+    RenameFile --> S3Storage
+    
+    %% Response Flow
+    S3Storage --> Dashboard
+    Dashboard --> ReactApp
+    ReactApp --> User
+    
+    %% Styling
+    classDef publicZone fill:#e8f5e8,stroke:#4caf50,stroke-width:2px
+    classDef authBarrier fill:#fff3e0,stroke:#ff9800,stroke-width:3px
+    classDef protectedZone fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    classDef authDecision fill:#f3e5f5,stroke:#9c27b0,stroke-width:3px
+    
+    class User,ReactApp,CloudFront,S3Static,LoginPage publicZone
+    class Cognito,UserPool,JWTToken,AuthCheck authBarrier
+    class APIGateway,JWTAuth,Dashboard,GetFiles,GetURL,CreateFolder,DeleteFile,DeleteFolder,RenameFile,S3Storage,DynamoDB protectedZone
+    class AuthCheck authDecision
 ```
 
 ## Files Created
