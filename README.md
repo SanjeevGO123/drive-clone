@@ -139,12 +139,14 @@ graph LR
     
     subgraph "Deployment Targets"
         S3Deploy[🪣 S3 Deployment]
+        EB[⚡ EventBridge Rule]
+        Lambda[🔧 Lambda Function]
         CFInvalidate[🌐 CloudFront Invalidation]
     end
     
     subgraph "Monitoring"
         Monitor[CloudWatch Monitoring]
-        Logs[� CloudTrail Logs]
+        Logs[📋 CloudTrail Logs]
         Alerts[🚨 Alarms]
     end
     
@@ -156,7 +158,9 @@ graph LR
     BuildSpec --> Artifacts
     
     Artifacts --> S3Deploy
-    S3Deploy --> CFInvalidate
+    S3Deploy --> EB
+    EB --> Lambda
+    Lambda --> CFInvalidate
     
     S3Deploy --> Monitor
     Monitor --> Logs
@@ -170,6 +174,10 @@ graph LR
     BuildSpec -.-> |Node.js 22| CB
     BuildSpec -.-> |npm ci| CB
     BuildSpec -.-> |npm run build| CB
+    
+    %% EventBridge Details
+    EB -.-> |S3 Object Created| Lambda
+    Lambda -.-> |Invalidate Cache| CFInvalidate
 ```
 
 ## 🧰 Technology Stack
