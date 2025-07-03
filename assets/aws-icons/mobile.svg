@@ -1,0 +1,7 @@
+<svg class="w-6 h-6" height="40" width="40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder for Mobile SVG -->
+  <rect width="40" height="40" fill="#4A5568" rx="4"/>
+  <rect x="10" y="6" width="20" height="28" fill="white" rx="3"/>
+  <rect x="12" y="10" width="16" height="18" fill="#E5E7EB"/>
+  <circle cx="20" cy="31" r="2" fill="#6B7280"/>
+</svg>
