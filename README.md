@@ -103,6 +103,44 @@ sequenceDiagram
     R->>R: Update upload progress
     R-->>U: Show upload completion
     
+    Note over U,D: Create Folder Flow (POST /createFolder)
+    U->>R: Click "New Folder" button
+    R->>A: POST /createFolder (JWT + folder data)
+    A->>Auth: Validate JWT token
+    Auth->>C: Verify token
+    C-->>Auth: Token valid
+    Auth-->>A: Authorization success
+    A->>L: Invoke createFolder Lambda
+    L->>S: PutObject (empty folder marker)
+    L->>D: Store folder metadata
+    S-->>L: Folder created
+    D-->>L: Metadata stored
+    L-->>A: HTTP 200 + folder path
+    A-->>R: Folder creation response
+    R->>R: Update UI state
+    R-->>U: Show new folder
+    
+    Note over U,D: Delete Folder Flow (DELETE /deleteFolder)
+    U->>R: Right-click folder → Delete
+    R->>R: Show confirmation dialog
+    U->>R: Confirm deletion
+    R->>A: DELETE /deleteFolder (JWT + folder path)
+    A->>Auth: Validate JWT token
+    Auth->>C: Verify token
+    C-->>Auth: Token valid
+    Auth-->>A: Authorization success
+    A->>L: Invoke deleteFolder Lambda
+    L->>S: ListObjects (get all contents)
+    S-->>L: List of objects to delete
+    L->>S: DeleteObjects (batch delete)
+    L->>D: Remove folder metadata
+    S-->>L: Objects deleted
+    D-->>L: Metadata removed
+    L-->>A: HTTP 200 + deletion count
+    A-->>R: Deletion response
+    R->>R: Update UI state
+    R-->>U: Show deletion success
+    
     Note over U,D: File Operations (DELETE/RENAME)
     U->>R: File action (delete/rename)
     R->>A: API call (JWT + operation data)
