@@ -206,6 +206,152 @@
     </div>
 </div>
 
+## Comprehensive AWS Architecture (Visual Diagram with Icons)
+
+<div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin: 20px 0; font-family: 'Segoe UI', Arial, sans-serif;">
+    <h3 style="text-align: center; margin-bottom: 30px; color: #333;">Drive Clone - AWS System Architecture</h3>
+    
+    <!-- Public Access Layer -->
+    <div style="background: linear-gradient(135deg, #e8f5e8, #f1f8e9); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #4caf50;">
+        <h4 style="margin: 0 0 15px 0; color: #2e7d32; text-align: center;">Public Access Layer</h4>
+        <div style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/user.svg" alt="User" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #2e7d32;">User Browser</div>
+            </div>
+            <div style="color: #4caf50; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/browser.svg" alt="React App" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #2e7d32;">React App</div>
+            </div>
+            <div style="color: #4caf50; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/cloudfront.svg" alt="CloudFront" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #2e7d32;">CloudFront CDN</div>
+            </div>
+            <div style="color: #4caf50; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/s3.svg" alt="S3" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #2e7d32;">S3 Static Hosting</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Authentication Layer -->
+    <div style="background: linear-gradient(135deg, #fff3e0, #fef7f0); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 3px solid #ff9800;">
+        <h4 style="margin: 0 0 15px 0; color: #e65100; text-align: center;">Authentication Layer (Gateway)</h4>
+        <div style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/cognito.svg" alt="Cognito" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #e65100;">AWS Cognito</div>
+            </div>
+            <div style="color: #ff9800; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/iam.svg" alt="User Pool" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #e65100;">User Pool</div>
+            </div>
+            <div style="color: #ff9800; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/iam.svg" alt="JWT" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #e65100;">JWT Authorizer</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Protected API Layer -->
+    <div style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #e91e63;">
+        <h4 style="margin: 0 0 15px 0; color: #ad1457; text-align: center;">Protected API Layer</h4>
+        <div style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/api-gateway.svg" alt="API Gateway" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #ad1457;">API Gateway</div>
+            </div>
+            <div style="color: #e91e63; font-size: 24px; font-weight: bold;">→</div>
+            <div style="text-align: center; min-width: 120px; background: rgba(156, 39, 176, 0.1); padding: 15px; border-radius: 8px; border: 2px solid #9c27b0;">
+                <img src="assets/aws-icons/iam.svg" alt="Auth Barrier" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #7b1fa2;">Auth Required</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Compute Layer -->
+    <div style="background: linear-gradient(135deg, #e1f5fe, #b3e5fc); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #00bcd4;">
+        <h4 style="margin: 0 0 15px 0; color: #00695c; text-align: center;">Compute Layer (JWT Required)</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; justify-items: center;">
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">getFiles</div>
+            </div>
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">getPresignedURL</div>
+            </div>
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">createFolder</div>
+            </div>
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">deleteFile</div>
+            </div>
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">deleteFolder</div>
+            </div>
+            <div style="text-align: center;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="45" height="45" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #00695c; font-size: 14px;">renameFile</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Storage Layer -->
+    <div style="background: linear-gradient(135deg, #f1f8e9, #dcedc8); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #8bc34a;">
+        <h4 style="margin: 0 0 15px 0; color: #33691e; text-align: center;">Storage Layer (User-Scoped)</h4>
+        <div style="display: flex; gap: 50px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/s3.svg" alt="S3" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #33691e;">S3 File Storage</div>
+            </div>
+            <div style="text-align: center; min-width: 120px;">
+                <img src="assets/aws-icons/dynamodb.svg" alt="DynamoDB" width="50" height="50" style="margin-bottom: 5px;"/>
+                <div style="font-weight: 500; color: #33691e;">DynamoDB Metadata</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monitoring & CI/CD Layer -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="background: linear-gradient(135deg, #fafafa, #f5f5f5); padding: 20px; border-radius: 10px; border: 2px solid #757575;">
+            <h4 style="margin: 0 0 15px 0; color: #424242; text-align: center;">Monitoring Layer</h4>
+            <div style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <div style="text-align: center; min-width: 100px;">
+                    <img src="assets/aws-icons/cloudwatch.svg" alt="CloudWatch" width="45" height="45" style="margin-bottom: 5px;"/>
+                    <div style="font-weight: 500; color: #424242; font-size: 14px;">CloudWatch</div>
+                </div>
+                <div style="text-align: center; min-width: 100px;">
+                    <img src="assets/aws-icons/cloudtrail.svg" alt="CloudTrail" width="45" height="45" style="margin-bottom: 5px;"/>
+                    <div style="font-weight: 500; color: #424242; font-size: 14px;">CloudTrail</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 20px; border-radius: 10px; border: 2px solid #6366f1;">
+            <h4 style="margin: 0 0 15px 0; color: #3730a3; text-align: center;">CI/CD Layer</h4>
+            <div style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <div style="text-align: center; min-width: 100px;">
+                    <img src="assets/aws-icons/codepipeline.svg" alt="CodePipeline" width="45" height="45" style="margin-bottom: 5px;"/>
+                    <div style="font-weight: 500; color: #3730a3; font-size: 14px;">CodePipeline</div>
+                </div>
+                <div style="text-align: center; min-width: 100px;">
+                    <img src="assets/aws-icons/codebuild.svg" alt="CodeBuild" width="45" height="45" style="margin-bottom: 5px;"/>
+                    <div style="font-weight: 500; color: #3730a3; font-size: 14px;">CodeBuild</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 ## Comprehensive AWS Architecture (Mermaid)
 
 ```mermaid
@@ -440,37 +586,37 @@ journey
 ```mermaid
 flowchart LR
     subgraph "Client Side"
-        Browser[🌐 Browser]
-        React[⚛️ React App]
+        Browser[Browser]
+        React[React App]
     end
     
     subgraph "AWS Edge (Public)"
-        CF[☁️ CloudFront]
-        S3Web[🪣 S3 Website]
+        CF[CloudFront]
+        S3Web[S3 Website]
     end
     
     subgraph "Authentication Gateway"
-        Cognito[🔐 Cognito]
-        JWT[🎫 JWT Token]
+        Cognito[Cognito]
+        JWT[JWT Token]
     end
     
     subgraph "Protected API Layer"
-        APIGW[🌉 API Gateway]
-        Auth[🔑 Authorizer]
+        APIGW[API Gateway]
+        Auth[Authorizer]
     end
     
     subgraph "Business Logic (JWT Required)"
-        L1[⚡ getFiles]
-        L2[⚡ getPresignedURL]
-        L3[⚡ createFolder]
-        L4[⚡ deleteFile]
-        L5[⚡ deleteFolder]
-        L6[⚡ renameFile]
+        L1[getFiles]
+        L2[getPresignedURL]
+        L3[createFolder]
+        L4[deleteFile]
+        L5[deleteFolder]
+        L6[renameFile]
     end
     
     subgraph "Data Storage (User-Scoped)"
-        S3[🗄️ S3 Storage]
-        DDB[🗃️ DynamoDB]
+        S3[S3 Storage]
+        DDB[DynamoDB]
     end
     
     %% Public Access Flow
@@ -517,41 +663,41 @@ flowchart LR
 graph TB
     subgraph "Security Layers"
         subgraph "Frontend Security"
-            HTTPS[🔒 HTTPS/TLS]
-            CORS[🛡️ CORS Policy]
-            CSP[🚫 Content Security Policy]
+            HTTPS[HTTPS/TLS]
+            CORS[CORS Policy]
+            CSP[Content Security Policy]
         end
         
         subgraph "Authentication Security"
-            UserPool[👥 Cognito User Pool]
-            StrongPwd[🔐 Strong Password Policy]
-            MFA[📱 Multi-Factor Auth]
-            JWT[🎫 JWT Tokens]
+            UserPool[Cognito User Pool]
+            StrongPwd[Strong Password Policy]
+            MFA[Multi-Factor Auth]
+            JWT[JWT Tokens]
         end
         
         subgraph "API Security"
-            APIAuth[🔑 API Gateway Auth]
-            RateLimit[⏱️ Rate Limiting]
-            Throttling[🚦 Throttling]
-            InputVal[✅ Input Validation]
+            APIAuth[API Gateway Auth]
+            RateLimit[Rate Limiting]
+            Throttling[Throttling]
+            InputVal[Input Validation]
         end
         
         subgraph "Data Security"
-            S3Encrypt[🔒 S3 Encryption]
-            UserScope[👤 User-Scoped Access]
-            PresignedURL[🔗 Presigned URLs]
-            DDBEncrypt[🔒 DynamoDB Encryption]
+            S3Encrypt[S3 Encryption]
+            UserScope[User-Scoped Access]
+            PresignedURL[Presigned URLs]
+            DDBEncrypt[DynamoDB Encryption]
         end
         
         subgraph "Infrastructure Security"
-            IAMRoles[🎭 IAM Roles]
-            LeastPriv[🔒 Least Privilege]
-            VPCEndpoint[🔗 VPC Endpoints]
-            SecurityGroup[🛡️ Security Groups]
+            IAMRoles[IAM Roles]
+            LeastPriv[Least Privilege]
+            VPCEndpoint[VPC Endpoints]
+            SecurityGroup[Security Groups]
         end
         
         subgraph "Monitoring Security"
-            CloudTrail[📋 CloudTrail Audit]
+            CloudTrail[CloudTrail Audit]
             CloudWatch[📊 CloudWatch Alarms]
             GuardDuty[🕵️ GuardDuty Threat Detection]
             Config[⚙️ Config Compliance]
@@ -913,3 +1059,5 @@ These files provide a complete picture of your AWS system architecture, covering
 - Scalability and performance optimization
 - Disaster recovery planning
 - Cost optimization strategies
+
+> **Note:** The visual diagram above uses the actual AWS SVG icons for professional presentation. The Mermaid diagrams below provide additional detail and technical documentation. While Mermaid doesn't support SVG images directly, the visual diagram serves as the icon-based representation of the system architecture.
