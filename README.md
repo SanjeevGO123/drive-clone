@@ -159,7 +159,6 @@ graph LR
     S3Deploy --> CFInvalidate
     
     S3Deploy --> Monitor
-    LambdaDeploy --> Monitor
     Monitor --> Logs
     Monitor --> Alerts
     
