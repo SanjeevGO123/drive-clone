@@ -64,7 +64,7 @@ export const handler = async (event) => {
         FileId: { S: fileId },
         Filename: { S: folderName },
         S3Key: { S: s3Key },
-        UploadTimestamp: { S: timestamp }
+        UpdatedAt: { S: timestamp }
       }
     }));
 

@@ -71,7 +71,7 @@ export const handler = async (event) => {
         FileId: { S: fileId },
         Filename: { S: filename },
         S3Key: { S: s3Key },
-        UploadTimestamp: { S: new Date().toISOString() },
+        UpdatedAt: { S: new Date().toISOString() },
       },
     });
 
