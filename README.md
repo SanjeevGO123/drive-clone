@@ -36,6 +36,15 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 
 ---
 ## Architecture
+
+### AWS Architecture
+![AWS Architecture](./screenshots/system-design.png)
+*High-level AWS system architecture showing services and data flow*
+
+### AWS Deployment Pipeline
+![AWS Deployment Pipeline](./screenshots/deployment-design.png)
+*Visual overview of the AWS CI/CD deployment pipeline and integration*
+
 ### API Endpoints Flow (Request/Response Model)
 
 ```mermaid
@@ -253,6 +262,8 @@ graph LR
 ### Drive Dashboard
 ![Drive Dashboard](./screenshots/drive-dashboard.png)
 *File management dashboard with color-coded file types, modern UI components, and intuitive navigation*
+
+
 
 ---
 
