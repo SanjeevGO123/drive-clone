@@ -35,6 +35,92 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 - ⚫ **Text/Other** - Gray for plain text and unknown types
 
 ---
+## Architecture
+### API Endpoints Flow (Request/Response Model)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant R as React App
+    participant C as Cognito
+    participant A as API Gateway
+    participant Auth as JWT Authorizer
+    participant L as Lambda
+    participant S as S3
+    participant D as DynamoDB
+    
+    Note over U,D: User Registration Flow
+    U->>R: Enter signup details
+    R->>C: POST /auth/signup
+    C->>C: Validate signup data
+    C-->>R: User created + verification required
+    R-->>U: Show verification prompt
+    U->>R: Enter verification code
+    R->>C: POST /auth/confirmSignup
+    C->>C: Verify OTP code
+    C-->>R: Account confirmed
+    R-->>U: Show login page
+    
+    Note over U,D: User Authentication Flow
+    U->>R: Enter credentials
+    R->>C: POST /auth/signin
+    C->>C: Validate credentials
+    C-->>R: JWT token + user info
+    R->>R: Store JWT token
+    R-->>U: Redirect to dashboard
+    
+    Note over U,D: Dashboard Load (GET /getFiles)
+    U->>R: Access dashboard
+    R->>A: GET /getFiles (Authorization: Bearer JWT)
+    A->>Auth: Validate JWT token
+    Auth->>C: Verify token signature
+    C-->>Auth: Token valid + user context
+    Auth-->>A: Authorization success
+    A->>L: Invoke getFiles Lambda (user context)
+    L->>S: ListObjectsV2 (user-scoped prefix)
+    S-->>L: Files and folders list
+    L-->>A: HTTP 200 + { folders: [], files: [] }
+    A-->>R: Response data
+    R->>R: Update UI state
+    R-->>U: Display files grid
+    
+    Note over U,D: File Upload Flow (POST /generatepresignedURL)
+    U->>R: Select file for upload
+    R->>A: POST /generatepresignedURL (JWT + file metadata)
+    A->>Auth: Validate JWT token
+    Auth->>C: Verify token
+    C-->>Auth: Token valid
+    Auth-->>A: Authorization success
+    A->>L: Invoke getPresignedURL Lambda
+    L->>S: Generate presigned upload URL
+    L->>D: Store file metadata
+    S-->>L: Presigned URL (15min expiry)
+    D-->>L: Metadata stored
+    L-->>A: HTTP 200 + { uploadUrl, key }
+    A-->>R: Presigned URL response
+    R->>S: PUT file data (direct to S3)
+    S-->>R: HTTP 200 Upload success
+    R->>R: Update upload progress
+    R-->>U: Show upload completion
+    
+    Note over U,D: File Operations (DELETE/RENAME)
+    U->>R: File action (delete/rename)
+    R->>A: API call (JWT + operation data)
+    A->>Auth: Validate JWT token
+    Auth->>C: Verify token
+    C-->>Auth: Token valid
+    Auth-->>A: Authorization success
+    A->>L: Invoke operation Lambda
+    L->>S: S3 operation (delete/copy/rename)
+    L->>D: Update metadata
+    S-->>L: Operation success
+    D-->>L: Metadata updated
+    L-->>A: HTTP 200 + success message
+    A-->>R: Operation response
+    R->>R: Update UI state
+    R-->>U: Show operation result
+```
+
 
 ## 🧰 Technology Stack
 
