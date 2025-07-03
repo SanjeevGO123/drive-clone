@@ -37,7 +37,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 ---
 ## Architecture
 
-### AWS Architecture
+### AWS System Design Architecture
 ![AWS Architecture](./screenshots/system-design.png)
 *High-level AWS system architecture showing services and data flow*
 
@@ -45,7 +45,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 ![AWS Deployment Pipeline](./screenshots/deployment-design.png)
 *Visual overview of the AWS CI/CD deployment pipeline and integration*
 
-### API Endpoints Flow (Request/Response Model)
+### Sequence Diagram (Request/Response Model)
 
 ```mermaid
 sequenceDiagram
@@ -167,65 +167,7 @@ sequenceDiagram
     R->>R: Update UI state
     R-->>U: Show operation result
 ```
-### Deployment Pipeline (Updated)
 
-```mermaid
-graph LR
-    subgraph "Development"
-        Dev[💻 Developer]
-        Git[📚 Git Repository]
-        PR[🔄 Pull Request]
-    end
-    
-    subgraph "AWS CI/CD Pipeline"
-        CP[CodePipeline]
-        CB[🔨 CodeBuild]
-        BuildSpec[buildspec.yml]
-        Artifacts[📦 Build Artifacts]
-    end
-    
-    subgraph "Deployment Targets"
-        S3Deploy[🪣 S3 Deployment]
-        EB[⚡ EventBridge Rule]
-        Lambda[🔧 Lambda Function]
-        CFInvalidate[🌐 CloudFront Invalidation]
-    end
-    
-    subgraph "Monitoring"
-        Monitor[CloudWatch Monitoring]
-        Logs[📋 CloudTrail Logs]
-        Alerts[🚨 Alarms]
-    end
-    
-    Dev --> Git
-    Git --> PR
-    PR --> CP
-    CP --> CB
-    CB --> BuildSpec
-    BuildSpec --> Artifacts
-    
-    Artifacts --> S3Deploy
-    S3Deploy --> EB
-    EB --> Lambda
-    Lambda --> CFInvalidate
-    
-    S3Deploy --> Monitor
-    Monitor --> Logs
-    Monitor --> Alerts
-    
-    %% Feedback loops
-    Alerts --> Dev
-    Monitor --> Dev
-    
-    %% Build Process Details
-    BuildSpec -.-> |Node.js 22| CB
-    BuildSpec -.-> |npm ci| CB
-    BuildSpec -.-> |npm run build| CB
-    
-    %% EventBridge Details
-    EB -.-> |S3 Object Created| Lambda
-    Lambda -.-> |Invalidate Cache| CFInvalidate
-```
 
 ## 🧰 Technology Stack
 
