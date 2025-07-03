@@ -72,10 +72,11 @@ export const handler = async (event) => {
           UserId: { S: userId },
           FileId: { S: oldKey }, // or however you identify the row
         },
-        UpdateExpression: "SET Filename = :f, S3Key = :k",
+        UpdateExpression: "SET Filename = :f, S3Key = :k, UpdatedAt = :t",
         ExpressionAttributeValues: {
           ":f": { S: newFilename },
           ":k": { S: newKey },
+          ":t": { S: new Date().toISOString() },
         },
       })
     );

@@ -20,9 +20,12 @@
 // - Returns appropriate HTTP status codes and error messages.
 
 import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 
 const BUCKET_NAME = process.env.BUCKET_NAME;
+const METADATA_TABLE = process.env.METADATA_TABLE;
 const s3 = new S3Client({});
+const ddb = new DynamoDBClient({});
 
 export const handler = async (event) => {
   try {
@@ -53,6 +56,15 @@ export const handler = async (event) => {
       new DeleteObjectsCommand({
         Bucket: BUCKET_NAME,
         Delete: { Objects: objectsToDelete },
+      })
+    );
+    await ddb.send(
+      new DeleteItemCommand({
+        TableName: process.env.METADATA_TABLE,
+        Key: {
+          UserId: { S: userId },
+          FileId: { S: folderPrefix }, // Assuming folderName is used as FileId
+        },
       })
     );
     return {
