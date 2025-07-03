@@ -140,7 +140,6 @@ graph LR
     subgraph "Deployment Targets"
         S3Deploy[🪣 S3 Deployment]
         CFInvalidate[🌐 CloudFront Invalidation]
-        LambdaDeploy[⚡ Lambda Deployment]
     end
     
     subgraph "Monitoring"
@@ -158,7 +157,6 @@ graph LR
     
     Artifacts --> S3Deploy
     S3Deploy --> CFInvalidate
-    Artifacts --> LambdaDeploy
     
     S3Deploy --> Monitor
     LambdaDeploy --> Monitor
