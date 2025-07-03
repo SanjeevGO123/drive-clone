@@ -38,11 +38,11 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 ## Architecture
 
 ### AWS System Design Architecture
-![AWS Architecture](./screenshots/system-design.png)
+![AWS Architecture](./screenshots/system-design.jpeg)
 *High-level AWS system architecture showing services and data flow*
 
 ### AWS Deployment Pipeline
-![AWS Deployment Pipeline](./screenshots/deployment-design.png)
+![AWS Deployment Pipeline](./screenshots/deployment-design.jpeg)
 *Visual overview of the AWS CI/CD deployment pipeline and integration*
 
 ### Sequence Diagram (Request/Response Model)
