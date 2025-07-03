@@ -120,7 +120,60 @@ sequenceDiagram
     R->>R: Update UI state
     R-->>U: Show operation result
 ```
+### Deployment Pipeline (Updated)
 
+```mermaid
+graph LR
+    subgraph "Development"
+        Dev[💻 Developer]
+        Git[📚 Git Repository]
+        PR[🔄 Pull Request]
+    end
+    
+    subgraph "AWS CI/CD Pipeline"
+        CP[CodePipeline]
+        CB[🔨 CodeBuild]
+        BuildSpec[buildspec.yml]
+        Artifacts[📦 Build Artifacts]
+    end
+    
+    subgraph "Deployment Targets"
+        S3Deploy[🪣 S3 Deployment]
+        CFInvalidate[🌐 CloudFront Invalidation]
+        LambdaDeploy[⚡ Lambda Deployment]
+    end
+    
+    subgraph "Monitoring"
+        Monitor[CloudWatch Monitoring]
+        Logs[� CloudTrail Logs]
+        Alerts[🚨 Alarms]
+    end
+    
+    Dev --> Git
+    Git --> PR
+    PR --> CP
+    CP --> CB
+    CB --> BuildSpec
+    BuildSpec --> Artifacts
+    
+    Artifacts --> S3Deploy
+    S3Deploy --> CFInvalidate
+    Artifacts --> LambdaDeploy
+    
+    S3Deploy --> Monitor
+    LambdaDeploy --> Monitor
+    Monitor --> Logs
+    Monitor --> Alerts
+    
+    %% Feedback loops
+    Alerts --> Dev
+    Monitor --> Dev
+    
+    %% Build Process Details
+    BuildSpec -.-> |Node.js 22| CB
+    BuildSpec -.-> |npm ci| CB
+    BuildSpec -.-> |npm run build| CB
+```
 
 ## 🧰 Technology Stack
 
