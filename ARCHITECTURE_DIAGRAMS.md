@@ -487,12 +487,25 @@ sequenceDiagram
     participant S as S3
     participant D as DynamoDB
     
-    Note over U,D: Authentication Flow
+    Note over U,D: User Registration Flow
+    U->>R: Enter signup details
+    R->>C: POST /auth/signup
+    C->>C: Validate signup data
+    C-->>R: User created + verification required
+    R-->>U: Show verification prompt
+    U->>R: Enter verification code
+    R->>C: POST /auth/confirmSignup
+    C->>C: Verify OTP code
+    C-->>R: Account confirmed
+    R-->>U: Show login page
+    
+    Note over U,D: User Authentication Flow
     U->>R: Enter credentials
     R->>C: POST /auth/signin
     C->>C: Validate credentials
     C-->>R: JWT token + user info
     R->>R: Store JWT token
+    R-->>U: Redirect to dashboard
     
     Note over U,D: Dashboard Load (GET /getFiles)
     U->>R: Access dashboard
