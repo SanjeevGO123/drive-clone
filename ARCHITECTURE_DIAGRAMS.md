@@ -352,7 +352,143 @@
     </div>
 </div>
 
-## Comprehensive AWS Architecture (Mermaid)
+## Comprehensive AWS Architecture (Visual + Mermaid)
+
+### Visual Architecture with AWS Icons
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h4 style="margin-top: 0; color: #2c3e50;">Drive Clone - AWS Architecture Overview</h4>
+    
+    <!-- Public Access Layer -->
+    <div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #4caf50;">
+        <h5 style="margin: 0 0 10px 0; color: #2e7d32;">Public Access Layer</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/user.svg" alt="User" width="24" height="24"/>
+                <span>User Browser</span>
+            </div>
+            <span>→</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/browser.svg" alt="Browser" width="24" height="24"/>
+                <span>React Application</span>
+            </div>
+            <span>→</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/cloudfront.svg" alt="CloudFront" width="24" height="24"/>
+                <span>CloudFront CDN</span>
+            </div>
+            <span>→</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/s3.svg" alt="S3" width="24" height="24"/>
+                <span>S3 Static Hosting</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Authentication Layer -->
+    <div style="background: #fff3e0; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #ff9800;">
+        <h5 style="margin: 0 0 10px 0; color: #e65100;">Authentication Layer</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/cognito.svg" alt="Cognito" width="24" height="24"/>
+                <span>AWS Cognito</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/iam.svg" alt="IAM" width="24" height="24"/>
+                <span>JWT Authorizer</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Layer -->
+    <div style="background: #fce4ec; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #e91e63;">
+        <h5 style="margin: 0 0 10px 0; color: #ad1457;">Protected API Layer</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/api-gateway.svg" alt="API Gateway" width="24" height="24"/>
+                <span>API Gateway</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Compute Layer -->
+    <div style="background: #e1f5fe; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #00bcd4;">
+        <h5 style="margin: 0 0 10px 0; color: #0097a7;">Compute Layer (JWT Required)</h5>
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>getFiles</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>getPresignedURL</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>createFolder</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>deleteFile</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>deleteFolder</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/lambda.svg" alt="Lambda" width="24" height="24"/>
+                <span>renameFile</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Storage Layer -->
+    <div style="background: #f1f8e9; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #8bc34a;">
+        <h5 style="margin: 0 0 10px 0; color: #558b2f;">Storage Layer (User-Scoped)</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/s3.svg" alt="S3" width="24" height="24"/>
+                <span>S3 File Storage</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/dynamodb.svg" alt="DynamoDB" width="24" height="24"/>
+                <span>DynamoDB Metadata</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monitoring Layer -->
+    <div style="background: #fafafa; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #757575;">
+        <h5 style="margin: 0 0 10px 0; color: #424242;">Monitoring Layer</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/cloudwatch.svg" alt="CloudWatch" width="24" height="24"/>
+                <span>CloudWatch</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/cloudtrail.svg" alt="CloudTrail" width="24" height="24"/>
+                <span>CloudTrail</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CI/CD Layer -->
+    <div style="background: #e0e7ff; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #6366f1;">
+        <h5 style="margin: 0 0 10px 0; color: #4f46e5;">CI/CD Layer</h5>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/codepipeline.svg" alt="CodePipeline" width="24" height="24"/>
+                <span>CodePipeline</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/aws-icons/codebuild.svg" alt="CodeBuild" width="24" height="24"/>
+                <span>CodeBuild</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+### Detailed Mermaid Flow Diagram
 
 ```mermaid
 graph TB
@@ -1073,4 +1209,4 @@ These files provide a complete picture of your AWS system architecture, covering
 - Disaster recovery planning
 - Cost optimization strategies
 
-> **Note:** The visual diagram above uses the actual AWS SVG icons for professional presentation. The Mermaid diagrams below provide additional detail and technical documentation. While Mermaid doesn't support SVG images directly, the visual diagram serves as the icon-based representation of the system architecture.
+> **Note:** The visual diagrams above use the actual AWS SVG icons from your `assets/aws-icons/` directory for professional presentation. The hybrid approach combines HTML with SVG icons for visual clarity, while the Mermaid diagrams provide detailed technical documentation and flow representation. This gives you the best of both worlds - professional AWS icons for presentations and detailed technical flows for development reference.
