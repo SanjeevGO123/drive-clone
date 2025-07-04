@@ -1,0 +1,332 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Full stack architecture with S3, DynamoDB, Lambda, API Gateway, Cognito UserPool, and CloudFront
+
+Parameters:
+  LambdaCodeS3Bucket:
+    Type: String
+    Description: S3 bucket where Lambda code zips are stored
+  LambdaCodeS3KeyPrefix:
+    Type: String
+    Description: S3 key prefix for Lambda code zips (e.g., 'lambda/')
+
+Resources:
+  # CloudFront Origin Access Control for FilesBucket
+  FilesOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub 'files-oac-${AWS::StackName}'
+        Description: OAC for files bucket
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        OriginAccessControlOriginType: s3
+
+  # CloudFront Distribution for FilesBucket
+  FilesDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: ''
+        Origins:
+          - Id: FilesOrigin
+            DomainName: !GetAtt FilesBucket.RegionalDomainName
+            S3OriginConfig: {}
+            OriginAccessControlId: !GetAtt FilesOAC.Id
+        DefaultCacheBehavior:
+          TargetOriginId: FilesOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        HttpVersion: http2
+        IPV6Enabled: true
+  # S3 Bucket for application data (AppDataBucket)
+  AppDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'drive-app-data-${AWS::StackName}-${AWS::AccountId}-${AWS::Region}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # S3 Bucket Policy for AppDataBucket
+  AppDataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AppDataBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${AppDataBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${AppDataDistribution}'
+
+  # CloudFront Origin Access Control for AppDataBucket
+  AppDataOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub 'appdata-oac-${AWS::StackName}'
+        Description: OAC for app data bucket
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        OriginAccessControlOriginType: s3
+
+  # CloudFront Distribution for AppDataBucket (static site)
+  AppDataDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: AppDataOrigin
+            DomainName: !GetAtt AppDataBucket.RegionalDomainName
+            S3OriginConfig: {}
+            OriginAccessControlId: !GetAtt AppDataOAC.Id
+        DefaultCacheBehavior:
+          TargetOriginId: AppDataOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        HttpVersion: http2
+        IPV6Enabled: true
+
+  # DynamoDB Table
+  AppTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'drive-metadata-${AWS::StackName}-${AWS::AccountId}-${AWS::Region}'
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
+        - AttributeName: FileId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
+        - AttributeName: FileId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  # Lambda Functions (6)
+  LambdaFunction1:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'createFolder-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda1 placeholder' };
+          };
+
+  LambdaFunction2:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'renameFile-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda2 placeholder' };
+          };
+
+  LambdaFunction3:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'getpresignedURL-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda3 placeholder' };
+          };
+
+  LambdaFunction4:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'getFiles-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda4 placeholder' };
+          };
+
+  LambdaFunction5:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'deleteFile-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda5 placeholder' };
+          };
+
+  LambdaFunction6:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'deleteFolder-${AWS::StackName}'
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          // Lambda function code goes here
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: 'Lambda6 placeholder' };
+          };
+
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:*
+                Resource: '*'
+
+  # Cognito User Pool
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${AWS::StackName}-userpool'
+      AutoVerifiedAttributes:
+        - email
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${AWS::StackName}-userpool-client'
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+
+
+  # API Gateway (HTTP API, resource only, no routes)
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub '${AWS::StackName}-http-api'
+      ProtocolType: HTTP
+
+
+  # S3 Bucket for storing files (FilesBucket)
+  FilesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'drive-files-${AWS::StackName}-${AWS::AccountId}-${AWS::Region}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # S3 Bucket Policy for FilesBucket
+  FilesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FilesBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${FilesBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${FilesDistribution}'
+
+  # (Removed StaticSiteBucket, StaticSiteDistribution, ContentBucket, ContentDistribution)
+
+Outputs:
+  AppDataBucketName:
+    Description: S3 bucket for app data
+    Value: !Ref AppDataBucket
+  AppTableName:
+    Description: DynamoDB table name
+    Value: !Ref AppTable
+  ApiGatewayUrl:
+    Description: API Gateway endpoint
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/v1'
+  FilesDistributionDomainName:
+    Description: CloudFront distribution domain name for files
+    Value: !GetAtt FilesDistribution.DomainName
+  AppDataDistributionDomainName:
+    Description: CloudFront distribution domain name for app data (static site)
+    Value: !GetAtt AppDataDistribution.DomainName
