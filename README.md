@@ -35,7 +35,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 - ⚫ **Text/Other** - Gray for plain text and unknown types
 
 ---
-## Architecture
+## 🏗️ Architecture
 
 ### AWS System Design Architecture
 ![AWS Architecture](./screenshots/system-design.jpeg)
@@ -549,37 +549,36 @@ npm run build
 npm test
 ```
 
-### Backend Setup & Deployment
-- Each file in `api/` is a Lambda handler. Deploy each handler individually to AWS Lambda using the AWS Console, AWS CLI, or your preferred deployment tool:
+## 🏗️ CloudFormation Template
 
-```bash
-# Example AWS CLI command to deploy a Lambda function
-aws lambda create-function --function-name your-function-name --runtime nodejs22.x --role your-execution-role-arn --handler handler-file-name.handler --zip-file fileb://path-to-your-zip-file
-```
+The full AWS CloudFormation template for this project is provided in the file [`cloudformation-template.yaml`](./template/cloudformation-template.yaml) in the infrastructure/ directory of this repository.
 
----
+This template provisions all required AWS resources for the backend, including:
+- S3 buckets (for app data and file storage)
+- CloudFront distributions (for static site and file delivery)
+- DynamoDB table (for metadata)
+- Lambda functions (API handlers)
+- API Gateway (HTTP API)
+- Cognito User Pool and User Pool Client
 
-## 🚀 Production Deployment
+### How to Deploy
 
-- **Frontend:**
-  ```bash
-  npm run build
-  aws s3 sync build/ s3://your-frontend-bucket
-  ```
-- **Backend:**
-  - Deploy Lambda handlers individually as AWS Lambda functions
-- **CDN:**
-  - Configure CloudFront with S3 as origin for frontend, API Gateway for backend
-- **API Gateway:**
-  - Set up routes for each Lambda, protected by Cognito JWT authorizer
-- **Cognito:**
-  - Create User Pool & App Client, configure domain and sign-in UI
-- **S3:**
-  - Create bucket, set permissions, enable CORS
-- **DynamoDB:**
-  - (Optional) Create table for file metadata
-- **CI/CD:**
-  - Use AWS CodePipeline or GitHub Actions for automation
+1. **Review and customize the template** as needed in `cloudformation-template.yaml` (e.g., bucket names, parameters).
+2. **Deploy using the AWS Console:**
+   - Go to the AWS CloudFormation service in your AWS Console.
+   - Click “Create stack” → “With new resources (standard)”.
+   - Upload the `cloudformation-template.yaml` file.
+   - Follow the prompts to launch the stack.
+3. **Or deploy using the AWS CLI:**
+   ```sh
+   aws cloudformation deploy \
+     --template-file cloudformation-template.yaml \
+     --stack-name your-stack-name \
+     --capabilities CAPABILITY_NAMED_IAM
+   ```
+4. After deployment, check the CloudFormation Outputs tab for resource names, endpoints, and URLs.
+
+**Tip:** You can modify the template to fit your environment or CI/CD pipeline. For advanced automation, integrate with AWS CodePipeline or GitHub Actions.
 
 ---
 
@@ -683,34 +682,6 @@ docker run -p 8080:80 drive-clone
 The app will be available at [http://localhost:8080](http://localhost:8080).
 
 ---
+## 📜 License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-## 🏗️ CloudFormation Template
-
-The full AWS CloudFormation template for this project is provided in the file [`cloudformation-template.yaml`](./template/cloudformation-template.yaml) in the infrastructure/ directory of this repository.
-
-This template provisions all required AWS resources for the backend, including:
-- S3 buckets (for app data and file storage)
-- CloudFront distributions (for static site and file delivery)
-- DynamoDB table (for metadata)
-- Lambda functions (API handlers)
-- API Gateway (HTTP API)
-- Cognito User Pool and User Pool Client
-
-### How to Deploy
-
-1. **Review and customize the template** as needed in `cloudformation-template.yaml` (e.g., bucket names, parameters).
-2. **Deploy using the AWS Console:**
-   - Go to the AWS CloudFormation service in your AWS Console.
-   - Click “Create stack” → “With new resources (standard)”.
-   - Upload the `cloudformation-template.yaml` file.
-   - Follow the prompts to launch the stack.
-3. **Or deploy using the AWS CLI:**
-   ```sh
-   aws cloudformation deploy \
-     --template-file cloudformation-template.yaml \
-     --stack-name your-stack-name \
-     --capabilities CAPABILITY_NAMED_IAM
-   ```
-4. After deployment, check the CloudFormation Outputs tab for resource names, endpoints, and URLs.
-
-**Tip:** You can modify the template to fit your environment or CI/CD pipeline. For advanced automation, integrate with AWS CodePipeline or GitHub Actions.
