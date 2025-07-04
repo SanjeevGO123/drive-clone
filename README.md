@@ -686,7 +686,7 @@ The app will be available at [http://localhost:8080](http://localhost:8080).
 
 ## 🏗️ CloudFormation Template
 
-The full AWS CloudFormation template for this project is provided in the file [`cloudformation-template.yaml`](./infrastructure/cloudformation-template.yaml) in the infrastructure/ directory of this repository.
+The full AWS CloudFormation template for this project is provided in the file [`cloudformation-template.yaml`](./template/cloudformation-template.yaml) in the infrastructure/ directory of this repository.
 
 This template provisions all required AWS resources for the backend, including:
 - S3 buckets (for app data and file storage)
