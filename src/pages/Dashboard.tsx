@@ -240,7 +240,6 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-
       const res = await fetch(`${API_URL}/api/files/folder`, {
         method: "POST",
         headers: {
