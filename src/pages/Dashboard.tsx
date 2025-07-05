@@ -206,7 +206,7 @@ export default function Dashboard() {
       formData.append("file", fileObj.file);
       formData.append("userId", userId);
       formData.append("prefix", currentPrefix);
-
+      
       const res = await fetch(`${API_URL}/api/files/upload`, {
         method: "POST",
         headers: {
