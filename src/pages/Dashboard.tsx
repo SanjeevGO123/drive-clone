@@ -318,7 +318,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-      const res = await fetch(`${API_URL}/api/files/delete-file/${encodeURIComponent(fileKey)}`, {
+      const res = await fetch(`${API_URL}/api/files/delete-file`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -341,7 +341,7 @@ export default function Dashboard() {
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
       // Lambda-style: use s3Key and userId, folderId is not required in URL
-      const res = await fetch(`${API_URL}/api/files/delete-folder/${encodeURIComponent(folderName)}`, {
+      const res = await fetch(`${API_URL}/api/files/delete-folder`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
