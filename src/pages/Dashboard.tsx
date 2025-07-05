@@ -206,7 +206,7 @@ export default function Dashboard() {
       formData.append("file", fileObj.file);
       formData.append("userId", userId);
       formData.append("prefix", currentPrefix);
-      
+
       const res = await fetch(`${API_URL}/api/files/upload`, {
         method: "POST",
         headers: {
@@ -240,7 +240,8 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-      const res = await fetch(`${API_URL}/api/files/folder`, {
+
+      const res = await fetch(`${API_URL}/api/files/create-folder`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -317,7 +318,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-      const res = await fetch(`${API_URL}/api/files/temp-id`, {
+      const res = await fetch(`${API_URL}/api/files/delete-file/${encodeURIComponent(fileKey)}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -340,7 +341,7 @@ export default function Dashboard() {
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
       // Lambda-style: use s3Key and userId, folderId is not required in URL
-      const res = await fetch(`${API_URL}/api/files/folder/temp-id`, {
+      const res = await fetch(`${API_URL}/api/files/delete-folder/${encodeURIComponent(folderName)}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
