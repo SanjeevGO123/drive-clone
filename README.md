@@ -3,7 +3,7 @@
 A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend using **shadcn/ui** components and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
 ✨ **Latest Update:** Enhanced with cutting-edge liquid glass backgrounds, glassmorphism UI elements, strong password requirements with real-time validation, and fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
-
+ 
 ---
 
 ## 🎨 Design Features
