@@ -117,7 +117,7 @@ export default function Dashboard() {
       if (!userId || !token) throw new Error("User not logged in");
 
       const res = await fetch(
-        `${API_URL}/getFiles?userId=${encodeURIComponent(
+        `${API_URL}/api/files?userId=${encodeURIComponent(
           userId
         )}&prefix=${encodeURIComponent(prefix)}`,
         {
@@ -202,64 +202,26 @@ export default function Dashboard() {
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
 
-      const res = await fetch(`${API_URL}/generatepresignedURL`, {
+      const formData = new FormData();
+      formData.append("file", fileObj.file);
+      formData.append("userId", userId);
+      formData.append("prefix", currentPrefix);
+
+      const res = await fetch(`${API_URL}/api/files/upload`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          filename: currentPrefix + fileObj.file.name,
-          filetype: fileObj.file.type,
-          userId,
-        }),
+        body: formData,
       });
 
-      if (!res.ok) throw new Error("Failed to get upload URL");
+      if (!res.ok) throw new Error("Failed to upload file");
 
-      const { uploadUrl } = await res.json();
-      // Use XMLHttpRequest for progress
-      await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", uploadUrl);
-        xhr.setRequestHeader("Content-Type", fileObj.file.type);
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setUploadQueue((prev) =>
-              prev.map((f) =>
-                f.file === fileObj.file ? { ...f, progress: percent } : f
-              )
-            );
-          }
-        };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            setUploadQueue((prev) =>
-              prev.map((f) =>
-                f.file === fileObj.file ? { ...f, status: "success", progress: 100 } : f
-              )
-            );
-            resolve(null);
-          } else {
-            setUploadQueue((prev) =>
-              prev.map((f) =>
-                f.file === fileObj.file ? { ...f, status: "error", errorMsg: "Upload failed" } : f
-              )
-            );
-            reject(new Error("Upload failed"));
-          }
-        };
-        xhr.onerror = () => {
-          setUploadQueue((prev) =>
-            prev.map((f) =>
-              f.file === fileObj.file ? { ...f, status: "error", errorMsg: "Upload error" } : f
-            )
-          );
-          reject(new Error("Upload error"));
-        };
-        xhr.send(fileObj.file);
-      });
+      setUploadQueue((prev) =>
+        prev.map((f) =>
+          f.file === fileObj.file ? { ...f, status: "success", progress: 100 } : f
+        )
+      );
     } catch (err: any) {
       setUploadQueue((prev) =>
         prev.map((f) =>
@@ -279,7 +241,7 @@ export default function Dashboard() {
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
 
-      const res = await fetch(`${API_URL}/createFolder`, {
+      const res = await fetch(`${API_URL}/api/files/folder`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -327,11 +289,18 @@ export default function Dashboard() {
     if (!newName || oldKey.split('/').pop() === newName) return setRenameModal({ open: false, key: null });
     try {
       const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      const res = await fetch(`${API_URL}/renameFile`, {
+      const userId = localStorage.getItem('username');
+      if (!token || !userId) throw new Error('Not authenticated');
+      const newS3Key = oldKey.replace(/[^/]+$/, newName);
+      const res = await fetch(`${API_URL}/api/files/rename`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ userId, oldKey, newFilename: newName }),
+        body: JSON.stringify({ 
+          userId,
+          newName, 
+          oldS3Key: oldKey, 
+          newS3Key
+        }),
       });
       if (!res.ok) throw new Error('Rename failed');
       await fetchFiles(currentPrefix);
@@ -349,13 +318,13 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-      const res = await fetch(`${API_URL}/deleteFile`, {
+      const res = await fetch(`${API_URL}/api/files/temp-id`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, fileKey }),
+        body: JSON.stringify({ s3Key: fileKey, userId }),
       });
       if (!res.ok) throw new Error("Failed to delete file");
       fetchFiles(currentPrefix);
@@ -371,13 +340,14 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("username");
       if (!token || !userId) throw new Error("Not authenticated");
-      const res = await fetch(`${API_URL}/deleteFolder`, {
+      // Lambda-style: use s3Key and userId, folderId is not required in URL
+      const res = await fetch(`${API_URL}/api/files/folder/temp-id`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, prefix: currentPrefix, folderName }),
+        body: JSON.stringify({ s3Key: `${userId}/${currentPrefix}${folderName}/`, userId }),
       });
       if (!res.ok) throw new Error("Failed to delete folder");
       fetchFiles(currentPrefix);

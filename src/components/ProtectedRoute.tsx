@@ -11,9 +11,16 @@ import { Navigate } from "react-router-dom";
 // ProtectedRoute checks if token exists in localStorage
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("token");
+  const tokenTime = localStorage.getItem("tokenTime");
+  // Check if token exists and is not expired (15 minutes)
+  const isTokenValid =
+    token && tokenTime && Date.now() - parseInt(tokenTime) < 15 * 60 * 1000;
 
-  if (!token) {
-    // Not logged in, redirect to login page
+  if (!isTokenValid) {
+    // Token missing or expired, clear storage and redirect to login
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("tokenTime");
     return <Navigate to="/login" replace />;
   }
 

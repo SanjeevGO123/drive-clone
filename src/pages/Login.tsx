@@ -264,6 +264,7 @@ export default function Login() {
     try {
       const token = await signIn(username, password);
       localStorage.setItem("token", token);
+      localStorage.setItem("tokenTime", Date.now().toString());
       localStorage.setItem("username", username);
       window.location.href = "/dashboard";
     } catch (err: any) {
@@ -299,8 +300,10 @@ export default function Login() {
       });
       // After confirm, sign in automatically
       const token = await signIn(username, password);
+      // After setting token and username, store tokenTime
       localStorage.setItem("token", token);
       localStorage.setItem("username", username);
+      localStorage.setItem("tokenTime", Date.now().toString());
       window.location.href = "/dashboard";
     } catch (err: any) {
       // Show error dialog for wrong OTP
