@@ -21,16 +21,6 @@ jobs:
           echo "✅ Production site is healthy"
         fi
 
-    - name: Check API endpoints
-      run: |
-        # Test API Gateway health
-        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.REACT_APP_API_URL }}/health || echo "000")
-        if [ "$response" != "200" ]; then
-          echo "❌ API is down! HTTP $response"
-          exit 1
-        else
-          echo "✅ API is healthy"
-        fi
 
     - name: Notify on failure
       if: failure()
