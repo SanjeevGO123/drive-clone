@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./Folder.css";
 
 const darkenColor = (hex: string, percent: number) => {
