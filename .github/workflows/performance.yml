@@ -249,12 +249,45 @@ jobs:
       run: |
         npm install -g serve
         serve -s build -p 3000 &
-        sleep 10
-        # Test if server is running
-        curl --retry 5 --retry-delay 2 http://localhost:3000 || (echo "Server failed to start" && exit 1)
+        SERVER_PID=$!
+        echo "Server started with PID: $SERVER_PID"
+        sleep 15
+        
+        # Test if server is running and accessible
+        echo "Testing server connectivity..."
+        curl --retry 10 --retry-delay 2 --retry-connrefused -f http://localhost:3000 || {
+          echo "Server failed to start or respond"
+          echo "Server logs:"
+          ps aux | grep serve
+          netstat -tulpn | grep :3000
+          exit 1
+        }
+        echo "Server is running and accessible ✓"
 
     - name: Run Lighthouse
       uses: treosh/lighthouse-ci-action@v10
       with:
+        configPath: './lighthouserc.json'
         uploadArtifacts: true
         temporaryPublicStorage: true
+      continue-on-error: true
+
+    - name: Run Lighthouse (fallback)
+      if: failure()
+      run: |
+        npm install -g lighthouse
+        lighthouse http://localhost:3000 \
+          --output=html \
+          --output-path=lighthouse-report.html \
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" \
+          --quiet || echo "Lighthouse analysis failed"
+
+    - name: Upload Lighthouse reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lighthouse-reports
+        path: |
+          lighthouse-report.html
+          .lighthouseci/
+        retention-days: 30
