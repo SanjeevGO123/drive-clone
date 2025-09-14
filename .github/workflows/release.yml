@@ -3,12 +3,13 @@ name: "Release"
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'  # Only trigger on semantic version tags like v1.0.0
   workflow_dispatch:
     inputs:
       version:
         description: 'Release version (e.g., v1.0.0)'
         required: true
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -36,6 +37,23 @@ jobs:
     - name: Run tests
       run: npm test -- --coverage --watchAll=false
 
+    - name: Set release version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create and push tag (for manual dispatch)
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
+        git push origin ${{ steps.version.outputs.version }}
+
     - name: Build application
       run: |
         CI=false npm run build
@@ -45,26 +63,34 @@ jobs:
 
     - name: Create build archive
       run: |
-        tar -czf drive-clone-${{ github.ref_name }}.tar.gz build/
-        zip -r drive-clone-${{ github.ref_name }}.zip build/
+        tar -czf drive-clone-${{ steps.version.outputs.version }}.tar.gz build/
+        zip -r drive-clone-${{ steps.version.outputs.version }}.zip build/
 
     - name: Generate changelog
       id: changelog
       run: |
         echo "## What's Changed 🚀" > CHANGELOG.md
         echo "" >> CHANGELOG.md
-        git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+        git log $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "HEAD~10")..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
         echo "" >> CHANGELOG.md
-        echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'initial')...${{ github.ref_name }}" >> CHANGELOG.md
+        echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'initial')...${{ steps.version.outputs.version }}" >> CHANGELOG.md
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}
-        name: Release ${{ github.ref_name }}
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Release ${{ steps.version.outputs.version }}
         body_path: CHANGELOG.md
         files: |
-          drive-clone-${{ github.ref_name }}.tar.gz
-          drive-clone-${{ github.ref_name }}.zip
+          drive-clone-${{ steps.version.outputs.version }}.tar.gz
+          drive-clone-${{ steps.version.outputs.version }}.zip
         draft: false
-        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
+        prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') }}
+
+    - name: Create and push tag (for manual dispatch)
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
+        git push origin ${{ steps.version.outputs.version }}
