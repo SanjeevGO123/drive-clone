@@ -23,37 +23,181 @@ jobs:
     - name: Install dependencies
       run: npm ci --legacy-peer-deps
 
-    - name: Build and analyze bundle
-      run: |
-        CI=false npm run build
-        # Use webpack-bundle-analyzer to generate a static report instead of server mode
-        npx webpack-bundle-analyzer build/static/js/main.*.js --mode static --report bundle-report.html --no-open
+    - name: Build application
+      run: CI=false npm run build
       env:
         REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
         REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 
-    - name: Generate bundle report
+    - name: Analyze bundle size
       run: |
-        echo "## Bundle Size Report 📊" > bundle-report.md
-        echo "" >> bundle-report.md
-        echo "| File | Size | Gzipped |" >> bundle-report.md
-        echo "|------|------|---------|" >> bundle-report.md
-        
-        # Calculate sizes for all JS and CSS files
-        for file in build/static/js/*.js build/static/css/*.css; do
-          if [ -f "$file" ]; then
-            filename=$(basename "$file")
-            size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "0")
-            gzipped=$(gzip -c "$file" | wc -c)
-            # Convert bytes to KB for readability
-            size_kb=$((size / 1024))
-            gzipped_kb=$((gzipped / 1024))
-            echo "| $filename | ${size_kb} KB | ${gzipped_kb} KB |" >> bundle-report.md
-          fi
-        done
-        
-        echo "" >> bundle-report.md
-        echo "📊 **Bundle Analysis HTML Report**: [View Details](./bundle-report.html)" >> bundle-report.md
+        # Create a more robust bundle analyzer script
+        cat > analyze-bundle.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        const { execSync } = require('child_process');
+
+        function getFileSize(filePath) {
+          try {
+            const stats = fs.statSync(filePath);
+            return stats.size;
+          } catch (error) {
+            console.warn(`Could not get size for ${filePath}:`, error.message);
+            return 0;
+          }
+        }
+
+        function getGzippedSize(filePath) {
+          try {
+            // Use system gzip command for accurate gzipped size
+            const command = process.platform === 'win32' 
+              ? `powershell -c "(Get-Content '${filePath}' -Raw | gzip).Length"`
+              : `gzip -c "${filePath}" | wc -c`;
+            const result = execSync(command, { encoding: 'utf8' });
+            return parseInt(result.trim()) || 0;
+          } catch (error) {
+            // Fallback to Node.js zlib if system gzip fails
+            try {
+              const zlib = require('zlib');
+              const content = fs.readFileSync(filePath);
+              return zlib.gzipSync(content).length;
+            } catch (zlibError) {
+              console.warn(`Could not get gzipped size for ${filePath}:`, error.message);
+              return 0;
+            }
+          }
+        }
+
+        function formatBytes(bytes) {
+          return (bytes / 1024).toFixed(1) + ' KB';
+        }
+
+        function analyzeFiles(dir, extension, type) {
+          if (!fs.existsSync(dir)) {
+            console.log(`Directory ${dir} does not exist, skipping ${type} analysis`);
+            return { files: [], total: 0, totalGzipped: 0 };
+          }
+          
+          const files = fs.readdirSync(dir)
+            .filter(file => file.endsWith(extension))
+            .map(file => {
+              const filePath = path.join(dir, file);
+              const size = getFileSize(filePath);
+              const gzippedSize = getGzippedSize(filePath);
+              
+              return {
+                name: file,
+                size: size,
+                gzippedSize: gzippedSize,
+                sizeFormatted: formatBytes(size),
+                gzippedSizeFormatted: formatBytes(gzippedSize)
+              };
+            })
+            .sort((a, b) => b.size - a.size);
+
+          const total = files.reduce((sum, file) => sum + file.size, 0);
+          const totalGzipped = files.reduce((sum, file) => sum + file.gzippedSize, 0);
+
+          return { files, total, totalGzipped };
+        }
+
+        function generateReport() {
+          console.log('Starting bundle analysis...');
+          
+          const buildDir = './build';
+          const jsDir = path.join(buildDir, 'static', 'js');
+          const cssDir = path.join(buildDir, 'static', 'css');
+
+          if (!fs.existsSync(buildDir)) {
+            console.error('Build directory not found. Please run npm run build first.');
+            process.exit(1);
+          }
+
+          const jsAnalysis = analyzeFiles(jsDir, '.js', 'JavaScript');
+          const cssAnalysis = analyzeFiles(cssDir, '.css', 'CSS');
+
+          let report = '## Bundle Size Analysis Report 📊\n\n';
+          
+          // JavaScript files
+          if (jsAnalysis.files.length > 0) {
+            report += '### JavaScript Files\n';
+            report += '| File | Size | Gzipped |\n';
+            report += '|------|------|---------|\n';
+            jsAnalysis.files.forEach(file => {
+              report += `| ${file.name} | ${file.sizeFormatted} | ${file.gzippedSizeFormatted} |\n`;
+            });
+            report += '\n';
+          }
+
+          // CSS files
+          if (cssAnalysis.files.length > 0) {
+            report += '### CSS Files\n';
+            report += '| File | Size | Gzipped |\n';
+            report += '|------|------|---------|\n';
+            cssAnalysis.files.forEach(file => {
+              report += `| ${file.name} | ${file.sizeFormatted} | ${file.gzippedSizeFormatted} |\n`;
+            });
+            report += '\n';
+          }
+
+          // Summary
+          const totalSize = jsAnalysis.total + cssAnalysis.total;
+          const totalGzipped = jsAnalysis.totalGzipped + cssAnalysis.totalGzipped;
+
+          report += '### Bundle Summary\n';
+          report += '| Asset Type | Size | Gzipped |\n';
+          report += '|------------|------|---------|\n';
+          report += `| JavaScript | ${formatBytes(jsAnalysis.total)} | ${formatBytes(jsAnalysis.totalGzipped)} |\n`;
+          report += `| CSS | ${formatBytes(cssAnalysis.total)} | ${formatBytes(cssAnalysis.totalGzipped)} |\n`;
+          report += `| **Total** | **${formatBytes(totalSize)}** | **${formatBytes(totalGzipped)}** |\n\n`;
+
+          // Performance recommendations
+          report += '### Performance Analysis\n';
+          const totalKB = totalSize / 1024;
+          const gzippedKB = totalGzipped / 1024;
+          
+          if (gzippedKB > 250) {
+            report += '🔴 **Critical**: Bundle size is very large (>250KB gzipped). Consider aggressive code splitting and lazy loading.\n';
+          } else if (gzippedKB > 150) {
+            report += '🟡 **Warning**: Bundle size is large (>150KB gzipped). Consider code splitting and optimization.\n';
+          } else if (gzippedKB > 100) {
+            report += '🟠 **Good**: Bundle size is reasonable but could be optimized further.\n';
+          } else {
+            report += '🟢 **Excellent**: Bundle size is optimal for fast loading!\n';
+          }
+
+          report += `\n**Recommendations:**\n`;
+          report += `- Current gzipped size: ${formatBytes(totalGzipped)}\n`;
+          report += `- Target for optimal loading: <100KB gzipped\n`;
+          if (gzippedKB > 100) {
+            report += `- Consider implementing code splitting with React.lazy()\n`;
+            report += `- Analyze and reduce large dependencies\n`;
+            report += `- Use tree shaking to eliminate unused code\n`;
+          }
+
+          fs.writeFileSync('bundle-report.md', report);
+          
+          console.log('Bundle analysis complete!');
+          console.log(`Total bundle size: ${formatBytes(totalSize)}`);
+          console.log(`Total gzipped size: ${formatBytes(totalGzipped)}`);
+          
+          return { totalSize, totalGzipped };
+        }
+
+        // Run the analysis
+        try {
+          generateReport();
+        } catch (error) {
+          console.error('Bundle analysis failed:', error);
+          process.exit(1);
+        }
+        EOF
+
+        # Run the analysis
+        node analyze-bundle.js
+      env:
+        REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+        REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 
     - name: Comment PR
       if: github.event_name == 'pull_request'
@@ -74,9 +218,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bundle-analysis
-        path: |
-          bundle-report.html
-          bundle-report.md
+        path: bundle-report.md
         retention-days: 30
 
   lighthouse:
