@@ -1,4 +1,4 @@
-name: "Performance Analysis"
+name: "Performance Analysis & Lighthouse"
 
 on:
   pull_request:
