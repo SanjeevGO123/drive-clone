@@ -1,0 +1,44 @@
+name: "Dependency Update"
+
+on:
+  schedule:
+    - cron: '0 2 * * 1' # Every Monday at 2 AM
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Update dependencies
+      run: |
+        npm update
+        npm audit fix
+
+    - name: Run tests
+      run: |
+        npm ci --legacy-peer-deps
+        CI=false npm test -- --watchAll=false
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: 'Automated dependency updates'
+        body: |
+          Automated dependency updates by GitHub Actions
+          
+          - Updated npm packages to latest versions
+          - Fixed security vulnerabilities
+          - All tests passing ✅
+        branch: dependency-updates

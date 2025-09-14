@@ -1,0 +1,68 @@
+name: "Release"
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+
+    - name: Run tests
+      run: npm test -- --coverage --watchAll=false
+
+    - name: Build application
+      run: CI=false npm run build
+
+    - name: Create build archive
+      run: |
+        tar -czf drive-clone-${{ github.ref_name }}.tar.gz build/
+        zip -r drive-clone-${{ github.ref_name }}.zip build/
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        echo "## What's Changed 🚀" > CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'initial')...${{ github.ref_name }}" >> CHANGELOG.md
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        body_path: CHANGELOG.md
+        files: |
+          drive-clone-${{ github.ref_name }}.tar.gz
+          drive-clone-${{ github.ref_name }}.zip
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
+
+    - name: Deploy to production
+      uses: ./.github/workflows/multi-env-deploy.yml
+      with:
+        environment: production

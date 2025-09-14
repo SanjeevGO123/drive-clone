@@ -1,0 +1,55 @@
+name: "Health Check"
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Application Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check production site
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.PRODUCTION_URL }} || echo "000")
+        if [ "$response" != "200" ]; then
+          echo "❌ Production site is down! HTTP $response"
+          exit 1
+        else
+          echo "✅ Production site is healthy"
+        fi
+
+    - name: Check API endpoints
+      run: |
+        # Test API Gateway health
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.REACT_APP_API_URL }}/health || echo "000")
+        if [ "$response" != "200" ]; then
+          echo "❌ API is down! HTTP $response"
+          exit 1
+        else
+          echo "✅ API is healthy"
+        fi
+
+    - name: Notify on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 Health Check Failed',
+            body: `
+            ## Health Check Alert 🚨
+            
+            **Time**: ${new Date().toISOString()}
+            **Status**: Failed
+            **Workflow**: ${context.workflow}
+            **Run**: ${context.runId}
+            
+            Please investigate immediately.
+            `,
+            labels: ['bug', 'urgent', 'health-check']
+          });
