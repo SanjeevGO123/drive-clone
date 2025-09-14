@@ -43,6 +43,7 @@ type HeaderProps = {
   handleUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   viewMode: 'grid' | 'list';
   setViewMode: (mode: 'grid' | 'list') => void;
+  username?: string;
 };
 
 const Header: React.FC<HeaderProps> = ({
@@ -58,6 +59,7 @@ const Header: React.FC<HeaderProps> = ({
   handleUpload,
   viewMode,
   setViewMode,
+  username,
 }) => {
   return (
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white/80 dark:bg-gray-900/80 shadow-xl dark:shadow-gray-900/60 px-6 sm:px-12 py-6 sticky top-0 z-30 gap-4 sm:gap-0 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
@@ -117,6 +119,19 @@ const Header: React.FC<HeaderProps> = ({
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+      
+      {/* Username display */}
+      {username && (
+        <div className="hidden sm:flex items-center gap-2 mx-4">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/20 dark:to-emerald-900/20 rounded-full border border-blue-200 dark:border-blue-700">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {username}
+            </span>
+          </div>
+        </div>
+      )}
+      
       {/* Responsive action buttons */}
       <div className="flex flex-wrap gap-3 w-full sm:w-auto sm:flex-nowrap items-center justify-end">
         {/* View toggle */}
@@ -219,47 +234,61 @@ const Header: React.FC<HeaderProps> = ({
         <ThemeToggle className="ml-4" />
       </div>
       {/* Mobile breadcrumbs below header */}
-      <Breadcrumb className="flex sm:hidden mt-2">
-        <BreadcrumbList className="text-sm">
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => fetchFiles("")}
-                aria-label="Go to root directory"
-                className="font-medium text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
-              >
-                Drive
-              </Button>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          {breadcrumbs.map(({ name, prefix }, i) => (
-            <React.Fragment key={prefix}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                {i === breadcrumbs.length - 1 ? (
-                  <BreadcrumbPage className="font-medium text-blue-600 dark:text-blue-300">
-                    {name}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => fetchFiles(prefix)}
-                      aria-label={`Go to folder ${name}`}
-                      className="text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
-                    >
+      <div className="flex sm:hidden mt-2 flex-col gap-2">
+        {/* Mobile username display */}
+        {username && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/20 dark:to-emerald-900/20 rounded-full border border-blue-200 dark:border-blue-700">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {username}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        <Breadcrumb>
+          <BreadcrumbList className="text-sm">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fetchFiles("")}
+                  aria-label="Go to root directory"
+                  className="font-medium text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
+                >
+                  Drive
+                </Button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {breadcrumbs.map(({ name, prefix }, i) => (
+              <React.Fragment key={prefix}>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  {i === breadcrumbs.length - 1 ? (
+                    <BreadcrumbPage className="font-medium text-blue-600 dark:text-blue-300">
                       {name}
-                    </Button>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </React.Fragment>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => fetchFiles(prefix)}
+                        aria-label={`Go to folder ${name}`}
+                        className="text-blue-600 dark:text-blue-300 btn-liquid-glass-blue h-auto p-1"
+                      >
+                        {name}
+                      </Button>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+              </React.Fragment>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
     </header>
   );
 };

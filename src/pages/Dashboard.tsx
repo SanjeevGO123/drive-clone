@@ -530,6 +530,7 @@ export default function Dashboard() {
         handleUpload={handleUpload}
         viewMode={viewMode}
         setViewMode={setViewMode}
+        username={userId}
       />
 
       {/* Selection toolbar */}
