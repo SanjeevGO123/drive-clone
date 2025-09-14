@@ -82,7 +82,8 @@ jobs:
       run: npm ci --legacy-peer-deps
 
     - name: Build application
-      run: CI=false npm run build
+      run: |
+        CI=false npm run build
 
     - name: Serve build
       run: |

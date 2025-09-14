@@ -34,7 +34,8 @@ jobs:
       run: npm test -- --coverage --watchAll=false
 
     - name: Build application
-      run: CI=false npm run build
+      run: |
+        CI=false npm run build
 
     - name: Create build archive
       run: |
