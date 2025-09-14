@@ -29,6 +29,9 @@ jobs:
         npx webpack-bundle-analyzer build/static/js/*.js --mode server --port 3001 &
         sleep 5
         curl http://localhost:3001 > bundle-report.html
+      env:
+        REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+        REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 
     - name: Install bundle analyzer
       run: npm install -g webpack-bundle-analyzer
@@ -84,6 +87,9 @@ jobs:
     - name: Build application
       run: |
         CI=false npm run build
+      env:
+        REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+        REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 
     - name: Serve build
       run: |

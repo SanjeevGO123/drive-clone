@@ -92,13 +92,12 @@ const Folder = ({
     });
   };
 
-  const folderStyle: React.CSSProperties = {
-    // Type assertion to allow CSS custom properties
-    ["--folder-color" as any]: color,
-    ["--folder-back-color" as any]: folderBackColor,
-    ["--paper-1" as any]: paper1,
-    ["--paper-2" as any]: paper2,
-    ["--paper-3" as any]: paper3,
+  const folderStyle: React.CSSProperties & Record<string, string> = {
+    "--folder-color": color,
+    "--folder-back-color": folderBackColor,
+    "--paper-1": paper1,
+    "--paper-2": paper2,
+    "--paper-3": paper3,
   };
 
   const folderClassName = `folder ${open ? "open" : ""}`.trim();

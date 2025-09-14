@@ -8,16 +8,28 @@ import {
 const USER_POOL_ID = process.env.REACT_APP_USER_POOL_ID!;
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID!;
 
-if (!USER_POOL_ID || !CLIENT_ID) {
-  throw new Error("Missing Cognito User Pool ID or Client ID in environment variables");
-}
+// Create a function to check environment variables only when needed
+const validateConfig = () => {
+  if (!USER_POOL_ID || !CLIENT_ID) {
+    throw new Error("Missing Cognito User Pool ID or Client ID in environment variables");
+  }
+};
 
 const poolData = {
   UserPoolId: USER_POOL_ID,
   ClientId: CLIENT_ID,
 };
 
-const userPool = new CognitoUserPool(poolData);
+let userPool: CognitoUserPool;
+
+// Initialize userPool only when needed
+const getUserPool = () => {
+  if (!userPool) {
+    validateConfig();
+    userPool = new CognitoUserPool(poolData);
+  }
+  return userPool;
+};
 
 export const signUp = (
   username: string,
@@ -32,7 +44,7 @@ export const signUp = (
   ];
 
   return new Promise((resolve, reject) => {
-    userPool.signUp(username, password, attributeList, [], (err, result) => {
+    getUserPool().signUp(username, password, attributeList, [], (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -46,7 +58,7 @@ export const signUp = (
 export const confirmSignUp = (username: string, code: string): Promise<void> => {
   const user = new CognitoUser({
     Username: username,
-    Pool: userPool,
+    Pool: getUserPool(),
   });
 
   return new Promise((resolve, reject) => {
@@ -63,7 +75,7 @@ export const confirmSignUp = (username: string, code: string): Promise<void> => 
 export const signIn = (username: string, password: string): Promise<string> => {
   const user = new CognitoUser({
     Username: username,
-    Pool: userPool,
+    Pool: getUserPool(),
   });
 
   const authDetails = new AuthenticationDetails({

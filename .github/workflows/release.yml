@@ -36,6 +36,9 @@ jobs:
     - name: Build application
       run: |
         CI=false npm run build
+      env:
+        REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+        REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 
     - name: Create build archive
       run: |
