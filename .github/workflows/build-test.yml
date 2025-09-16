@@ -6,20 +6,6 @@ on:
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  contents: read
-  pull-requests: read
-  issues: read
-
-env:
-  NODE_VERSION: '20'
-
-on:
-  push:
-    branches: [ "master", "dev" ]
-  pull_request:
-    branches: [ "master" ]
-
 env:
   NODE_VERSION: '20'
 
