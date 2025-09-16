@@ -2,7 +2,7 @@ name: "Build & Test"
 
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: [ "master", "dev" ]
   pull_request:
     branches: [ "master" ]
 
@@ -12,11 +12,11 @@ permissions:
   issues: read
 
 env:
-  NODE_VERSION: '20'ld & Test"
+  NODE_VERSION: '20'
 
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: [ "master", "dev" ]
   pull_request:
     branches: [ "master" ]
 
