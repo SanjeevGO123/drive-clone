@@ -5,7 +5,7 @@ on:
     workflows: ["Build and Test"]
     types:
       - completed
-    branches: [master, develop]
+    branches: [master, dev]
 
 env:
   REGISTRY: ghcr.io
