@@ -2,9 +2,7 @@ name: Build and Publish Docker Image
 
 on:
   workflow_run:
-
     workflows: ["Build & Test"]
-
     types:
       - completed
     branches: [master, dev]
@@ -16,13 +14,21 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     
     permissions:
       contents: read
       packages: write
       
     steps:
+      - name: Debug workflow trigger
+        run: |
+          echo "Workflow triggered by: ${{ github.event.workflow_run.name }}"
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Event: ${{ github.event.workflow_run.event }}"
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Repository: ${{ github.repository }}"
+      
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -35,9 +41,17 @@ jobs:
                repo: context.repo.repo,
                run_id: context.payload.workflow_run.id,
             });
+            
+            console.log("Available artifacts:", allArtifacts.data.artifacts.map(a => a.name));
+            
             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "build-files"
             })[0];
+            
+            if (!matchArtifact) {
+              throw new Error("No build-files artifact found");
+            }
+            
             let download = await github.rest.actions.downloadArtifact({
                owner: context.repo.owner,
                repo: context.repo.repo,
