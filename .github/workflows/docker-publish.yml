@@ -64,7 +64,24 @@ jobs:
       - name: Extract build artifacts
         run: |
           unzip build-files.zip
+          echo "Contents after unzip:"
           ls -la
+          echo "Looking for HTML files:"
+          find . -name "*.html" -o -name "*.js" -o -name "*.css" | head -10
+
+      - name: Prepare build directory structure
+        run: |
+          # The artifacts should contain the build files directly
+          # Let's organize them properly for the Dockerfile
+          if [ -f "index.html" ]; then
+            echo "Build files are in root, creating build directory"
+            mkdir -p build
+            mv *.* build/ 2>/dev/null || true
+            mv static build/ 2>/dev/null || true
+          else
+            echo "Build files structure:"
+            ls -la
+          fi
 
       - name: Create Dockerfile
         run: |
@@ -74,7 +91,7 @@ jobs:
           # Copy the React build files to nginx html directory
           COPY build/ /usr/share/nginx/html/
           
-          # Copy custom nginx configuration if needed
+          # Copy custom nginx configuration
           COPY nginx.conf /etc/nginx/nginx.conf
           
           # Expose port 80
