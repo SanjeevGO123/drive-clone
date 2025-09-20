@@ -66,21 +66,22 @@ jobs:
           unzip build-files.zip
           echo "Contents after unzip:"
           ls -la
-          echo "Looking for HTML files:"
-          find . -name "*.html" -o -name "*.js" -o -name "*.css" | head -10
+          echo "Checking if build directory exists:"
+          ls -la build/ || echo "No build directory found"
+          echo "All files in workspace:"
+          find . -type f | head -20
 
-      - name: Prepare build directory structure
+      - name: Verify build structure
         run: |
-          # The artifacts should contain the build files directly
-          # Let's organize them properly for the Dockerfile
-          if [ -f "index.html" ]; then
-            echo "Build files are in root, creating build directory"
-            mkdir -p build
-            mv *.* build/ 2>/dev/null || true
-            mv static build/ 2>/dev/null || true
+          if [ -d "build" ]; then
+            echo "✅ Build directory exists"
+            echo "Contents of build directory:"
+            ls -la build/
           else
-            echo "Build files structure:"
+            echo "❌ Build directory not found"
+            echo "Available files:"
             ls -la
+            exit 1
           fi
 
       - name: Create Dockerfile
