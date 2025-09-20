@@ -1,5 +1,9 @@
 # 🚀 Drive Clone – Google Drive-Inspired Cloud Storage Platform
 
+![Build & Test](https://github.com/SanjeevGO123/drive-clone/workflows/Build%20&%20Test/badge.svg)
+![CodeQL](https://github.com/SanjeevGO123/drive-clone/workflows/CodeQL%20Analysis/badge.svg)
+![Docker](https://github.com/SanjeevGO123/drive-clone/workflows/Build%20and%20Publish%20Docker%20Image/badge.svg)
+
 A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive. Built with a visually rich React frontend using **shadcn/ui** components and a secure, scalable serverless backend leveraging AWS Lambda, S3, DynamoDB, API Gateway, and CloudFront.
 
 ✨ **Latest Update:** Enhanced with cutting-edge liquid glass backgrounds, glassmorphism UI elements, strong password requirements with real-time validation, and fully migrated to shadcn/ui with enhanced accessibility, modern design system, color-coded file types, loading states, and improved user experience.
@@ -43,7 +47,7 @@ A modern, full-stack, AWS-native cloud storage solution inspired by Google Drive
 
 ### AWS Deployment Pipeline
 ![AWS Deployment Pipeline](./screenshots/deployment-design.jpeg)
-*Visual overview of the AWS CI/CD deployment pipeline and integration*
+*AWS CI/CD pipeline using CodePipeline, CodeBuild, and S3 deployment with CloudFront distribution*
 
 ### Sequence Diagram (Request/Response Model)
 
@@ -478,6 +482,14 @@ This project uses **shadcn/ui** for consistent, accessible, and customizable com
 
 ```
 project-root/
+├── .github/              # GitHub workflows
+│   ├── workflows/
+│   │   ├── build-test.yml
+│   │   ├── codeql-analysis.yml
+│   │   ├── docker-publish.yml
+│   │   ├── health-check.yml
+│   │   ├── performance.yml
+│   │   └── release.yml
 ├── public/                # Static assets
 │   └── index.html
 ├── src/
@@ -560,6 +572,29 @@ This template provisions all required AWS resources for the backend, including:
 - Lambda functions (API handlers)
 - API Gateway (HTTP API)
 - Cognito User Pool and User Pool Client
+- **CodePipeline** (for automated CI/CD)
+- **CodeBuild** (for building and testing)
+- **IAM Roles** (for secure service-to-service communication)
+
+### AWS CI/CD Pipeline Integration
+
+The deployment uses AWS native CI/CD services:
+
+1. **CodePipeline** - Orchestrates the deployment workflow
+   - Source stage: GitHub repository integration
+   - Build stage: CodeBuild for compilation and testing
+   - Deploy stage: S3 deployment with CloudFront invalidation
+
+2. **CodeBuild** - Handles build and test processes
+   - Node.js 20 runtime environment
+   - npm dependencies installation with `--legacy-peer-deps`
+   - React production build compilation
+   - Artifact preparation for S3 deployment
+
+3. **S3 + CloudFront** - Static site hosting
+   - S3 bucket for static asset storage
+   - CloudFront CDN for global content delivery
+   - Automatic cache invalidation on deployments
 
 ### How to Deploy
 
@@ -665,21 +700,149 @@ This template provisions all required AWS resources for the backend, including:
 
 Inspired by the Google Drive UX. Built for modern, cloud-native deployment on AWS. Contributions and feedback welcome!
 
----
 
-## 🐳 Docker Usage
 
-You can build and run the app in a container using Docker:
+## 🚀 CI/CD & GitHub Actions Workflows
 
-```powershell
-# Build the Docker image
-docker build -t drive-clone .
+This project uses GitHub Actions for automated continuous integration, deployment, and monitoring. All workflows are configured to use GitHub secrets for sensitive environment variables (AWS Cognito configuration).
 
-# Run the container (serves on http://localhost:8080)
-docker run -p 8080:80 drive-clone
+### 🔧 Core Workflows
+
+#### **Build & Test** (`build-test.yml`)
+**Triggers:** Push to `master`/`dev`, Pull requests to `master`  
+**Purpose:** Validates code quality and functionality
+
+- ✅ **ESLint Analysis** - Code style and quality checks (max 100 warnings)
+- 🔍 **TypeScript Check** - Static type analysis with `tsc --noEmit`
+- 🧪 **Unit Tests** - Jest test suite with coverage reporting
+- 📊 **Coverage Upload** - Codecov integration for coverage tracking
+- 🏗️ **Production Build** - Validates the app builds successfully
+
+```yaml
+env:
+  REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+  REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
 ```
 
-The app will be available at [http://localhost:8080](http://localhost:8080).
+#### **CodeQL Security Analysis** (`codeql-analysis.yml`)
+**Triggers:** Push to `master`/`dev`, Pull requests, Weekly schedule  
+**Purpose:** Automated security vulnerability scanning
+
+- 🔒 **Static Analysis** - CodeQL for JavaScript/TypeScript
+- 🛡️ **Security Scanning** - Identifies potential vulnerabilities
+- 📅 **Scheduled Scans** - Weekly security audits (Sundays 1:30 AM)
+- 📋 **Security Alerts** - Automatic issue creation for findings
+
+#### **Performance Analysis** (`performance.yml`)
+**Triggers:** Pull requests to `master`, Manual dispatch  
+**Purpose:** Performance monitoring and optimization
+
+- 📦 **Bundle Size Analysis** - Tracks JavaScript bundle sizes
+- 🚨 **Size Limit Enforcement** - Fails if bundles exceed thresholds:
+  - Main bundle: 1MB limit
+  - Individual chunks: 500KB limit
+- 🏠 **Lighthouse CI** - Automated performance, accessibility, and SEO audits
+- 📊 **Performance Metrics** - Core Web Vitals tracking
+- 💬 **PR Comments** - Automatic performance reports on pull requests
+
+### 🐳 Deployment Workflows
+
+#### **AWS CI/CD Pipeline** 
+**Platform:** AWS CodePipeline + CodeBuild + S3  
+**Purpose:** Automated deployment to AWS infrastructure
+
+- 🚀 **CodePipeline** - Orchestrates the entire CI/CD workflow
+- 🏗️ **CodeBuild** - Compiles and builds the React application 
+- 📦 **S3 Deployment** - Deploys static assets to S3 with CloudFront CDN
+- 🔄 **Automated Triggers** - Triggered by repository changes
+- 🎯 **Multi-Environment** - Support for staging and production deployments
+
+**Deployment Flow:** GitHub → CodePipeline → CodeBuild → S3 + CloudFront
+
+#### **Docker Image Publishing** (`docker-publish.yml`)
+**Triggers:** Push to `master`, Manual dispatch  
+**Purpose:** Builds and publishes containerized application
+
+- 🏗️ **React Build** - Compiles optimized production build
+- 🐳 **Docker Image** - Creates containerized app with nginx
+- 📦 **GitHub Packages** - Publishes to `ghcr.io` container registry
+- 🏷️ **Image Tagging** - Tags with commit SHA and `latest`
+- 🔐 **Registry Authentication** - Secure publishing to GitHub Container Registry
+
+**Published Image:** `ghcr.io/SanjeevGO123/drive-clone:latest`
+
+#### **Release Management** (`release.yml`)
+**Triggers:** Git tags (`v*.*.*`), Manual dispatch  
+**Purpose:** Automated release creation and asset publishing
+
+- 📝 **Release Notes** - Auto-generated from git commits and PRs
+- 📦 **Build Artifacts** - Optimized production build assets
+- 🏷️ **Asset Upload** - Release binaries and source archives
+- 📋 **Changelog** - Formatted release documentation
+
+### 📊 Monitoring Workflows
+
+#### **Health Check** (`health-check.yml`)
+**Triggers:** Every 6 hours, Manual dispatch  
+**Purpose:** Production application monitoring
+
+- 🏥 **Uptime Monitoring** - HTTP health checks for production site
+- 🚨 **Failure Alerts** - Automatic issue creation on downtime
+- 📈 **Status Tracking** - Continuous availability monitoring
+- 🔔 **Incident Response** - Immediate notification on failures
+
+### 🔐 Required GitHub Secrets
+
+The following secrets must be configured in your GitHub repository:
+
+```bash
+# AWS Cognito Configuration (Required for all workflows)
+REACT_APP_USER_POOL_ID=your_cognito_user_pool_id
+REACT_APP_CLIENT_ID=your_cognito_app_client_id
+
+# Optional: Production monitoring
+PRODUCTION_URL=https://your-production-site.com
+```
+
+### 🎯 Workflow Features
+
+#### **Dependency Management**
+- 🔧 **Legacy Peer Deps** - Uses `--legacy-peer-deps` for React 18 compatibility
+- 📦 **NPM Cache** - Speeds up builds with dependency caching
+- 🔄 **Auto-retry** - Robust handling of flaky dependency installations
+
+#### **Error Handling & Reporting**
+- 🚨 **Build Failures** - Clear error reporting with actionable feedback
+- 📊 **Test Reports** - Detailed coverage and test result summaries
+- 🔍 **Debug Information** - Comprehensive logging for troubleshooting
+
+#### **Performance Optimizations**
+- ⚡ **Parallel Jobs** - Concurrent execution where possible
+- 💾 **Caching Strategy** - Node modules and build artifacts cached
+- 🎯 **Selective Triggers** - Workflows run only when necessary
+
+#### **Security Best Practices**
+- 🔐 **Minimal Permissions** - Least-privilege access for all workflows
+- 🛡️ **Secret Management** - Secure handling of sensitive environment variables
+- 🔒 **Registry Security** - Signed container images and secure publishing
+
+### 📋 Status Badges
+
+Add these badges to track your project's health:
+
+```markdown
+![Build & Test](https://github.com/<username>/drive-clone/workflows/Build%20&%20Test/badge.svg)
+![CodeQL](https://github.com/<username>/drive-clone/workflows/CodeQL%20Analysis/badge.svg)
+![Docker](https://github.com/<username>/drive-clone/workflows/Build%20and%20Publish%20Docker%20Image/badge.svg)
+```
+
+### 🚀 Getting Started with CI/CD
+
+1. **Fork this repository** to your GitHub account
+2. **Configure secrets** in Settings → Secrets and variables → Actions
+3. **Push to master** or create a pull request to trigger workflows
+4. **Monitor workflow runs** in the Actions tab
+5. **Review security alerts** in the Security tab for CodeQL findings
 
 ---
 ## 📜 License
