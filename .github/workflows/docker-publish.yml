@@ -1,13 +1,9 @@
 name: Build and Publish Docker Image
 
 on:
-  workflow_run:
-
-    workflows: ["Build & Test"]
-
-    types:
-      - completed
-    branches: [master, dev]
+  push:
+    branches: [master]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -16,41 +12,53 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     permissions:
       contents: read
       packages: write
       
     steps:
+      - name: Debug workflow trigger
+        run: |
+          echo "Workflow triggered by: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit SHA: ${{ github.sha }}"
+      
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/github-script@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: context.payload.workflow_run.id,
-            });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "build-files"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-            });
-            let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/build-files.zip`, Buffer.from(download.data));
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Extract build artifacts
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build React application
+        run: CI=false npm run build
+        env:
+          REACT_APP_USER_POOL_ID: ${{ secrets.REACT_APP_USER_POOL_ID }}
+          REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
+
+      - name: Verify build output
         run: |
-          unzip build-files.zip
-          ls -la
+          echo "Build completed successfully!"
+          echo "Contents of build directory:"
+          ls -la build/
+          echo "Build directory size:"
+          du -sh build/
+
+      - name: Create .dockerignore
+        run: |
+          cat > .dockerignore << 'EOF'
+          # Everything except build output and nginx config
+          **
+          !build/**
+          !nginx.conf
+          EOF
 
       - name: Create Dockerfile
         run: |
@@ -60,7 +68,7 @@ jobs:
           # Copy the React build files to nginx html directory
           COPY build/ /usr/share/nginx/html/
           
-          # Copy custom nginx configuration if needed
+          # Copy custom nginx configuration
           COPY nginx.conf /etc/nginx/nginx.conf
           
           # Expose port 80
