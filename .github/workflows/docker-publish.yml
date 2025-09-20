@@ -2,7 +2,9 @@ name: Build and Publish Docker Image
 
 on:
   workflow_run:
-    workflows: ["Build and Test"]
+
+    workflows: ["Build & Test"]
+
     types:
       - completed
     branches: [master, dev]
