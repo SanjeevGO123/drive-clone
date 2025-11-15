@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
+// Disable static generation for this route
+export const dynamic = 'force-dynamic';
+
 import { signIn, signUp, confirmSignUp } from "../../src/aws/auth";
 import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";

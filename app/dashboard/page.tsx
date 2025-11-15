@@ -2,6 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+// Disable static generation for this route
+export const dynamic = 'force-dynamic';
+
 import { 
   Header, 
   FileGrid, 

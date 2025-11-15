@@ -3,6 +3,9 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Disable static generation for this route
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const router = useRouter();
 
