@@ -1,5 +1,3 @@
-'use client';
-
 // Index file for dashboard components.
 // Exports all components for easy import.
 

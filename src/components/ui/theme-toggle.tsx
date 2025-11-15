@@ -1,33 +1,33 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
 
 interface ThemeToggleProps {
   className?: string;
 }
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className={`relative ${className}`}>
-        <div className="w-16 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-      </div>
-    );
-  }
-
-  const isDark = theme === 'dark';
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
 
   const toggleTheme = () => {
-    setTheme(isDark ? 'light' : 'dark');
+    setIsDark(!isDark);
   };
 
   return (

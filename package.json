@@ -36,8 +36,6 @@
     "input-otp": "^1.4.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.523.0",
-    "next": "^16.0.3",
-    "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -49,14 +47,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "next dev",
-    "next:build": "next build",
-    "next:start": "next start",
     "start": "react-scripts start",
-    "build": "next build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "next lint"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

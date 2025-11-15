@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Button } from '../ui/button';
 import { Trash2, X, MoreHorizontal } from 'lucide-react';
