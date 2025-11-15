@@ -408,7 +408,7 @@ Content-Type: application/json
   "newKey": "user123/documents/new-name.pdf"
 }
 ```
-
+ 
 ---
 
 ### Error Responses
